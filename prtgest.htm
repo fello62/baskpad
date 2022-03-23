@@ -1,0 +1,5575 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>BaskPad</title>
+<link href="img/basket.ico" rel="shortcut icon" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<style>
+table#datcmp th, table#datcmp td {
+ text-align: right;
+ padding: 1px;}
+table.tableinfo td {
+ text-align: left;
+ padding: 2px;}
+canvas#disegno {
+ cursor: crosshair;}
+canvas#pun0, canvas#pun1 {
+ cursor: crosshair;
+ overflow: hidden;
+ display: none;
+ position: absolute;}
+div#campodiv {
+ margin: 0;
+ padding: 0;
+ border: 1px solid blue;
+ float: right;
+ display: none;}
+div#tiridiv2 {
+ margin: 0;
+ padding: 0;
+ float: right;
+ display: none;}
+div.cell {
+ display: none;}
+div.btn-stretti button {
+ padding-left: 2px;
+ padding-right: 2px;}
+button.btn-gioc {
+ padding:4px;
+ font-size:18px;
+ line-height:1.3333333;
+ border-radius:6px;}
+button.btn-gioc.gioc-v {
+ height:47px;
+ width:50px;}
+button.btn-gioc.gioc-o {
+ height:50px;
+ width:50px;}
+div.marginev {
+ margin-top:3px;}
+a.nero {
+ color: white;
+ background-color: #333;}
+.dropdown-submenu {
+ position: relative;}
+.dropdown-submenu .dropdown-menu {
+ top: 0;
+ left: 100%;
+ margin-top: -1px;}
+</style>
+</head>
+<body>
+<div class="container-fluid" id="princ">
+ <form name="f" class="form-horizontal">
+  <div class="form-group" style="margin-bottom: 5px;">
+   <div class="col-xs-9">
+    <div class="dropdown menuprinc" style="float:left;margin-right:5px;">
+     <button id="sharespy" type="button" class="btn btn-lg btn-info" data-toggle="dropdown">
+      <span class="glyphicon glyphicon-menu-hamburger"></span>
+     </button>
+     <ul class="dropdown-menu">
+      <li class="dropdown-submenu">
+       <a href="javascript:void(0);" class="submenu">Impostazioni <b class="caret"></b></a>
+       <ul class="dropdown-menu">
+        <li><a href="javascript:imprilshow();">Rilevazione</a></li>
+        <li><a href="javascript:impintshow();">Intestazioni</a></li>
+        <li><a href="javascript:stackpush(apriprt,5);impnmshow();">Numeri maglia</a></li>
+        <li><a href="javascript:impshareshow();">Sharing</a></li>
+        <li><a href="javascript:sessionStorage.crono=prtrec.codprt;vai('crono.htm');">Cronometro</a></li>
+       </ul>
+      </li>
+      <li class="dropdown-submenu">
+       <a href="javascript:void(0);" class="submenu">Stampe <b class="caret"></b></a>
+       <ul class="dropdown-menu">
+        <li><a href="javascript:stpstatistiche();">Statistiche</a></li>
+        <li><a href="javascript:stppresroster();">Presentazione roster</a></li>
+        <li><a href="javascript:stpmappe(0);">Mappe tiro A</a></li>
+        <li><a href="javascript:stpmappe(1);">Mappe tiro B</a></li>
+        <li><a href="javascript:stpmappaint();">Mappa tiro interattiva</a></li>
+        <li><a href="javascript:stpquintetti();">Quintetti</a></li>
+        <li><a href="javascript:stpreflegg();">Referto leggibile</a></li>
+        <li><a href="javascript:stpattacchi();">Attacchi</a></li>
+        <li><a href="javascript:stpdifese();">Difese</a></li>
+        <li><a href="javascript:stptabcsv();">Tabellini CSV</a></li>
+        <li><a href="javascript:stptabtxt();">Tabellini TXT</a></li>
+        <li><a href="javascript:stpul();">Upload stampe</a></li>
+       </ul>
+      </li>
+      <li class="dropdown-submenu">
+       <a href="javascript:void(0);" class="submenu">Referto <b class="caret"></b></a>
+       <ul class="dropdown-menu">
+        <li><a href="javascript:modrefshow();">Modifica</a></li>
+        <li><a href="javascript:reful();">Upload</a></li>
+        <li><a href="javascript:refrec();">Recupera precedente</a></li>
+        <li><a href="javascript:cercaref();">Ricerca</a></li>
+       </ul>
+      </li>
+      <li><a href="javascript:zoom(-10);"><span class="glyphicon glyphicon-zoom-out"></span></a></li>
+      <li><a href="javascript:zoom(10);"><span class="glyphicon glyphicon-zoom-in"></span></a></li>
+      <li><a href="javascript:chiudiprt();">Chiudi <span>&times;</span></a></li>
+     </ul>
+    </div>
+    <div class="input-group input-group-lg">
+     <input type="text" name="dati" class="form-control">
+     <span class="input-group-btn">
+      <button type="button" class="btn btn-default" id="canc"><span class="glyphicon glyphicon-arrow-left"></span></button>
+      <button type="button" class="btn btn-default" id="spazio">SP</button>
+     </span>
+    </div>
+   </div>
+   <div class="col-xs-3">
+    <button type="submit" class="btn btn-primary btn-lg btn-block"><span class="glyphicon glyphicon-ok"></span></button>
+   </div>
+  </div>
+ </form>
+ <div class="row tablet">
+  <div class="col-xs-12">
+   <div class="btn-group">
+    <button type="button" class="btn btn-default btn-lg punto1">PP</button>
+    <button type="button" class="btn btn-default btn-lg punto1">PR</button>
+    <button type="button" class="btn btn-default btn-lg punto1">SD</button>
+    <button type="button" class="btn btn-default btn-lg punto1">SS</button>
+    <div class="btn-group">
+     <button type="button" class="btn btn-default btn-lg punto1">FF</button>
+     <button type="button" class="btn btn-default btn-lg dropdown-toggle" data-toggle="dropdown"><b class="caret"></b></button>
+     <ul class="dropdown-menu">
+      <li><a href="javascript:void(0);" class="punto1">FFP</a></li>
+      <li><a href="javascript:void(0);" class="punto1">FFA</a></li>
+     </ul>
+    </div>
+    <div class="btn-group">
+     <button type="button" class="btn btn-default btn-lg punto1">FS</button>
+     <button type="button" class="btn btn-default btn-lg dropdown-toggle" data-toggle="dropdown"><b class="caret"></b></button>
+     <ul class="dropdown-menu">
+      <li><a href="javascript:void(0);" class="punto1">FSP</a></li>
+      <li><a href="javascript:void(0);" class="punto1">FSA</a></li>
+     </ul>
+    </div>
+    <button type="button" class="btn btn-default btn-lg punto0 rimbalg">RO</button>
+    <button type="button" class="btn btn-default btn-lg punto0 rimbalg">RD</button>
+    <button type="button" class="btn btn-default btn-lg punto0">AS</button>
+    <button type="button" class="btn btn-default btn-lg punto0">CP</button>
+    <div class="btn-group" style="margin-top:6px;">
+     <button type="button" class="btn btn-default punto0">PRI</button>
+     <button type="button" class="btn btn-default punto1">AP</button>
+     <button type="button" class="btn btn-default punto0 rimbasm">RO</button>
+     <button type="button" class="btn btn-default punto0 rimbasm">RD</button>
+     <button type="button" class="btn btn-default punto0">RFT</button>
+     <button type="button" class="btn btn-default punto1">SC1</button>
+    </div>
+    <button type="button" class="btn btn-warning btn-lg tirilib">TL</button>
+    <button type="button" class="btn btn-warning btn-lg sost">ENT</button>
+    <button type="button" class="btn btn-warning btn-lg sost">&nbsp;S&nbsp;</button>
+    <div class="btn-group" style="margin-top:6px;">
+     <button type="button" class="btn btn-warning quadre">&nbsp;'&nbsp;</button>
+     <button type="button" class="btn btn-warning quadre">NOTE</button>
+     <button type="button" class="btn btn-warning quadre">TMP</button>
+     <button type="button" class="btn btn-warning quadre">AA</button>
+     <button type="button" class="btn btn-warning quadre">AB</button>
+     <button type="button" class="btn btn-warning quadre">DA</button>
+     <button type="button" class="btn btn-warning quadre">DB</button>
+    </div>
+   </div>
+  </div>
+ </div>
+ <div class="row cell btn-stretti">
+  <div class="col-xs-12">
+   <div class="btn-group">
+    <div class="btn-group" id="tirispan">
+     <button type="button" class="btn btn-default punto1">TS1</button>
+     <button type="button" class="btn btn-default punto1">TS0</button>
+     <button type="button" class="btn btn-default punto1">TF1</button>
+     <button type="button" class="btn btn-default punto1">TF0</button>
+     <button type="button" class="btn btn-default punto1">T31</button>
+     <button type="button" class="btn btn-default punto1">T30</button>
+    </div>
+    <div class="btn-group">
+     <button type="button" class="btn btn-default punto1">PP</button>
+     <button type="button" class="btn btn-default punto1">PR</button>
+     <button type="button" class="btn btn-default punto1">SD</button>
+     <button type="button" class="btn btn-default punto1">SS</button>
+     <div class="btn-group">
+      <button type="button" class="btn btn-default punto1">FF</button>
+      <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><b class="caret"></b></button>
+       <ul class="dropdown-menu">
+        <li><a href="javascript:void(0);" class="punto1">FFP</a></li>
+        <li><a href="javascript:void(0);" class="punto1">FFA</a></li>
+       </ul>
+     </div>
+     <div class="btn-group">
+      <button type="button" class="btn btn-default punto1">FS</button>
+      <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><b class="caret"></b></button>
+      <ul class="dropdown-menu">
+       <li><a href="javascript:void(0);" class="punto1">FSP</a></li>
+       <li><a href="javascript:void(0);" class="punto1">FSA</a></li>
+      </ul>
+     </div>
+     <button type="button" class="btn btn-default punto0">RO</button>
+     <button type="button" class="btn btn-default punto0">RD</button>
+     <button type="button" class="btn btn-default punto0">AS</button>
+     <button type="button" class="btn btn-default punto0">CP</button>
+    </div>
+    <div class="btn-group">
+     <button type="button" class="btn btn-default punto0">PRI</button>
+     <button type="button" class="btn btn-default punto1">AP</button>
+     <button type="button" class="btn btn-default punto0">RFT</button>
+     <button type="button" class="btn btn-default punto1">SC1</button>
+    </div>
+    <div class="btn-group">
+     <button type="button" class="btn btn-warning tirilib">TL</button>
+     <button type="button" class="btn btn-warning sost">ENT</button>
+     <button type="button" class="btn btn-warning sost">&nbsp;S&nbsp;</button>
+    </div>
+    <div class="btn-group">
+     <button type="button" class="btn btn-warning quadre">&nbsp;'&nbsp;</button>
+     <button type="button" class="btn btn-warning quadre">NOTE</button>
+     <button type="button" class="btn btn-warning quadre">TMP</button>
+     <button type="button" class="btn btn-warning quadre">AA</button>
+     <button type="button" class="btn btn-warning quadre">AB</button>
+     <button type="button" class="btn btn-warning quadre">DA</button>
+     <button type="button" class="btn btn-warning quadre">DB</button>
+    </div>
+   </div>
+  </div>
+ </div>
+ <div class="row">
+  <div id="giocsqar" class="col-xs-12">
+  </div>
+ </div>
+ <div class="row">
+  <div id="giocsqbr" class="col-xs-12">
+  </div>
+ </div>
+ <div class="row">
+  <div class="col-xs-12">
+   <table class="table table-condensed table-bordered" id="datcmp" style="table-layout: fixed; margin-bottom: 0px;">
+    <tr><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0/0</td><td>0/0</td><td>0/0</td><td>0/0</td></tr>
+    <tr>
+     <th><a href="javascript:mostrainfo('#vedipun',function(s,g){return punti(s,g);},'Punti');" id="vedipun">Punti</a></th>
+     <th>Bonus</th>
+     <th><a href="javascript:mostrainfo('#vediff',function(s,g){return datirec[s][g].dati[vcff];},'Falli fatti');" id="vediff">Ff</a></th>
+     <th><a href="javascript:mostrainfo('#vedifs',function(s,g){return datirec[s][g].dati[vcfs];},'Falli subiti');" id="vedifs">Fs</a></th>
+     <th><a href="javascript:mostrainfo('#vedird',function(s,g){return datirec[s][g].dati[vcrd];},'Rimbalzi difensivi');" id="vedird">Rd</a></th>
+     <th><a href="javascript:mostrainfo('#vediro',function(s,g){return datirec[s][g].dati[vcro];},'Rimbalzi offensivi');" id="vediro">RdAvv</a></th>
+     <th>Sd</th>
+     <th>Ss</th>
+     <th><a href="javascript:mostrainfo('#vedipp',function(s,g){return datirec[s][g].dati[vcpp];},'Palle perse');" id="vedipp">Pp</a></th>
+     <th><a href="javascript:mostrainfo('#vedipr',function(s,g){return datirec[s][g].dati[vcpr];},'Palle recuperate');" id="vedipr">Pr</a></th>
+     <th>Poss</th>
+     <th><a href="javascript:mostrainfo('#vedits',function(s,g){return mostrainfotiri(s,g,vcts1);},'Tiri da sotto');" id="vedits">TS</a></th>
+     <th><a href="javascript:mostrainfo('#veditf',function(s,g){return mostrainfotiri(s,g,vctf1);},'Tiri da fuori');" id="veditf">TF</a></th>
+     <th><a href="javascript:mostrainfo('#vedit3',function(s,g){return mostrainfotiri(s,g,vct31);},'Tiri da tre');" id="vedit3">T3</a></th>
+     <th><a href="javascript:mostrainfo('#veditl',function(s,g){return mostrainfotiri(s,g,vctl1);},'Tiri liberi');" id="veditl">TL</a></th>
+    </tr>
+    <tr><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0/0</td><td>0/0</td><td>0/0</td><td>0/0</td></tr>
+   </table>
+  </div>
+ </div>
+ <div class="row">
+  <div class="col-xs-12">
+   <div id="campogioc" style="float:right;">
+    <div id="giocsqab" style="float:right;"></div>
+    <div id="giocsqa" style="float:right;"></div>
+    <div id="campodiv">
+     <canvas id="disegno" width="560" height="300"></canvas>
+     <canvas id="pun0" width="11" height="11"></canvas>
+     <canvas id="pun1" width="11" height="11"></canvas>
+     <button type="button" class="btn btn-default btn-xs">A</button>
+     <button type="button" class="btn btn-default btn-xs">B</button>
+    </div>
+    <div id="giocsqb" style="float:right;"></div>
+   </div>
+   <div id="tiridiv2" class="tablet">
+    <div class="btn-group-vertical">
+     <button type="button" class="btn btn-default btn-lg punto1">TS1</button>
+     <button type="button" class="btn btn-default btn-lg punto1">TS0</button>
+    </div>
+    <div class="btn-group-vertical">
+     <button type="button" class="btn btn-default btn-lg punto1">TF1</button>
+     <button type="button" class="btn btn-default btn-lg punto1">TF0</button>
+    </div>
+    <div class="btn-group-vertical">
+     <button type="button" class="btn btn-default btn-lg punto1">T31</button>
+     <button type="button" class="btn btn-default btn-lg punto1">T30</button>
+    </div>
+   </div>
+   <div id="refdiv" style="overflow-x: auto; overflow-y: auto; -webkit-overflow-scrolling: touch;">
+    <table class="table table-condensed table-hover table-striped" id="reftab" style="font-size: 75%;">
+    </table>
+   </div>
+  </div>
+ </div>
+</div>
+
+<form name="ril" class="form-horizontal">
+ <div class="modal fade" id="modImpRil" tabindex="-1">
+  <div class="modal-dialog">
+   <div class="modal-content">
+    <div class="modal-header">
+     <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+     <h4 class="modal-title">Impostazioni rilevazione</h4>
+    </div>
+    <div class="modal-body">
+     <div class="form-group">
+      <div class="checkbox col-xs-10 col-xs-offset-1">
+       <label>
+        <input type="checkbox" name="punto" value="1"> Uso del punto automatico per immettere le azioni derivate da altre
+       </label>
+      </div>
+     </div>
+     <div class="form-group">
+      <div class="checkbox col-xs-10 col-xs-offset-1">
+       <label>
+        <input type="checkbox" name="tiridalcampo" value="1"> Rilevazione tiri tramite campo di gioco
+       </label>
+      </div>
+     </div>
+     <div class="form-group">
+      <label class="col-xs-2 col-xs-offset-2 control-label">Tiri da sotto</label>
+      <div class="col-xs-8">
+       <div class="mod">
+        <label class="radio-inline">
+         <input type="radio" name="tsinarea" value="0"> Entro 3 metri
+        </label>
+        <label class="radio-inline">
+         <input type="radio" name="tsinarea" value="1"> In area
+        </label>
+       </div>
+      </div>
+     </div>
+     <div class="form-group">
+      <div class="checkbox col-xs-10 col-xs-offset-1">
+       <label>
+        <input type="checkbox" name="cellulare" value="1"> Rilevazione su cellulare (bottoni più piccoli)
+       </label>
+      </div>
+     </div>
+     <div class="form-group">
+      <label class="col-xs-2 col-xs-offset-2 control-label">Posizione numeri maglia</label>
+      <div class="col-xs-8">
+       <div class="mod">
+        <label class="radio-inline">
+         <input type="radio" name="nmagliagiu" value="0"> Sopra dati comparativi
+        </label>
+        <label class="radio-inline">
+         <input type="radio" name="nmagliagiu" value="1"> Sotto dati comparativi
+        </label>
+       </div>
+      </div>
+     </div>
+    </div>
+    <div class="modal-footer">
+     <button type="button" class="btn btn-lg btn-default" data-dismiss="modal">Annulla</button>
+     <button type="submit" class="btn btn-lg btn-primary">OK</button>
+    </div>
+   </div>
+  </div>
+ </div>
+</form>
+
+<form name="int" class="form-horizontal">
+ <div class="modal fade" id="modImpInt" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+   <div class="modal-content">
+    <div class="modal-header">
+     <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+     <h4 class="modal-title">Intestazioni partita</h4>
+    </div>
+    <div class="modal-body">
+     <div class="form-group">
+      <label class="col-xs-3 control-label">Squadra A</label>
+      <div class="col-xs-3">
+       <input type="text" class="form-control maiusc" name="nomesqa">
+      </div>
+      <label class="col-xs-3 control-label">Squadra B</label>
+      <div class="col-xs-3">
+       <input type="text" class="form-control maiusc" name="nomesqb">
+      </div>
+     </div>
+     <div class="form-group">
+      <label class="col-xs-3 control-label">Nome abbreviato squadra A</label>
+      <div class="col-xs-3">
+       <input type="text" class="form-control maiusc" name="nomecortosqa">
+      </div>
+      <label class="col-xs-3 control-label">Nome abbreviato squadra B</label>
+      <div class="col-xs-3">
+       <input type="text" class="form-control maiusc" name="nomecortosqb">
+      </div>
+     </div>
+     <div class="form-group">
+      <label class="col-xs-3 control-label">Coach A</label>
+      <div class="col-xs-3">
+       <input type="text" class="form-control" name="coacha">
+      </div>
+      <label class="col-xs-3 control-label">Coach B</label>
+      <div class="col-xs-3">
+       <input type="text" class="form-control" name="coachb">
+      </div>
+     </div>
+     <div class="form-group">
+      <label class="col-xs-3 control-label">Arbitri</label>
+      <div class="col-xs-9">
+       <input type="text" class="form-control" name="arbitri">
+      </div>
+     </div>
+     <div class="form-group">
+      <label class="col-xs-3 control-label">Rilevatori</label>
+      <div class="col-xs-9">
+       <input type="text" class="form-control" name="rilevatori">
+      </div>
+     </div>
+     <div class="form-group">
+      <label class="col-xs-3 control-label">Risultato</label>
+      <div class="col-xs-3">
+       <input type="text" class="form-control" name="ris">
+      </div>
+      <label class="col-xs-3 control-label">Parziali</label>
+      <div class="col-xs-3">
+       <input type="text" class="form-control" name="parz">
+      </div>
+     </div>
+     <div class="form-group">
+      <label class="col-xs-3 control-label">Note</label>
+      <div class="col-xs-9">
+       <input type="text" class="form-control" name="note">
+      </div>
+     </div>
+    </div>
+    <div class="modal-footer">
+     <button type="button" class="btn btn-lg btn-default" data-dismiss="modal">Annulla</button>
+     <button type="submit" class="btn btn-lg btn-primary">OK</button>
+    </div>
+   </div>
+  </div>
+ </div>
+</form>
+
+<div class="modal fade" id="modSost" tabindex="-1">
+ <div class="modal-dialog">
+  <div class="modal-content">
+   <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+    <h4 class="modal-title">Sostituzioni</h4>
+   </div>
+   <div class="modal-body">
+    <div class="form-group">
+     <label class="col-xs-3 control-label">Tempo</label>
+     <div class="col-xs-3">
+      <input type="text" class="form-control" id="tempo" maxlength="4">
+      <input type="hidden" id="entrateflag" value="0">
+      <input type="hidden" id="entrateprimotasto" value="1">
+     </div>
+     <div class="col-xs-6 text-center">
+      <div>
+       <button type="button" class="btn btn-default tast">1</button>
+       <button type="button" class="btn btn-default tast">2</button>
+       <button type="button" class="btn btn-default tast">3</button>
+      </div>
+      <div>
+       <button type="button" class="btn btn-default tast">4</button>
+       <button type="button" class="btn btn-default tast">5</button>
+       <button type="button" class="btn btn-default tast">6</button>
+      </div>
+      <div>
+       <button type="button" class="btn btn-default tast">7</button>
+       <button type="button" class="btn btn-default tast">8</button>
+       <button type="button" class="btn btn-default tast">9</button>
+      </div>
+      <div>
+       <button type="button" class="btn btn-default remove"><span class="glyphicon glyphicon-remove-sign"></span></button>
+       <button type="button" class="btn btn-default tast">0</button>
+       <button type="button" class="btn btn-default dele"><span class="glyphicon glyphicon-arrow-left"></span></button>
+      </div>
+     </div>
+    </div>
+    <div class="form-group">Squadra A: <span id="timea"></span></div>
+    <div class="form-group" id="sostsqa">
+    </div>
+    <div class="form-group">Squadra B: <span id="timeb"></span></div>
+    <div class="form-group" id="sostsqb">
+    </div>
+   </div>
+   <div class="modal-footer">
+    <button type="button" class="btn btn-lg btn-default" data-dismiss="modal">Annulla</button>
+    <button type="button" class="btn btn-lg btn-primary">OK</button>
+   </div>
+  </div>
+ </div>
+</div>
+
+<div class="modal fade" id="modTL" tabindex="-1">
+ <div class="modal-dialog modal-sm">
+  <div class="modal-content">
+   <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+    <h4 class="modal-title">Tiri liberi</h4>
+   </div>
+   <div class="modal-body">
+    <div class="form-group">
+     <div class="input-group">
+      <input type="text" class="form-control" id="testotl" maxlength="5">
+      <span class="input-group-btn">
+       <button type="button" class="btn btn-default dele"><span class="glyphicon glyphicon-arrow-left"></span></button>
+      </span>
+     </div>
+    </div>
+   </div>
+   <div class="modal-footer">
+    <div class="form-group">
+     <label class="control-label col-xs-4">Tiri non finali</label>
+     <button type="button" class="btn btn-default btn-lg col-xs-3">1</button>
+     <button type="button" class="btn btn-default btn-lg col-xs-3 col-xs-offset-1">0</button>
+    </div>
+    <div class="form-group">
+     <label class="control-label col-xs-4">Tiri finali</label>
+     <button type="button" class="btn btn-primary btn-lg col-xs-3">1</button>
+     <button type="button" class="btn btn-primary btn-lg col-xs-3 col-xs-offset-1">0</button>
+    </div>
+   </div>
+  </div>
+ </div>
+</div>
+
+<form name="ref" class="form-horizontal">
+ <div class="modal fade" id="modRef" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+   <div class="modal-content">
+    <div class="modal-header">
+     <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+     <h4 class="modal-title">Modifica referto</h4>
+    </div>
+    <div class="modal-body">
+     <textarea class="form-control" name="reftxt" rows="12"></textarea>
+    </div>
+    <div class="modal-footer">
+     <button type="submit" class="btn btn-lg btn-primary">OK</button>
+    </div>
+   </div>
+  </div>
+ </div>
+</form>
+
+<form name="sh" class="form-horizontal">
+ <div class="modal fade" id="modSharing" tabindex="-1">
+  <div class="modal-dialog">
+   <div class="modal-content">
+    <div class="modal-header">
+     <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+     <h4 class="modal-title">Impostazioni sharing</h4>
+    </div>
+    <div class="modal-body">
+     <div class="form-group">
+      <label class="col-xs-3 control-label">URL</label>
+      <div class="col-xs-9">
+       <input type="text" class="form-control" name="url" value="sharing.php">
+      </div>
+     </div>
+     <div class="form-group">
+      <label class="col-xs-3 control-label">Utente</label>
+      <div class="col-xs-9">
+       <input type="password" class="form-control" name="user">
+      </div>
+     </div>
+     <div class="form-group">
+      <label class="col-xs-3 control-label">Password</label>
+      <div class="col-xs-9">
+       <input type="password" class="form-control" name="pass">
+      </div>
+     </div>
+    </div>
+    <div class="modal-footer">
+     <button type="button" class="btn btn-lg btn-danger" data-dismiss="modal">Disattiva</button>
+     <button type="button" class="btn btn-lg btn-success" data-dismiss="modal">Attiva</button>
+    </div>
+   </div>
+  </div>
+ </div>
+</form>
+
+<div class="container" id="modNumMag" style="display: none;">
+ <form name="nm" class="form-horizontal">
+  <input type="hidden" name="dati" value="">
+  <div class="form-group">
+   <div class="col-xs-12 text-center">
+    <h4>Numeri maglia</h4>
+   </div>
+  </div>
+  <div class="form-group" style="font-size: 70%;">
+   <div class="col-xs-6">
+    <table class="table table-hover">
+     <caption>Squadra A</caption>
+     <tbody id="righea">
+     </tbody>
+    </table>
+   </div>
+   <div class="col-xs-6">
+    <table class="table table-hover">
+     <caption>Squadra B</caption>
+     <tbody id="righeb">
+     </tbody>
+    </table>
+   </div>
+  </div>
+  <div class="form-group">
+   <div class="col-xs-12 text-center">
+    <button type="button" class="btn btn-lg btn-default ann">Annulla</button>
+    <button type="submit" class="btn btn-lg btn-primary">OK</button>
+   </div>
+  </div>
+ </form>
+</div>
+
+<script src="js/jquery-1.11.2.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/localforage.min.js"></script>
+<script src="js/fastclick.min.js"></script>
+<script src="js/ctrldata.js"></script>
+<script src="js/bp.js"></script>
+<script>
+<!--
+if (typeof sessionStorage.codprt=='undefined')
+ vai('prtopen.htm');
+
+$(function(){
+ FastClick.attach(document.body);
+});
+
+var stack={f:[],p:[]};
+var cerca={txt:'',arr:[]};
+
+var adrec,attaccoidx,attaccorec,camprec,daticmp,datirec,difesaidx,difesarec,ent,numeri,periodi,prtrec,prt2rec,quintidx,quintrec,reflegg;
+var cambioris,contropiede,contropiedecmb,diff,dq,incmp,info,possiniz,rimbalzooff,selgioc,selgiocidx,selsq,tempodigioco,secondi;
+
+var modificato,presstime,sharing,spia,oldtmp,oldtmpf;
+
+
+var abflag=false;
+var vertflag=false;
+var xmouse=0;
+var ymouse=0;
+var punto=false;
+var tiridalcampo=false;
+var tsinarea=false;
+var cellulare=false;
+var nmagliagiu=false;
+var currzoom=100;
+if (localStorage.punto){
+ punto=(localStorage.punto=='1')?true:false;
+ tiridalcampo=(localStorage.tiridalcampo=='1')?true:false;
+ tsinarea=(localStorage.tsinarea=='1')?true:false;
+ cellulare=(localStorage.cellulare=='1')?true:false;
+ nmagliagiu=(localStorage.nmagliagiu=='1')?true:false;
+ if (localStorage.abflag){
+  abflag=true;
+  setbottonicampo();
+ }
+}
+
+var orientevent=('onorientationchange' in window)?'orientationchange':'resize';
+var orientid;
+$(window).on(orientevent,function(event){
+ clearTimeout(orientid);
+ orientid=setTimeout(function(){
+  orienta();
+ },500);
+});
+
+$(document).on('click','.popover',function(ev){
+ ev.stopPropagation();
+});
+
+$('.dropdown-submenu a.submenu').on("click", function(e){
+ var d=$(this);
+ if (d.hasClass('open')){
+  d.removeClass('open');
+  d.next('ul').hide();
+ } else {
+  $('.dropdown-submenu a.submenu')
+   .removeClass('open')
+   .next('ul').hide();
+  d.addClass('open');
+  d.next('ul').toggle();
+ }
+ e.stopPropagation();
+ e.preventDefault();
+});
+
+$('.menuprinc').on('hidden.bs.dropdown',function(){
+ $('.dropdown-submenu a.submenu')
+  .removeClass('open')
+  .next('ul').hide();
+});
+
+$('#modImpInt').find('input.maiusc').blur(function(event){
+ return maiusc(this);
+});
+$(document.int).on('submit',function(event){
+ impintsave();
+ modificato=true;
+ refiniz();
+ saveallref();
+ return false;
+});
+$('#modImpInt').on('hidden.bs.modal',function(event){
+ impinthide();
+});
+
+$('#modNumMag').find('button.ann').click(function(event){
+ return impnmhide();
+});
+$(document.nm).on('submit',function(event){
+ impnmsave();
+ return false;
+});
+$('#modNumMag').on('click','button.nmag',function(event){
+ var button=$(this);
+ var cg='#nm'+button.data('codgioc');
+ $(cg).val(('  '+button.text()).slice(-2));
+ return false;
+});
+$('#modNumMag').on('blur','input.nmag',function(event){
+ solonumeri(this);
+ var q=('  '+this.value).slice(-2);
+ if (q!='  ')
+  this.value=q;
+});
+
+$(document.ref).on('submit',function(event){
+ return modrefsave();
+});
+
+$(document.ril).on('submit',function(event){
+ return imprilsave();
+});
+$('#modImpRil').on('hidden.bs.modal',function(event){
+ imprilhide();
+});
+$(document.ril.tiridalcampo).click(function(event){
+ var t=this.checked;
+ document.ril.tsinarea[0].disabled=!t;
+ document.ril.tsinarea[1].disabled=!t;
+});
+$(document.ril.cellulare).click(function(event){
+ var t=this.checked;
+ document.ril.nmagliagiu[0].disabled=t;
+ document.ril.nmagliagiu[1].disabled=t;
+});
+
+$(document.f).on('submit',function(event){
+ var s=document.f.dati.value;
+ document.f.dati.value='';
+ s=sintassi(s,1);
+ if (s.length>0){
+  modificato=true;
+  interprete(s,31);
+ }
+ return false;
+});
+
+$('#spazio').click(function(event){
+ document.f.dati.value+=' ';
+});
+
+$('#canc').click(function(event){
+ var s=trim(document.f.dati.value);
+ if (s.length==0){
+  document.f.dati.value='';
+  return false;
+ }
+ s='.'+s.substr(0,s.length-1);
+ var p=s.replace(/\s/g,".");
+ var pu=p.lastIndexOf(".");
+ var qu=p.lastIndexOf("]");
+ if (qu<0)
+  qu=pu;
+ if (qu>pu){
+  qu=p.lastIndexOf("[");
+  p=p.substr(0,qu);
+  pu=p.lastIndexOf(".");
+ }
+ s=s.substr(1,pu);
+ document.f.dati.value=s;
+ return false;
+});
+
+$('.punto1,.punto0').click(function(event){
+ var button=$(this);
+ var s=(button.hasClass('punto1')&&punto)?'.'+((button.text()=='AP')?'SQ':''):' ';
+ document.f.dati.value+=' '+button.text()+s;
+ if (button.is('a')) button.closest('.dropdown-menu').prev().dropdown('toggle');
+ return false;
+});
+
+$('#disegno,#pun0,#pun1')
+.on('mousedown',function(event){
+ event.stopPropagation();
+ tirostart(event.pageX,event.pageY);
+ return false;
+})
+.on('touchstart',function(event){
+ event.stopPropagation();
+ var ev=event.originalEvent;
+ if (ev.touches.length>1)
+  return false;
+ tirostart(ev.touches[0].pageX,ev.touches[0].pageY);
+ return false;
+})
+.on('mouseup',function(event){
+ clearTimeout(presstime);
+ event.stopPropagation();
+ tiroend(event.pageX,event.pageY);
+ return false;
+})
+.on('touchend',function(event){
+ clearTimeout(presstime);
+ event.stopPropagation();
+ var ev=event.originalEvent;
+ if (ev.changedTouches.length>1)
+  return false;
+ var xp,yp,cl,cr,ct,cb;//parte per evitare il touchend fuori dal campo di gioco
+ yp=$('canvas#disegno');
+ xp=yp.offset();
+ cl=parseInt(xp.left,10);
+ ct=parseInt(xp.top,10);
+ cr=cl+parseInt(yp.width(),10);
+ cb=ct+parseInt(yp.height(),10);
+ xp=ev.changedTouches[0].pageX;
+ yp=ev.changedTouches[0].pageY;
+ if ((xp<cl)||(xp>=cr)||(yp<ct)||(yp>=cb)) return false;
+ tiroend(xp,yp);
+ return false;
+});
+
+$('#campodiv').find('button.btn-xs').click(function(event){
+ abflag=!abflag;
+ setbottonicampo();
+ return false;
+});
+
+$('button.quadre').click(function(event){
+ var button=$(this);
+ var dato=trim(button.text());
+ var t=prompt('Immissione: '+dato,'');
+ if (t!=null)
+  document.f.dati.value+=' '+dato+'['+t+'] ';
+});
+
+$('button.tast').click(function(event){
+ var i=$('#tempo');
+ var v;
+ if ($('#entrateprimotasto').val()=='1'){
+  $('#entrateprimotasto').val('0');
+  v='';
+ } else
+  v=i.val();
+ if (v.length<4)
+  i.val(v+$(this).text());
+});
+
+$('button.remove').click(function(event){
+ $('#entrateprimotasto').val('0');
+ $('#tempo').val('');
+});
+
+$('button.dele').click(function(event){
+ $('#entrateprimotasto').val('0');
+ var i=$('#tempo');
+ var v=i.val();
+ if (v.length>0){
+  v=v.substr(0,v.length-1);
+  i.val(v);
+ }
+});
+
+$('#giocsqa,#giocsqb').on('click','button',function(event){
+ var button=$('#giocsqa,#giocsqb').find('button.btn-info');
+ button.removeClass('btn-info');
+ button.addClass(button.data('onc'));
+ button=$(this);
+ button.removeClass(button.data('onc'));
+ button.addClass('btn-info');
+ var v=document.f.dati.value;
+ var s=((v.charAt(v.length-1)!=".")?' ':'')+button.text();
+ document.f.dati.value+=s;
+});
+
+$('#modSost button.btn-primary').click(function(event){
+ var b,button,dopo,entrate,gioc,i,prima,r;
+ $('#modSost').modal('hide');
+ entrate=($('#entrateflag').val()=='1')?true:false;
+ b=$('button[data-sost]');
+ r='';
+ for (i=0;i<b.length;i++){
+  prima=(b.eq(i).data('sost')=='1')?true:false;
+  gioc=b.eq(i).text();
+  dopo=b.eq(i).hasClass('btn-success');
+  if (prima!=dopo)
+   r+=((dopo)?' +':' -')+gioc;
+ }
+ if (r.length>0){
+  r=(entrate?' ENT':' S')+'['+checktempo(1)+r+'] ';
+  document.f.dati.value+=r;
+ }
+});
+
+$('button.sost').click(function(event){
+ var s,i,bnum,ic,fc;
+ secondi=[0,0];
+ var button=$(this);
+ var entrate=(trim(button.text())=='S')?false:true;
+ if (entrate){
+  $('#entrateflag').val('1');
+  $('#modSost h4').text('Entrate');
+  s=((maxent()-minent())>1)?maxent():minent();
+  $('#tempo').val(((s+1>camprec.tempi)?camprec.suppl:camprec.durata)+'00');
+ } else {
+  $('#entrateflag').val('0');
+  $('#modSost h4').text('Sostituzioni');
+ }
+ $('#entrateprimotasto').val('1');
+ for (s=0;s<=1;s++){
+  secondi[s]=60*datirec[s][tot].dati[vcmin]+datirec[s][tot].dati[vcsec];
+  var mm=Math.floor(secondi[s]/60);
+  var ss=secondi[s]%60;
+  $('#time'+('ab'.charAt(s))).text(mm+"'"+('0'+ss).slice(-2)+'"');
+  ic=fc='<div class="btn-group">';
+  bnum=numeri[s].length/4;
+  for (i=0;i<bnum-1;i++){
+   if ((! entrate)&&(datirec[s][i+1].dati[vconc]!=0))
+    ic+='<button type="button" class="btn btn-success" data-sost="1">'+trim(numeri[s].substr(i*4,4))+'</button>';
+   else
+    fc+='<button type="button" class="btn btn-danger" data-sost="0">'+trim(numeri[s].substr(i*4,4))+'</button>';
+  }
+  fc+='</div>';
+  ic+='</div>';
+  $('#sostsq'+'ab'.charAt(s)).html(ic+fc);
+ }
+ $('#modSost').modal('show');
+});
+
+$('#modSost').on('click','button[data-sost]',function(event){
+ var v=checktempo();
+ var button=$(this);
+ var s='AB'.indexOf(button.text().charAt(0));
+ if (button.hasClass('btn-danger')){
+  button.removeClass('btn-danger');
+  button.addClass('btn-success');
+  secondi[s]+=v;
+ } else {
+  button.removeClass('btn-success');
+  button.addClass('btn-danger');
+  secondi[s]-=v;
+ }
+ var mm=Math.floor(secondi[s]/60);
+ var ss=secondi[s]%60;
+ $('#time'+('ab'.charAt(s))).text(mm+"'"+('0'+ss).slice(-2)+'"');
+});
+
+$('button.tirilib').click(function(event){
+ $('#modTL').modal('show');
+});
+
+$('#modTL button.dele').click(function(event){
+ var o=document.getElementById('testotl');
+ o.value=o.value.substr(0,o.value.length-1);
+});
+
+$('#modTL button.btn-lg').click(function(event){
+ var o=document.getElementById('testotl');
+ var button=$(this);
+ if (o.value.substr(0,2)!='TL') o.value='TL';
+ if (o.value.length<5) o.value+=button.text();
+ if (button.hasClass('btn-primary')){
+  $('#modTL').modal('hide');
+  document.f.dati.value+=' '+o.value+(punto?'.':' ');
+  if ('000'.indexOf(o.value.substr(2))==0){
+   var a=document.f.dati.value.lastIndexOf(' AS ');
+   if (a>=0) document.f.dati.value=document.f.dati.value.substr(0,a)+document.f.dati.value.substr(a+4);
+  }
+  o.value='';
+ }
+});
+
+$(document.sh).on('submit',function(){return false;});
+
+spia=$('#sharespy');
+sharing=false;
+oldtmpf=false;
+oldtmp=0;
+$('#modSharing').find('.btn-danger').click(function(){
+ sharingoff();
+});
+$('#modSharing').find('.btn-success').click(function(){
+ sharingon();
+});
+
+mostratiri();
+orienta();
+dispunto();
+apriprt(0);
+
+function apriprt(stato){
+ if (leggendo){
+  setTimeout(function(){apriprt(stato);},100);
+  return;
+ }
+ if (stato==0){
+  if (sessionStorage.codprt==''){
+   //carica dal ref
+   resetdati(false);
+   caricaprtdaref();
+   modificato=true;
+   stato=5;
+  } else {
+   //carica dal DB
+   //mostra la finestra di impostazione rilevazione
+   stackpush(apriprt,2);
+   imprilshow();
+  }
+ }
+ if (stato==2){
+  modificato=false;
+  stackpush(apriprt,3);
+  caricaprtdadb();
+ }
+ if (stato==3){
+  if (modificato){
+   //mostra la finestra intestazioni
+   stackpush(apriprt,4);
+   impintshow();
+  } else {
+   stato=5;
+  }
+ }
+ if (stato==4){
+  if (modificato){
+   //mostra la finestra numeri maglia
+   stackpush(apriprt,5);
+   impnmshow();
+  }
+ }
+ if (stato==5){
+  //sia carica dal ref che carica dal db
+  selgioc=sq;
+  selgiocidx=datirec[0][tot].dati[vcprt]+1;
+  //rilegge il referto
+  interprete(getrigheref(),1);
+  //mostra tutte le finestre di rilevazione
+  mostragioc();
+  mostradaticmp();
+  mostraref();
+  //settare a stringa vuota sessionStorage.codprt per fare carica dal referto una volta fatte le impostazioni iniziali
+  sessionStorage.codprt='';
+  //ripeti orienta per sistemare i riquadri una volta completati
+  orienta();
+ }
+}
+
+function cercaref(){
+ var t=prompt('Ricerca referto',cerca.txt);
+ if (t==null)
+  return;
+ if (t!=''){
+  cerca.txt=String(t).toUpperCase();
+  var r=(getrigheref()).split('\n');
+  cerca.arr=[];
+  for (var x=0;x<r.length-1;x++){
+  if (r[x].indexOf(cerca.txt)>=0)
+   cerca.arr.push(x);
+  }
+  if (cerca.arr.length==0){
+   alert('Nessun valore trovato!');
+   return;
+  }
+  cercarefpopover(0);
+  $(document).one('click',function(){
+   cercarefpopover(-1);
+  });
+ }
+}
+
+function cercarefpopover(riga){
+ if ($('#refdiv').find('.popover')){
+  $('#refdiv')
+  .popover('hide')
+  .popover('destroy');
+ }
+ $('a.nero').removeClass('nero');
+ if (riga==-1)
+  return;
+ setTimeout(function(){
+  $('#refdiv').scrollTop($(document.getElementById("reftab").rows[cerca.arr[riga]]).position().top-$('#reftab').position().top);
+  $(document.getElementById("reftab").rows[cerca.arr[riga]].cells[0]).find('a').addClass('nero');
+  $('#refdiv')
+  .popover({
+   content: function(){
+    var m=riga-1;
+    m=(m<0)?cerca.arr.length-1:m;
+    var h='<a class="btn btn-primary btn-sm" href="javascript:cercarefpopover('+m+');"><span class="glyphicon glyphicon-arrow-left"></span></a> ';
+    m=riga+1;
+    m=(m>=cerca.arr.length)?0:m;
+    h+=(1+riga)+'/'+cerca.arr.length;
+    h+=' <a class="btn btn-primary btn-sm" href="javascript:cercarefpopover('+m+');"><span class="glyphicon glyphicon-arrow-right"></span></a>';
+    return h;
+   },
+   placement: 'top',
+   html: true,
+   title: function(){
+    var h='<span class="glyphicon glyphicon-search"></span>&nbsp;<kbd>'+cerca.txt+'</kbd>';
+    return h;
+   },
+   trigger: 'manual'
+  })
+  .popover('show');
+ },500);
+}
+
+function checktempo(a){
+ var i,v,s,mm,ss;
+ i=$('#tempo');
+ v=i.val();
+ v=parseInt(v,10)||0;
+ s=('000'+v).slice(-4);
+ mm=parseInt(s.substr(0,2),10)||0;
+ ss=parseInt(s.substr(2,2),10)||0;
+ if (ss>=60)
+  ss=59;
+ s=mm+('0'+ss).slice(-2);
+ v=mm*60+ss;
+ i.val(s);
+ if (a)
+  return s;
+ else
+ return v;
+}
+
+function chiudiprt(){
+ if (confirm('CONFERMA\nChiudo la partita?')){
+  //sharingoff();
+  if (modificato){
+   saveprt();
+  } else {
+   localStorage.removeItem('refertotxt');
+   sessionStorage.removeItem('refertoold');
+   localStorage.removeItem('abflag');
+   vai('index.htm');
+  }
+ }
+}
+
+function dispunto(){
+ for (var i=0;i<=1;i++){
+  var canvas=document.getElementById("pun"+i);
+  if (canvas.getContext){
+   var ctx=canvas.getContext("2d");
+   ctx.lineWidth=1;
+   ctx.fillStyle=(i==0)?"red":"lime";
+   ctx.beginPath();
+   ctx.arc(5.5,5.5,5.5,Math.PI,-Math.PI,true);
+   ctx.fill();
+  }
+ }
+}
+
+function impinthide(){
+ stackpop();
+}
+
+function impintsave(){
+ maiusc(document.int.nomesqa);
+ maiusc(document.int.nomesqb);
+ maiusc(document.int.nomecortosqa);
+ maiusc(document.int.nomecortosqb);
+ prt2rec.nomesq[0]=document.int.nomesqa.value;
+ prt2rec.nomesq[1]=document.int.nomesqb.value;
+ prt2rec.nomecortosq[0]=document.int.nomecortosqa.value;
+ prt2rec.nomecortosq[1]=document.int.nomecortosqb.value;
+ prt2rec.coach[0]=document.int.coacha.value;
+ prt2rec.coach[1]=document.int.coachb.value;
+ prt2rec.arbitri=document.int.arbitri.value;
+ prt2rec.rilevatori=document.int.rilevatori.value;
+ prt2rec.ris=document.int.ris.value;
+ prt2rec.parz=document.int.parz.value;
+ prt2rec.note=document.int.note.value;
+ $('#modImpInt').modal('hide');
+ return false;
+}
+
+function impintshow(cb){
+ document.int.nomesqa.value=prt2rec.nomesq[0];
+ document.int.nomesqb.value=prt2rec.nomesq[1];
+ document.int.nomecortosqa.value=prt2rec.nomecortosq[0];
+ document.int.nomecortosqb.value=prt2rec.nomecortosq[1];
+ document.int.coacha.value=prt2rec.coach[0];
+ document.int.coachb.value=prt2rec.coach[1];
+ document.int.arbitri.value=prt2rec.arbitri;
+ document.int.rilevatori.value=prt2rec.rilevatori;
+ document.int.ris.value=prt2rec.ris;
+ document.int.parz.value=prt2rec.parz;
+ document.int.note.value=prt2rec.note;
+ $('#modImpInt').modal('show');
+}
+
+function impnmhide(){
+ $('#modNumMag').hide();
+ $('#princ').show();
+ resetdati(true);
+ caricanummag();
+ stackpop();
+ return false;
+}
+
+function impnmsave(){
+ var numerimaglia=JSON.parse(document.nm.dati.value);
+ //cerco i numeri già esistenti
+ var ng=numerimaglia.ng;
+ var n=-1;
+ var ap=[];
+ var inp=$('#modNumMag').find('input.nmag');
+ for (var s=0;s<=1;s++){
+  var lnum='';
+  for (var i=0;i<ng[s];i++){
+   n++;
+   ap[n]=n;
+   var e=inp.get(n);
+   if (e.value.length==0)
+    continue;
+   if (lnum.indexOf(' '+e.value)>=0){
+    alert('ATTENZIONE\nNumero di maglia esistente!');
+    e.focus();
+    return false;
+   }
+   lnum+=' '+e.value;
+  }
+ }
+ document.nm.dati.value='';
+ //ordina i numeri di maglia
+ for (s=0;s<=1;s++){
+  var flag,start;
+  var ucmb=s*ng[0]-1;
+  do {
+   start=ucmb+1;
+   flag=false;
+   for (i=ng[0]-2+s*ng[1];i>=start;i--){
+    if (inp.get(ap[i]).value>inp.get(ap[i+1]).value){
+     n=ap[i];
+     ap[i]=ap[i+1];
+     ap[i+1]=n;
+     ucmb=i;
+     flag=true;
+    }
+   }
+  } while (flag);
+ }
+ //inserisce i numeri di maglia nel referto
+ var ref=getrigheref().replace(/\n/g,' ');
+ flag=(ref.length>0);
+ start=false;
+ e='<num>\n';
+ n=0;
+ for (s=0;s<=1;s++){
+  for (i=0;i<ng[s];i++){
+   lnum=trim(inp.get(ap[n]).value);
+   if (lnum.length>0){
+    e+='AB'.charAt(s)+lnum+',';
+    e+=numerimaglia.codgioc[ap[n]]+',';
+    e+=numerimaglia.cognome[ap[n]]+',';
+    e+=numerimaglia.nome[ap[n]]+',';
+    e+=numerimaglia.anno[ap[n]]+',';
+    e+=numerimaglia.altezza[ap[n]]+',';
+    e+=numerimaglia.ruolo[ap[n]]+'\n';
+    if ((flag)&&(numerimaglia.nmagliap[ap[n]].length>0)&&(lnum!=numerimaglia.nmagliap[ap[n]])){
+     ucmb=new RegExp(('AB'.charAt(s)+numerimaglia.nmagliap[ap[n]]+' '),'g');
+     ref=ref.replace(ucmb,('ab'.charAt(s)+lnum)+' ');
+     ucmb=new RegExp(('AB'.charAt(s)+numerimaglia.nmagliap[ap[n]]+']'),'g');
+     ref=ref.replace(ucmb,('ab'.charAt(s)+lnum)+']');
+     start=true;
+    }
+   }
+   n++;
+  }
+ }
+ i=prt2rec.referto.indexOf('<num>\n');
+ n=prt2rec.referto.indexOf('</num>\n');
+ if ((flag)&&(start))
+  sessionStorage.refertoold=prt2rec.referto;
+ prt2rec.referto=prt2rec.referto.substr(0,i)+e+prt2rec.referto.substr(n);
+ modificato=true;
+ resetdati(true);
+ caricanummag();
+ if ((flag)&&(start)){
+  s=sintassi(ref,2);
+  setrigheref(s+'\n');
+ }
+ saveallref();
+ $('#modNumMag').hide();
+ $('#princ').show();
+ stackpop();
+ return false;
+}
+
+function impnmshow(cb){
+ var numerimaglia={
+  ng:[0,0],
+  sq:[],
+  codgioc:[],
+  cognome:[],
+  nome:[],
+  nmaglia:[],
+  anno:[],
+  altezza:[],
+  ruolo:[],
+  nmagliap:[]
+ };
+ var mappacodgioc=[];
+ mappacodgioc[0]=[];
+ mappacodgioc[1]=[];
+ for (var i=0;i<adb.sqgioc.length;i++){
+  if (adb.sqgioc[i][adf.sqgioc.codsq]==prtrec.codsq[0])
+   mappacodgioc[0][adb.sqgioc[i][adf.sqgioc.codgioc]]=i;
+  if (adb.sqgioc[i][adf.sqgioc.codsq]==prtrec.codsq[1])
+   mappacodgioc[1][adb.sqgioc[i][adf.sqgioc.codgioc]]=i;
+ }
+ var mappa=[];
+ mappa[0]=[];
+ mappa[1]=[];
+ for(i=0;i<adb.gioc.length;i++){
+  for(var sq=0;sq<=1;sq++){
+   if (mappacodgioc[sq][adb.gioc[i][0]]>-1){
+    var s={codgioc:adb.gioc[i][0],cognome:adb.gioc[i][adf.gioc.cognome],nome:adb.gioc[i][adf.gioc.nome],nmaglia:adb.sqgioc[mappacodgioc[sq][adb.gioc[i][0]]][adf.sqgioc.nmaglia],anno:adb.gioc[i][adf.gioc.anno],altezza:adb.gioc[i][adf.gioc.altezza],ruolo:adb.gioc[i][adf.gioc.ruolo]};
+    mappa[sq].push(s);
+   }
+  }
+ }
+ var r;
+ for (sq=0;sq<=1;sq++){
+  mappa[sq].sort(function(a,b){
+   return ((a.nmaglia==b.nmaglia)?0:((a.nmaglia>b.nmaglia)?1:-1));
+  });
+  var h='';
+  for (i=0;i<mappa[sq].length;i++){
+   r=mappa[sq][i];
+   numerimaglia.ng[sq]++;
+   numerimaglia.sq.push(sq);
+   numerimaglia.codgioc.push(r.codgioc);
+   numerimaglia.cognome.push(r.cognome);
+   numerimaglia.nome.push(r.nome);
+   numerimaglia.nmaglia.push(r.nmaglia);
+   numerimaglia.anno.push(r.anno);
+   numerimaglia.altezza.push(r.altezza);
+   numerimaglia.ruolo.push(r.ruolo);
+   h+='<tr><td>'+r.cognome+' '+r.nome+'</td>';
+   //trovamaglia
+   var v='';
+   for (var k=1;k<=datirec[sq][tot].dati[vcprt];k++){
+    if (datirec[sq][k].codgioc==parseInt(r.codgioc,10)){
+     v=datirec[sq][k].nmaglia;
+     break;
+    }
+   }
+   numerimaglia.nmagliap.push(v);
+   if (v.length>0)
+    v=('  '+v).slice(-2);
+   h+='<td><input type="text" class="form-control input-sm nmag" size="3" maxlength="2" name="nmag[]" value="'+v+'" id="nm'+r.codgioc+'"></td>';
+   h+='<td><button type="button" class="btn btn-default nmag" data-codgioc="'+r.codgioc+'">'+r.nmaglia+'</button></td></tr>';
+  }
+  $('#righe'+('ab'.charAt(sq))).html(h);
+ }
+ document.nm.dati.value=JSON.stringify(numerimaglia);
+ $('#princ').hide();
+ $('#modNumMag').show();
+}
+
+function imprilhide(){
+ stackpop();
+}
+
+function imprilsave(){
+ var d,old,s;
+ old=tsinarea;
+ punto=document.ril.punto.checked;
+ tiridalcampo=document.ril.tiridalcampo.checked;
+ tsinarea=document.ril.tsinarea[1].checked;
+ cellulare=document.ril.cellulare.checked;
+ if (cellulare) nmagliagiu=false;
+ else nmagliagiu=document.ril.nmagliagiu[1].checked;
+ localStorage.punto=(punto)?'1':'0';
+ localStorage.tiridalcampo=(tiridalcampo)?'1':'0';
+ localStorage.tsinarea=(tsinarea)?'1':'0';
+ localStorage.cellulare=(cellulare)?'1':'0';
+ localStorage.nmagliagiu=(nmagliagiu)?'1':'0';
+ mostratiri();
+ if (numeri)
+  mostragioc();
+ $('#modImpRil').modal('hide');
+ orienta();
+ if (old!=tsinarea){
+  old=s=getrigheref();
+  modificato=true;
+  resetdati(true);
+  caricanummag();
+  s=sintassi(s.replace(/\n/g,' '),4);
+  s=interprete(s,3);
+  setrigheref(s);
+  saveallref();
+  mostragioc();
+  mostradaticmp();
+  mostraref();
+  if (sharing){
+   d=eseguidiff(old,s);
+   inviodati('cor',d);
+  }
+ }
+ return false;
+}
+
+function imprilshow(){
+ document.ril.punto.checked=punto;
+ document.ril.tiridalcampo.checked=tiridalcampo;
+ document.ril.tsinarea[0].checked=!(document.ril.tsinarea[1].checked=tsinarea);
+ document.ril.tsinarea[0].disabled=!tiridalcampo;
+ document.ril.tsinarea[1].disabled=!tiridalcampo;
+ document.ril.cellulare.checked=cellulare;
+ document.ril.nmagliagiu[0].checked=!(document.ril.nmagliagiu[1].checked=nmagliagiu);
+ document.ril.nmagliagiu[0].disabled=cellulare;
+ document.ril.nmagliagiu[1].disabled=cellulare;
+ $('#modImpRil').modal('show');
+}
+
+function impshareshow(){
+ $('#modSharing').modal('show');
+}
+
+function modrefsave(){
+ var d,old,s;
+ $('#modRef').modal('hide');
+ s=document.ref.reftxt.value;
+ old=getrigheref();
+ if (s!=old){
+  sessionStorage.refertoold=prt2rec.referto;
+  modificato=true;
+  resetdati(true);
+  caricanummag();
+  s=sintassi(s.replace(/\n/g,' '),0);
+  s=interprete(s,3);
+  setrigheref(s);
+  saveallref();
+  mostragioc();
+  mostradaticmp();
+  mostraref();
+  if (sharing){
+   d=eseguidiff(old,s);
+   inviodati('cor',d);
+  }
+ }
+ return false;
+}
+
+function modrefshow(){
+ document.ref.reftxt.value=getrigheref();
+ $('#modRef').modal('show');
+}
+
+function modrigaref(riga){
+ var cella,d,old,r,s,t;
+ cella=$(document.getElementById("reftab").rows[riga].cells[0]).text();
+ t=prompt('Modifica referto riga '+riga,cella);
+ if (t!=null){
+  s=sintassi(t,2);
+  if (s!=cella){
+   sessionStorage.refertoold=prt2rec.referto;
+   modificato=true;
+   old=getrigheref();
+   r=old.split('\n');
+   r.splice(riga,1,s.replace(/\n/g,' '));
+   resetdati(true);
+   caricanummag();
+   s=sintassi(r.join(' '),0);
+   s=interprete(s,3);
+   setrigheref(s);
+   saveallref();
+   mostragioc();
+   mostradaticmp();
+   mostraref(riga);
+   if (sharing){
+    d=eseguidiff(old,s);
+    inviodati('cor',d);
+   }
+  }
+ }
+}
+
+function mostradaticmp(){
+ var s,d,i,o,f;
+ var celle=$('#datcmp').find('td');
+ for (s=0;s<=1;s++){
+  for (d=dcpunti;d<=dcmp;d++){
+   i=s*dcmp+4*s+d-dcpunti;
+   celle.eq(i).text(daticmp[s][d]);
+   if ((s==0)&&(d>=dcff)){
+    f=false;
+    if (d==dcposs){
+     o=i+dcmp+4;
+     if (Math.abs(daticmp[0][d]-daticmp[1][d])>1)
+      f=true;
+    } else {
+     o=i+dcmp+4+((i%2==0)?1:-1);
+     if (daticmp[0][d]!=daticmp[1][d+((d%2==0)?-1:1)])
+      f=true;
+    }
+    if (f){
+     celle.eq(i).attr('class','danger');
+     celle.eq(o).attr('class','danger');
+    } else {
+     celle.eq(i).attr('class','');
+     celle.eq(o).attr('class','');
+    }
+   }
+  }
+  d=vcts1;
+  while (d<vctl0){
+   i=dcmp+s*dcmp+4*s+(d-vcts1)/2;
+   celle.eq(i).text(datirec[s][tot].dati[d]+'/'+(datirec[s][tot].dati[d]+datirec[s][tot].dati[d+1]));
+   d+=2;
+  }
+ }
+}
+
+function mostragioc(){
+ var s,i,h,bnum,c,ic,fc;
+ for (s=0;s<=1;s++){
+  if (datirec[s][tot].dati[vcprt]==0){
+   ic=fc='';
+  } else {
+   ic='<div id="giocsqic'+'ab'.charAt(s)+'" class="btn-group'+((cellulare||!nmagliagiu)?'':'-vertical marginev')+'">';
+   fc='<div id="giocsqfc'+'ab'.charAt(s)+'" class="btn-group'+((cellulare||!nmagliagiu)?'':'-vertical marginev')+'">';
+   bnum=numeri[s].length/4;
+   for (i=0;i<bnum;i++){
+    c=((s==selsq)&&(i==selgiocidx-1));
+    if ((i<bnum-1)&&(datirec[s][i+1].dati[vconc]==0))
+     fc+='<button type="button" class="btn btn-'+(nmagliagiu?'xs':'sm')+' btn-'+(c?'info':'danger')+'" data-onc="btn-danger">'+trim(numeri[s].substr(i*4,4))+'</button>';
+    else
+     ic+='<button type="button" class="btn '+(cellulare?'':(nmagliagiu?'btn-gioc '+(vertflag?'gioc-v ':'gioc-o '):'btn-lg '))+'btn-'+(c?'info':'success')+'" data-onc="btn-success">'+trim(numeri[s].substr(i*4,4))+'</button>';
+   }
+   fc+='</div>';
+   ic+='</div>';
+  }
+  $('#giocsq'+'ab'.charAt(s)).html((cellulare||!nmagliagiu||!tiridalcampo||vertflag||((s==0)?abflag:!abflag))?ic+fc:fc+ic);
+ }
+}
+
+function mostragiocdisponi(){
+ if (cellulare||!nmagliagiu){
+  $('#giocsqa,#giocsqb').css({'float':'left','display':'inline-block'});
+  $('#giocsqica,#giocsqfca,#giocsqicb,#giocsqfcb')
+    .removeClass('btn-group-vertical marginev')
+    .addClass('btn-group'+(cellulare?' btn-stretti':''));
+  $('#giocsqa').prepend($('#giocsqica'));
+  $('#giocsqb').prepend($('#giocsqicb'));
+  $('#giocsqar').append($('#giocsqa'));
+  $('#giocsqbr').append($('#giocsqb'));
+  $('#giocsqfca button,#giocsqfcb button').removeClass('btn-xs').addClass('btn-sm');
+  if (cellulare) $('#giocsqica button,#giocsqicb button').removeClass('btn-lg btn-gioc gioc-v gioc-o');
+  else $('#giocsqica button,#giocsqicb button').removeClass('btn-gioc gioc-v gioc-o').addClass('btn-lg');
+ } else {
+  $('#giocsqica,#giocsqfca,#giocsqicb,#giocsqfcb')
+   .addClass('btn-group-vertical marginev')
+   .removeClass('btn-group btn-stretti');
+  $('#giocsqfca button,#giocsqfcb button').removeClass('btn-sm').addClass('btn-xs');
+  if (vertflag) s=$('#giocsqab');
+  else s=$('#campogioc');
+  if (!tiridalcampo?vertflag:(vertflag?!abflag:abflag)){
+   s.prepend($('#giocsqa'));
+   s.append($('#giocsqb'));
+  } else {
+   s.prepend($('#giocsqb'));
+   s.append($('#giocsqa'));
+  }
+  if (vertflag){
+   $('#giocsqa').prepend($('#giocsqica'));
+   $('#giocsqb').prepend($('#giocsqicb'));
+   $('#giocsqa,#giocsqb').css({'float':'none','display':'block'});
+   $('.btn-gioc').addClass('gioc-v').removeClass('gioc-o');
+  } else {
+   $('#giocsqa').prepend($('#giocsq'+((!tiridalcampo||abflag)?'i':'f')+'ca'));
+   $('#giocsqb').prepend($('#giocsq'+((!tiridalcampo||!abflag)?'i':'f')+'cb'));
+   $('#giocsqa,#giocsqb').css({'float':'right','display':'inline-block'});
+   $('.btn-gioc').addClass('gioc-o').removeClass('gioc-v');
+  }
+ }
+}
+
+function mostrainfo(o,f,t){
+ var r=$(o);
+ r=r.parent().find('.popover');
+ if (r.hasClass('popover'))
+  return;
+ mostrainfopop(false,o,f,t);
+ $(document).one('click',function(){
+  mostrainfopop(true,o,f,t);
+ });
+}
+
+function mostrainfopop(elim,o,f,t){
+ if (elim){
+  $(o)
+  .popover('hide')
+  .popover('destroy');
+  return;
+ }
+ setTimeout(function(){
+  $(o)
+  .popover({
+   content: function(){
+    var a,g,i,s,v,w;
+    a=new Array();
+    for (s=0;s<=1;s++){
+     i=0;
+     for (g=1;g<=sq;g++){
+      if ((g<=datirec[s][tot].dati[vcprt])||(g==sq)){
+       v=f(s,g);
+       if ((typeof v=='string')||(v>0)){
+        if (typeof a[i]=='undefined')
+         a[i]=new Array();
+        a[i][s*2]=('AB'.charAt(s))+((g<sq)?datirec[s][g].nmaglia:'SQ');
+        a[i][s*2+1]=v;
+        i++;
+       }
+      }
+     }
+    }
+    w='<table class="table table-bordered tableinfo">';
+    for (g=0;g<a.length;g++){
+     w+='<tr>';
+     for (s=0;s<=1;s++){
+      if (s==1)
+       w+='<td style="background-color: #dddddd"></td>';
+      if (a[g][s*2])
+       w+='<td>'+a[g][s*2]+'</td><td><i></i>'+a[g][s*2+1]+'</i></td>';
+      else
+       w+='<td></td><td></td>';
+     }
+     w+='</tr>';
+    }
+    w+='</table>';
+    return w;
+   },
+   placement: function(){
+    return ('PaTi'.indexOf(t.substr(0,2))>=0)?'left':'right';
+   },
+   html: true,
+   title: t,
+   trigger: 'manual'
+  })
+  .popover('show');
+ },500);
+}
+
+function mostrainfotiri(s,g,tipo){
+ var t=datirec[s][g].dati[tipo]+datirec[s][g].dati[tipo+1];
+ if (t==0)
+  return 0;
+ return datirec[s][g].dati[tipo]+'/'+t;
+}
+
+function mostraref(riga){
+ var r=(getrigheref()).split('\n');
+ var d=diff.split('\n');
+ var i=info.split('\n');
+ var h='';
+ for (var x=0;x<r.length-1;x++){
+  h+='<tr>';
+  h+='<td><a href="javascript:modrigaref('+x+');">'+r[x]+'</a></td>';
+  h+='<td>'+d[x]+'</td>';
+  h+='<td>'+i[x]+'</td>';
+  h+='</tr>';
+ }
+ $('#reftab').html(h);
+ if ((typeof riga=='undefined')||(riga>=x))
+  riga=x-1;
+ if (r.length>1)
+  $('#refdiv').scrollTop($(document.getElementById("reftab").rows[riga]).position().top-$('#reftab').position().top);
+}
+
+function mostratiri(){
+ if (cellulare){
+  $('.tablet').hide();
+  $('.cell').show();
+ } else {
+  $('.tablet').show();
+  $('.cell').hide();
+  if (punto){
+   $('.rimbalg').hide();
+   $('.rimbasm').show();
+  } else {
+   $('.rimbalg').show();
+   $('.rimbasm').hide();
+  }
+ }
+ if (tiridalcampo){
+  $('#campodiv').show();
+  $('#tiridiv2').hide();
+  $('#tirispan').hide();
+ } else {
+  $('#campodiv').hide();
+  if (cellulare)
+   $('#tirispan').show();
+  else
+   $('#tiridiv2').show();
+ }
+}
+
+function orienta(){
+ var a=window.orientation||0;
+ var h=$(window).height();
+ var w=$(window).width();
+ var bl,t;
+ var bottoni=$('#campodiv').find('button.btn-xs');
+ var o;
+ $('#pun0,#pun1').css('display','none');
+ var canvas=document.getElementById("disegno");
+ //if (a%180==0){
+ if (h>w){
+  //verticale
+  vertflag=true;
+  $('#campodiv').width('300').height('560').css('background-image','url("img/campov.jpg")');
+  $('#refdiv').height('560');
+  disvert(canvas,560,300,true);
+  o=$('#campodiv').offset();
+  b=bottoni.eq(0);
+  t=o.top+1;
+  l=o.left+141;
+  b.offset({top:t,left:l});
+  b=bottoni.eq(1);
+  t=o.top+539;
+  b.offset({top:t,left:l});
+ } else {
+  //orizzontale
+  vertflag=false;
+  $('#campodiv').width('560').height('300').css('background-image','url("img/campoo.jpg")');
+  $('#refdiv').height('300');
+  disorizz(canvas,560,300,true);
+  o=$('#campodiv').offset();
+  b=bottoni.eq(0);
+  t=o.top+140;
+  l=o.left+1;
+  b.offset({top:t,left:l});
+  b=bottoni.eq(1);
+  l=o.left+541;
+  b.offset({top:t,left:l});
+ }
+ mostragiocdisponi();
+}
+
+function refrec(){
+ if (typeof sessionStorage.refertoold=='undefined'){
+  alert('ATTENZIONE\nNon si sono effettuate modifiche direttamente al referto');
+  return;
+ }
+ var r=prt2rec.referto;
+ prt2rec.referto=sessionStorage.refertoold;
+ sessionStorage.refertoold=r;
+ saveallref();
+ apriprt(0);
+}
+
+function reful(){
+ // per inserire ris e parz nel referto
+ refiniz();
+ saveallref();
+ vai('refexport.htm');
+}
+
+function setbottonicampo(){
+ var b=$('#campodiv').find('button.btn-xs');
+ if (abflag){
+  b.eq(0).text('B');
+  b.eq(1).text('A');
+  localStorage.abflag='1';
+ } else {
+  b.eq(0).text('A');
+  b.eq(1).text('B');
+  localStorage.removeItem('abflag');
+ }
+ mostragiocdisponi();
+}
+
+function stackpop(){
+ if (stack.f.length>0){
+  var funzione=stack.f.pop();
+  var parametro=stack.p.pop();
+  funzione(parametro);
+ }
+}
+
+function stackpush(funzione,parametro){
+ stack.f.push(funzione);
+ stack.p.push(parametro);
+}
+
+function tiroclick(e){
+ var mlt,p,testo,x,xxx,y,yyy;
+ p=(abflag)?1:0;
+ mlt=300/15000;
+ if (vertflag){
+  xxx=(ymouse+0.5)/mlt;
+  yyy=15000-(xmouse+0.5)/mlt;
+ } else {
+  xxx=(xmouse+0.5)/mlt;
+  yyy=(ymouse+0.5)/mlt;
+ }
+ if (xxx>14000){
+  x=Math.round(26425-xxx);
+  y=Math.round(yyy-7500);
+  testo='YX'.substr(p,1);
+ } else {
+  x=Math.round(xxx-1575);
+  y=Math.round(7500-yyy);
+  testo='XY'.substr(p,1);
+ }
+ var s=(rtrim(document.f.dati.value)).toUpperCase();
+ p=s.lastIndexOf('SC1');
+ if ((p>=0)&&(p+4>=s.length)){
+  s=document.f.dati.value;
+  s=s.substring(0,p+3)+'[X'+x+'Y'+y+']'+s.substr(p+3);
+  document.f.dati.value=s;
+ } else {
+  testo=' T'+testo+(e?'1':'0');
+  testo+='[X'+x+'Y'+y+']'+(punto?'.':' ');
+  document.f.dati.value+=testo;
+ }
+ return;
+}
+
+function tiroend(x,y){
+ var fatto;
+ var p=$('#pun0');
+ if (fatto=((p.css('display'))=='none'))
+  p=$('#pun1');
+ p.offset({top:y-5,left:x-5});
+ var o=$('canvas#disegno').offset();
+ xmouse=x-o.left;
+ ymouse=y-o.top;
+ tiroclick(fatto);
+}
+
+function tirostart(x,y){
+ $('#pun1').css('display','none');
+ $('#pun0').css('display','block');
+ $('#pun0').offset({top:y-5,left:x-5});
+ var o=$('canvas#disegno').offset();
+ xmouse=x-o.left;
+ ymouse=y-o.top;
+ presstime=setTimeout(function(){
+  $('#pun0').css('display','none');
+  $('#pun1').css('display','block');
+  $('#pun1').offset({top:y-5,left:x-5});
+ },500);
+}
+
+function zoom(diff){
+ currzoom+=diff;
+ if ((currzoom<50)||(currzoom>100))
+  currzoom=100;
+ var v=(currzoom/100).toFixed(1);
+ var vp=document.querySelector('meta[name=viewport]');
+ vp.setAttribute('content','width=device-width, initial-scale='+v+', minimum-scale='+v+', maximum-scale='+v+', user-scalable=0');
+}
+
+function attaccocerca(s,d){
+ var g,result;
+ for (g=1;g<attaccorec.length;g++)
+  if ((attaccorec[g].nome==d)&&(attaccorec[g].dati[vcprt]==s)){
+   result=g;
+   return result;
+  }
+ //non trovato: crea un nuovo record e ne azzera i dati
+ result=attaccorec.length;
+ attaccorec[result]={
+  nome:'',
+  dati:[]
+ };
+ attaccorec[result].dati=new Array(voci+1);
+ attaccorec[result].nome=d;
+ for (g=1;g<=voci;g++)
+  attaccorec[result].dati[g]=0;
+ attaccorec[result].dati[vcprt]=s;
+ return result;
+}
+
+function caricanummag(){
+ var p=prt2rec.referto.indexOf('<num>\n');
+ var r=prt2rec.referto.indexOf('</num>\n');
+ if (p<0)
+  return;
+ var x=[0,0];
+ numeri=['',''];
+ var num=prt2rec.referto.substring(p,r).split('\n');
+ for (var i=1;i<num.length;i++){
+  if (num[i].length==0)
+   continue;
+  p=num[i].indexOf(',');
+  var nmaglia=num[i].substring(0,p);
+  var s=nmaglia.charCodeAt(0)-65;
+  x[s]++;
+  r=num[i].indexOf(',',p+1);
+  var codgioc=parseInt(num[i].substring(p+1,r),10);
+  p=num[i].indexOf(',',r+1);
+  var cognome=num[i].substring(r+1,p);
+  r=num[i].indexOf(',',p+1);
+  var nome=num[i].substring(p+1,r);
+  p=num[i].indexOf(',',r+1);
+  var anno=num[i].substring(r+1,p);
+  r=num[i].indexOf(',',p+1);
+  var altezza=num[i].substring(p+1,r);
+  var ruolo=num[i].substring(r+1);
+  datirec[s][x[s]].nmaglia=nmaglia.substr(1);
+  numeri[s]+=(nmaglia+'  ').substr(0,4);
+  datirec[s][x[s]].codgioc=codgioc;
+  datirec[s][x[s]].cognome=cognome;
+  datirec[s][x[s]].nome=nome;
+  datirec[s][x[s]].anno=anno;
+  datirec[s][x[s]].altezza=altezza;
+  datirec[s][x[s]].ruolo=ruolo;
+  datirec[s][x[s]].dati[vcprt]=1;
+ }
+ for (s=0;s<=1;s++){
+  datirec[s][tot].dati[vcprt]=x[s];
+  datirec[s][tot].codgioc=-1;
+  datirec[s][tot].cognome='TOTALI';
+  datirec[s][sq].dati[vcprt]=1;
+  datirec[s][sq].codgioc=0;
+  datirec[s][sq].cognome='Squadra';
+  numeri[s]+=('AB'.charAt(s))+'SQ ';
+  datirec[s][sq].nmaglia='SQ';
+ }
+}
+
+function caricaprtdadb(){
+ resetdati(false);
+ prtrec.codprt=sessionStorage.codprt;
+ var s=findrec('prt',prtrec.codprt);
+ var r=adb.prt[s];
+ prtrec.codcamp=r[adf.prt.codcamp];
+ prtrec.codsq[0]=r[adf.prt.codsqa]
+ prtrec.codsq[1]=r[adf.prt.codsqb];
+ prtrec.dataora=r[adf.prt.dataora];
+ prtrec.luogo=r[adf.prt.luogo];
+ prtrec.giornata=r[adf.prt.giornata];
+ prtrec.ngara=r[adf.prt.ngara];
+ s=findrec('camp',prtrec.codcamp);
+ r=adb.camp[s];
+ camprec.annosport=r[adf.camp.annosport];
+ camprec.nomecamp=r[adf.camp.nomecamp];
+ camprec.girone=r[adf.camp.girone];
+ camprec.fase=r[adf.camp.fase];
+ camprec.tempi=parseInt(r[adf.camp.tempi],10);
+ camprec.durata=parseInt(r[adf.camp.durata],10);
+ camprec.suppl=parseInt(r[adf.camp.suppl],10);
+ camprec.maxfalli=parseInt(r[adf.camp.maxfalli],10);
+ s=findrec('sq',prtrec.codsq[0]);
+ r=adb.sq[s];
+ prt2rec.nomesq[0]=r[adf.sq.nomesq];
+ prtrec.sesso[0]=r[adf.sq.sesso];
+ s=findrec('sq',prtrec.codsq[1]);
+ r=adb.sq[s];
+ prt2rec.nomesq[1]=r[adf.sq.nomesq];
+ prtrec.sesso[1]=r[adf.sq.sesso];
+ s=findrec('prt2',prtrec.codprt);
+ r=adb.prt2[s];
+ if (r[adf.prt2.referto].length==0)
+  modificato=true;
+ else {
+  prt2rec.referto=r[adf.prt2.referto];
+  prt2rec.nomesq[0]=r[adf.prt2.nomesqa];
+  prt2rec.nomesq[1]=r[adf.prt2.nomesqb];
+  prt2rec.coach[0]=r[adf.prt2.coacha];
+  prt2rec.coach[1]=r[adf.prt2.coachb];
+  prt2rec.arbitri=r[adf.prt2.arbitri];
+  prt2rec.rilevatori=r[adf.prt2.rilevatori];
+  prt2rec.note=r[adf.prt2.note];
+  prt2rec.ris=r[adf.prt2.ris];
+  prt2rec.parz=r[adf.prt2.parz];
+  prt2rec.nomecortosq[0]=cercarefdb('nomecortosqa');
+  prt2rec.nomecortosq[1]=cercarefdb('nomecortosqb');
+  modificato=false;
+ }
+ refiniz();
+ saveallref();
+ caricanummag();
+ stackpop();
+}
+
+function caricaprtdaref(){
+ prt2rec.referto=localStorage.refertotxt;
+ prtrec.codprt=cercarefdb('codprt');
+ prtrec.codcamp=cercarefdb('codcamp');
+ prtrec.codsq[0]=cercarefdb('codsqa');
+ prtrec.codsq[1]=cercarefdb('codsqb');
+ prtrec.dataora=cercarefdb('dataora');
+ prtrec.luogo=cercarefdb('luogo');
+ prtrec.giornata=cercarefdb('giornata');
+ prtrec.ngara=cercarefdb('ngara');
+ prtrec.sesso[0]=cercarefdb('sessoa');
+ prtrec.sesso[1]=cercarefdb('sessob');
+ camprec.annosport=cercarefdb('annosport');
+ camprec.nomecamp=cercarefdb('nomecamp');
+ camprec.girone=cercarefdb('girone');
+ camprec.fase=cercarefdb('fase');
+ camprec.tempi=cercarefdb('tempi');
+ camprec.durata=cercarefdb('durata');
+ camprec.suppl=cercarefdb('suppl');
+ camprec.maxfalli=cercarefdb('maxfalli');
+ prt2rec.nomesq[0]=cercarefdb('nomesqa');
+ prt2rec.nomesq[1]=cercarefdb('nomesqb');
+ prt2rec.nomecortosq[0]=cercarefdb('nomecortosqa');
+ prt2rec.nomecortosq[1]=cercarefdb('nomecortosqb');
+ prt2rec.coach[0]=cercarefdb('coacha');
+ prt2rec.coach[1]=cercarefdb('coachb');
+ prt2rec.arbitri=cercarefdb('arbitri');
+ prt2rec.rilevatori=cercarefdb('rilevatori');
+ prt2rec.note=cercarefdb('note');
+ prt2rec.ris=cercarefdb('ris');
+ prt2rec.parz=cercarefdb('parz');
+ caricanummag();
+}
+
+function cercarefdb(voce){
+ var p=prt2rec.referto.indexOf('</db>');
+ var result='';
+ if (p<0)
+  return result;
+ var d=prt2rec.referto.substr(0,p);
+ voce='\n'+voce+'=';
+ var v=voce.length;
+ p=d.indexOf(voce);
+ if (p>=0){
+  var r=d.indexOf('\n',p+v);
+  result=d.substr(p+v,r-p-v);
+ }
+ return result;
+}
+
+function difesacerca(s,d){
+ var g,result;
+ for (g=1;g<difesarec.length;g++)
+  if ((difesarec[g].nome==d)&&(difesarec[g].dati[vcprt]==s)){
+   result=g;
+   return result;
+  }
+ //non trovato: crea un nuovo record e ne azzera i dati
+ result=difesarec.length;
+ difesarec[result]={
+  nome:'',
+  dati:[]
+ };
+ difesarec[result].dati=new Array(voci+1);
+ difesarec[result].nome=d;
+ for (g=1;g<=voci;g++)
+  difesarec[result].dati[g]=0;
+ difesarec[result].dati[vcprt]=s;
+ return result;
+}
+
+function eseguidiff(testo1,testo2){
+ var c1,c2,i1,i2,m1,m2,r,s1,s2,t1,t2,trovato;
+ r=new Array();
+ t1=testo1.split('\n');
+ t2=testo2.split('\n');
+ i1=i2=0;
+ while ((i1<t1.length)&&(i2<t2.length)){
+  //linee diverse
+  if (t1[i1]!=t2[i2]){
+   //cerca la prima linea uguale
+   trovato=false;
+   m1=s1=i1;
+   m2=s2=i2;
+   do{
+    m1++;
+    if (m1<t1.length){
+     c1=m1;
+     c2=s2;
+     do{
+      if (t1[c1]==t2[c2]){
+       //trovato linee uguali
+       trovato=true;
+       break;
+      }
+      c2++;
+     } while((c2<=m2)&&(c2<t2.length));
+    }
+    if (trovato) break;
+    m2++;
+    if (m2<t2.length){
+     c1=s1;
+     c2=m2;
+     do{
+      if (t1[c1]==t2[c2]){
+       //trovato linee uguali
+       trovato=true;
+       break;
+      }
+      c1++;
+     } while((c1<=m1)&&(c1<t1.length));
+    }
+    if (trovato) break;
+   } while((m1<t1.length)||(m2<t2.length));
+   if (!trovato){
+    c1=t1.length;
+    c2=t2.length;
+   }
+   r.push(i1+','+i2);
+   for (s1=i1;s1<c1;s1++) r.push('-'+t1[s1]);
+   for (s2=i2;s2<c2;s2++) r.push('+'+t2[s2]);
+   i1=c1;
+   i2=c2;
+  } else {
+   //linee uguali
+   i1++;
+   i2++;
+  }
+ }
+ if ((i1<t1.length)||(i2<t2.length)){
+  r.push(i1+','+i2);
+  for (s1=i1;s1<t1.length;s1++) r.push('-'+t1[s1]);
+  for (s2=i2;s2<t2.length;s2++) r.push('+'+t2[s2]);
+ }
+ return r.join('\n');
+}
+
+function eseguipatch(testo1,testo3){
+ var c,i,p,r,t1,t3;
+ t1=testo1.split('\n');
+ t3=testo3.split('\n');
+ p=r=0;
+ for (i=0;i<t3.length;i++){
+  c=t3[i].charAt(0);
+  if ((c>='0')&&(c<='9')){
+   r=t3[i].indexOf(',');
+   p=parseInt(t3[i],10)||0;
+   r=parseInt(t3[i].substr(r+1),10)||0;
+   if (p>0) p=r;
+  } else if (c=='-'){
+   t1.splice(p,1);
+  } else if (c=='+'){
+   t1.splice(p,0,t3[i].substr(1));
+   p++;
+  }
+ }
+ return t1.join('\n');
+}
+
+function eseguipatchctrl(testo1,testo3){
+ var c,f,i,r,t1,t3;
+ t1=testo1.split('\n');
+ t3=testo3.split('\n');
+ r=0;
+ f=true;
+ for (i=0;i<t3.length;i++){
+  c=t3[i].charAt(0);
+  if ((c>='0')&&(c<='9')){
+   r=parseInt(t3[i],10)||0;
+  } else if (c=='-'){
+   if (t1[r]!=t3[i].substr(1)){
+    f=false;
+    break;
+   }
+   r++;
+  }
+ }
+ return f;
+}
+
+function getdiff(){
+ var i,r,s,result;
+ var u='f r s p ';
+ if (incmp){
+  incmp=false;
+  return incampo();
+ }
+ if (cambioris){
+  cambioris=false;
+  result=daticmp[0][dcpunti]+'-'+daticmp[1][dcpunti];
+ } else
+  result='';
+ i=dcff;
+ while (i<dcpr){
+  for (s=0;s<=1;s++){
+   r=daticmp[s][i]-daticmp[1-s][i+1];
+   if (r!=0){
+    if (result.length>0)
+     result+=' ';
+    result+=r+u.charAt(i-dcff)+('ab'.charAt(s));
+   }
+  }
+  i+=2;
+ }
+ r=Math.floor(Math.abs(daticmp[0][dcposs]-daticmp[1][dcposs])/2);
+ if (r>=1){
+  if (result.length>0)
+   result+=' ';
+  result+=r+'az';
+ }
+ if (contropiedecmb){
+  contropiedecmb=false;
+  if (result.length>0)
+   result+=' ';
+  if ((contropiede&1)!=0)
+   result+='cp1';
+  else
+   result+='cp0';
+ }
+ return result;
+}
+
+function getgiocperref(s,g){
+ if (g<sq)
+  return '#'+datirec[s][g].nmaglia+' '+datirec[s][g].nome+' '+datirec[s][g].cognome;
+ else
+  return 'Squadra';
+}
+
+function getrigheref(){
+ var r='</num>\n';
+ r=prt2rec.referto.indexOf(r)+r.length;
+ return prt2rec.referto.substring(r);
+}
+
+function gioccerca(s,t){
+ var c,i;
+ var result=0;
+ if ((s==0)||(s==1)){
+  c=numeri[s].indexOf((t+'   ').substr(0,3));
+  if ((c%4)==1){
+   result=Math.floor(c/4)+1;
+  }
+ } else {
+  for (i=0;i<=1;i++){
+   c=numeri[i].indexOf((t+'    ').substr(0,4));
+   if ((c%4)==0){
+    s=i;
+    result=Math.floor(c/4)+1;
+    break;
+   }
+  }
+ }
+ if ((result>0)&&(datirec[s][tot].dati[vcprt]<result)){
+  result=sq;
+ }
+ return [s,result];
+}
+
+function incampo(){
+ var x,y;
+ var result='In campo:';
+ for (x=0;x<=1;x++)
+  for (y=1;y<=maxgioc;y++)
+   if (datirec[x][y].dati[vconc]==1)
+    result+=' '+('AB'.charAt(x))+datirec[x][y].nmaglia;
+ return result;
+}
+
+function incdato(s,g,d){
+ datirec[s][g].dati[d]++;
+ datirec[s][tot].dati[d]++;
+}
+
+function interprete(testo,intflag){
+/*
+stati intflag:
+1 aggiorna diff e info
+2 warning non in campo
+4 aggiorna dati visuali
+8 aggiorna il referto
+16 gestione dq
+32 gestione quintetti
+64 referto leggibile
+128 analisi difese
+256 analisi attacchi
+stati contropiede:
+1 contropiede attivato
+2 contropiede squadra A
+4 contropiede squadra B
+stati mostra:
+1 mostra dati comparativi
+2 mostra gioc in campo
+*/
+ var mostra=0;
+ var addreftab='';
+ var result=[];
+ var dif=[];
+ var inf=[];
+ var rl=[];
+ var d,m,n,r,s,t,u,v,dato,giocidx,giocsel,qua,quc,riga,rinfo,sep,sint,sp,sqsel,tdc,tmp;
+ var righe=testo.split('\n');
+ if ((intflag&4)!=0){
+  var righereftab=document.getElementById("reftab").rows.length;
+ }
+ if ((intflag&64)!=0){
+  tmp='';
+  for (n=0;n<=2;n++){
+   rl[n]='';
+  }
+ }
+ r=0;
+ while (r<righe.length){
+  riga=righe[r]+' ';
+  if (trim(riga).length==0){
+   r++;
+   continue;
+  }
+  rinfo='';
+  while (riga.length>0){
+   sp=riga.indexOf(' ');
+   qua=riga.indexOf('[');
+   if ((qua>=0)&&(qua<sp)){
+    quc=riga.indexOf(']',qua);
+    sp=riga.indexOf(' ',quc);
+    sep=qua;
+   } else {
+    sep=sp;
+    qua=-1;
+    quc=-1;
+   }
+   //imposta il testo da cercare
+   tdc=trim(riga.substr(0,sep));
+   //cerca un giocatore di entrambe le squadre
+   sint=-1;
+   s=-1;
+   dato=gioccerca(s,tdc);
+   s=dato[0];
+   dato=dato[1];
+   //se trova un giocatore
+   if (dato>0){
+    sint=0;
+    //modifica giocsel sqsel giocidx
+    sqsel=s;
+    giocsel=dato;
+    if (giocsel==sq){
+     giocidx=datirec[sqsel][tot].dati[vcprt]+1;
+    } else {
+     giocidx=giocsel;
+    }
+    //aggiunge un warning se non era in campo
+    if (((intflag&2)!=0)&&(giocsel<sq)&&(datirec[sqsel][giocsel].dati[vconc]==0)){
+     t='ATT['+trim(numeri[sqsel].substr(giocidx*4-4,4))+': non in campo]';
+     righe.splice(r+1,0,t);
+    }
+   }
+   //dati stat
+   if (sint==-1){
+    v=('FF FS TS1TS0TF1TF0T31T30TL1TL0RO RD SD SS PP PR AS SC1PRIAP RFTFFPFSPFFAFSATL-').indexOf((tdc+'   ').substr(0,3));
+    dato=Math.floor(v/3)+vcff;
+    if ((v%3)==0){
+     sint=0;
+     switch (dato){
+
+      case (vcffp):
+      case (vcffa):
+       if (giocsel<sq)
+        daticmp[sqsel][dcbonus]++;
+       incdato(sqsel,giocsel,vcff);
+       rinfo=datirec[sqsel][giocsel].dati[vcff]+'ff';
+       setdatocmp(sqsel,dcff);
+       if (dato==vcffp){
+        incdato(sqsel,giocsel,vcpp);
+        rinfo+=' '+datirec[sqsel][giocsel].dati[vcpp]+'pp';
+       } else adrec[sqsel].azp++;
+       setdatocmp(sqsel,dcpp);
+       setposs(sqsel,-1);
+       if (((intflag&16)!=0)&&(giocsel<sq)&&(datirec[sqsel][giocsel].dati[vcff]>=camprec.maxfalli))
+        dq=String.fromCharCode(65+sqsel)+datirec[sqsel][giocsel].nmaglia;
+       if ((intflag&32)!=0){
+        quintrec[quintidx[sqsel]].datipro[vcff]++;
+        quintrec[quintidx[1-sqsel]].datiavv[vcff]++;
+        if (dato==vcffp){
+         quintrec[quintidx[sqsel]].datipro[vcpp]++;
+         quintrec[quintidx[1-sqsel]].datiavv[vcpp]++;
+        }
+       }
+       if ((intflag&128)!=0){
+        difesarec[difesaidx[1-sqsel]].dati[vcff]++;
+        if (dato==vcffp) difesarec[difesaidx[1-sqsel]].dati[vcpp]++;
+       }
+       if ((intflag&256)!=0){
+        attaccorec[attaccoidx[sqsel]].dati[vcff]++;
+        if (dato==vcffp) attaccorec[attaccoidx[sqsel]].dati[vcpp]++;
+       }
+       if ((intflag&64)!=0){
+        rl[sqsel]=getgiocperref(sqsel,giocsel);
+        rl[sqsel]=rl[sqsel]+': fallo fatto ('+datirec[sqsel][giocsel].dati[vcff]+')';
+        if (dato==vcffp){
+         rl[sqsel]=rl[sqsel]+' con palla persa';
+         if ((contropiede&1)!=0) rl[sqsel]=rl[sqsel]+' in contropiede';
+        } else rl[sqsel]=rl[sqsel]+' con azione persa';
+        refleggadd(rl);
+       }
+       if (((contropiede&1)!=0)&&(dato==vcffp)){//solo lo sfondamento ffp ferma il contropiede
+        contropiede=0;
+        contropiedecmb=true;
+        adrec[sqsel].cpnum++;
+        adrec[sqsel].cppp++;
+       }
+       if (rimbalzooff)
+        rimbalzooff=false;
+       break;
+
+      case vcff:
+       if (giocsel<sq)
+        daticmp[sqsel][dcbonus]++;
+       incdato(sqsel,giocsel,vcff);
+       rinfo=datirec[sqsel][giocsel].dati[vcff]+'ff';
+       setdatocmp(sqsel,dcff);
+       if (((intflag&16)!=0)&&(giocsel<sq)&&(datirec[sqsel][giocsel].dati[vcff]>=camprec.maxfalli))
+        dq=String.fromCharCode(65+sqsel)+datirec[sqsel][giocsel].nmaglia;
+       if ((intflag&32)!=0){
+        quintrec[quintidx[sqsel]].datipro[vcff]++;
+        quintrec[quintidx[1-sqsel]].datiavv[vcff]++;
+       }
+       if ((intflag&128)!=0)
+        difesarec[difesaidx[1-sqsel]].dati[vcff]++;
+       if ((intflag&256)!=0)
+        attaccorec[attaccoidx[sqsel]].dati[vcff]++;
+       if ((intflag&64)!=0){
+        rl[sqsel]=getgiocperref(sqsel,giocsel);
+        rl[sqsel]=rl[sqsel]+': fallo fatto ('+datirec[sqsel][giocsel].dati[vcff]+')';
+        refleggadd(rl);
+       }
+       break;
+
+      case (vcfsp):
+      case (vcfsa):
+       if (giocsel<sq){
+        incdato(sqsel,giocsel,vcfs);
+        rinfo=datirec[sqsel][giocsel].dati[vcfs]+'fs';
+       } else adrec[sqsel].fssq++;
+       setdatocmp(sqsel,dcfs);
+       adrec[sqsel].azr++;
+       setdatocmp(sqsel,dcpr);
+       setposs(sqsel,1);
+       if (giocsel<sq){
+        if ((intflag&32)!=0){
+         quintrec[quintidx[sqsel]].datipro[vcfs]++;
+         quintrec[quintidx[1-sqsel]].datiavv[vcfs]++;
+        }
+        if ((intflag&128)!=0){
+         difesarec[difesaidx[1-sqsel]].dati[vcfs]++;
+        }
+        if ((intflag&256)!=0){
+         attaccorec[attaccoidx[sqsel]].dati[vcfs]++;
+        }
+        if ((intflag&64)!=0){
+         rl[sqsel]=getgiocperref(sqsel,giocsel);
+         rl[sqsel]=rl[sqsel]+': fallo subito';
+         refleggadd(rl);
+        }
+       }
+       break;
+
+      case vcfs:
+       if (giocsel<sq){
+        incdato(sqsel,giocsel,vcfs);
+        rinfo=datirec[sqsel][giocsel].dati[vcfs]+'fs';
+       } else adrec[sqsel].fssq++;
+       setdatocmp(sqsel,dcfs);
+       if (giocsel<sq){
+        if ((intflag&32)!=0){
+         quintrec[quintidx[sqsel]].datipro[vcfs]++;
+         quintrec[quintidx[1 - sqsel]].datiavv[vcfs]++;
+        }
+        if ((intflag&128)!=0)
+         difesarec[difesaidx[1-sqsel]].dati[vcfs]++;
+        if ((intflag&256)!=0)
+         attaccorec[attaccoidx[sqsel]].dati[vcfs]++;
+        if ((intflag&64)!=0){
+         rl[sqsel]=getgiocperref(sqsel,giocsel);
+         rl[sqsel]=rl[sqsel]+': fallo subito';
+         refleggadd(rl);
+        }
+       }
+       break;
+
+      case vcro:
+       rimbalzooff=true;
+       //se il tiro sbagliato era in contropiede, lo riabilita
+       m=(contropiede&6);
+       if (m!=0){
+        if (Math.floor((m-2)/2)==sqsel){
+         contropiede=1;
+         contropiedecmb=true;
+         adrec[sqsel].cpnum--;
+        } else
+         contropiede=0;
+       }
+       incdato(sqsel,giocsel,dato);
+       rinfo=datirec[sqsel][giocsel].dati[vcro]+'ro';
+       setdatocmp(sqsel,dcrdavv);
+       setposs(sqsel,1);
+       if ((intflag&32)!=0){
+        quintrec[quintidx[sqsel]].datipro[vcro]++;
+        quintrec[quintidx[1-sqsel]].datiavv[vcro]++;
+       }
+       if ((intflag&128)!=0)
+        difesarec[difesaidx[1-sqsel]].dati[vcro]++;
+       if ((intflag&256)!=0)
+        attaccorec[attaccoidx[sqsel]].dati[vcro]++;
+       if ((intflag&64)!=0){
+        rl[sqsel]=getgiocperref(sqsel,giocsel);
+        rl[sqsel]=rl[sqsel]+': rimbalzo offensivo';
+        refleggadd(rl);
+       }
+       break;
+
+      case vcrd:
+       incdato(sqsel,giocsel,dato);
+       rinfo=datirec[sqsel][giocsel].dati[vcrd]+'rd';
+       setdatocmp(sqsel,dcrd);
+       setposs(sqsel,1);
+       if ((intflag&32)!=0){
+        quintrec[quintidx[sqsel]].datipro[vcrd]++;
+        quintrec[quintidx[1-sqsel]].datiavv[vcrd]++;
+       }
+       if ((intflag&128)!=0)
+        difesarec[difesaidx[1-sqsel]].dati[vcrd]++;
+       if ((intflag&256)!=0)
+        attaccorec[attaccoidx[sqsel]].dati[vcrd]++;
+       if ((intflag&64)!=0){
+        rl[sqsel]=getgiocperref(sqsel,giocsel);
+        rl[sqsel]=rl[sqsel]+': rimbalzo difensivo';
+        refleggadd(rl);
+       }
+       if ((contropiede&6)!=0)
+        contropiede=0;
+       break;
+
+      case vcsd:
+       incdato(sqsel,giocsel,dato);
+       rinfo=datirec[sqsel][giocsel].dati[vcsd]+'sd';
+       setdatocmp(sqsel,dcsd);
+       if ((intflag&32)!=0){
+        quintrec[quintidx[sqsel]].datipro[dato]++;
+        quintrec[quintidx[1-sqsel]].datiavv[dato]++;
+       }
+       if ((intflag&128)!=0)
+        difesarec[difesaidx[1-sqsel]].dati[dato]++;
+       if ((intflag&256)!=0)
+        attaccorec[attaccoidx[sqsel]].dati[dato]++;
+       if ((intflag&64)!=0){
+        rl[sqsel]=getgiocperref(sqsel,giocsel);
+        rl[sqsel]=rl[sqsel]+': stoppata data';
+        refleggadd(rl);
+       }
+       break;
+
+      case vcss:
+       incdato(sqsel,giocsel,dato);
+       rinfo=datirec[sqsel][giocsel].dati[vcss]+'ss';
+       setdatocmp(sqsel,dcss);
+       if ((intflag&32)!=0){
+        quintrec[quintidx[sqsel]].datipro[dato]++;
+        quintrec[quintidx[1-sqsel]].datiavv[dato]++;
+       }
+       if ((intflag&128)!=0)
+        difesarec[difesaidx[1-sqsel]].dati[dato]++;
+       if ((intflag&256)!=0)
+        attaccorec[attaccoidx[sqsel]].dati[dato]++;
+       if ((intflag&64)!=0){
+        rl[sqsel]=getgiocperref(sqsel,giocsel);
+        rl[sqsel]=rl[sqsel]+': stoppata subita';
+        refleggadd(rl);
+       }
+       break;
+
+      case vcpp:
+       incdato(sqsel,giocsel,dato);
+       rinfo=datirec[sqsel][giocsel].dati[vcpp]+'pp';
+       setdatocmp(sqsel,dcpp);
+       setposs(sqsel,-1);
+       if ((intflag&32)!=0){
+        quintrec[quintidx[sqsel]].datipro[vcpp]++;
+        quintrec[quintidx[1-sqsel]].datiavv[vcpp]++;
+       }
+       if ((intflag&128)!=0)
+        difesarec[difesaidx[1-sqsel]].dati[vcpp]++;
+       if ((intflag&256)!=0)
+        attaccorec[attaccoidx[sqsel]].dati[vcpp]++;
+       if ((intflag&64)!=0){
+        rl[sqsel]=getgiocperref(sqsel,giocsel);
+        rl[sqsel]=rl[sqsel]+': palla persa';
+        if ((contropiede&1)!=0)
+         rl[sqsel]=rl[sqsel]+' in contropiede';
+        refleggadd(rl);
+       }
+       if ((contropiede&1)!=0){
+        contropiede=0;
+        contropiedecmb=true;
+        adrec[sqsel].cpnum++;
+        adrec[sqsel].cppp++;
+       }
+       if (rimbalzooff)
+        rimbalzooff=false;
+       break;
+
+      case vcpr:
+       if (giocsel<sq){
+        incdato(sqsel,giocsel,dato);
+        rinfo=datirec[sqsel][giocsel].dati[vcpr]+'pr';
+       } else adrec[sqsel].azr++;
+       setdatocmp(sqsel,dcpr);
+       setposs(sqsel,1);
+       if (giocsel<sq){
+        if ((intflag&32)!=0){
+         quintrec[quintidx[sqsel]].datipro[vcpr]++;
+         quintrec[quintidx[1-sqsel]].datiavv[vcpr]++;
+        }
+        if ((intflag&128)!=0)
+         difesarec[difesaidx[1-sqsel]].dati[vcpr]++;
+        if ((intflag&256)!=0)
+         attaccorec[attaccoidx[sqsel]].dati[vcpr]++;
+        if ((intflag&64)!=0){
+         rl[sqsel]=getgiocperref(sqsel,giocsel);
+         rl[sqsel]=rl[sqsel]+': palla recuperata';
+         refleggadd(rl);
+        }
+       }
+       break;
+
+      case vcas:
+       incdato(sqsel,giocsel,dato);
+       rinfo=datirec[sqsel][giocsel].dati[vcas]+'as';
+       if ((intflag&32)!=0){
+        quintrec[quintidx[sqsel]].datipro[vcas]++;
+        quintrec[quintidx[1-sqsel]].datiavv[vcas]++;
+       }
+       if ((intflag&128)!=0)
+        difesarec[difesaidx[1-sqsel]].dati[vcas]++;
+       if ((intflag&256)!=0)
+        attaccorec[attaccoidx[sqsel]].dati[vcas]++;
+       if ((intflag&64)!=0){
+        rl[sqsel]=getgiocperref(sqsel,giocsel);
+        rl[sqsel]=rl[sqsel]+': assist';
+        refleggadd(rl);
+       }
+       break;
+
+      case (vcpri):
+       if (adrec[0].pri+adrec[1].pri==0){
+        m=true;
+        adrec[sqsel].pri++;
+        rinfo=adrec[sqsel].pri+'pri';
+       } else {
+        m=false;
+        adrec[sqsel].pra++;
+       }
+       possiniz=false;
+       //si forzano i valori del possesso nell'eventualità
+       //di fallo tecnico prima del salto iniziale
+       daticmp[sqsel][dcposs]=1;
+       daticmp[1-sqsel][dcposs]=0;
+       if ((m)&&((intflag&64)!=0)){
+        rl[sqsel]=getgiocperref(sqsel,giocsel);
+        rl[sqsel]=rl[sqsel]+': palla recuperata iniziale';
+        refleggadd(rl);
+       }
+       break;
+
+      case (vcap):
+       adrec[sqsel].azp++;
+       setdatocmp(sqsel,dcpp);
+       setposs(sqsel,-1);
+       break;
+
+      case (vcrft):
+       adrec[sqsel].rft++;
+       setdatocmp(sqsel,dcrd);
+       setposs(sqsel,1);
+       break;
+
+      case vcts1:
+      case vcts0:
+      case vctf1:
+      case vctf0:
+      case vct31:
+      case vct30:
+      case vcsc1:
+       if (dato==vcsc1){ //se è una schiacciata, aggiorna i ts
+        m=vcts1;
+        incdato(sqsel,giocsel,vcts1);
+        rinfo=(1+datirec[sqsel][giocsel].dati[vcsc1])+'sc ';
+        if ((intflag&32)!=0){
+         quintrec[quintidx[sqsel]].datipro[vcts1]++;
+         quintrec[quintidx[1 - sqsel]].datiavv[vcts1]++;
+        }
+        if ((intflag&128)!=0)
+         difesarec[difesaidx[1-sqsel]].dati[vcts1]++;
+        if ((intflag&256)!=0)
+         attaccorec[attaccoidx[sqsel]].dati[vcts1]++;
+       } else {
+        m=dato;
+       }
+       if (giocsel==sq){
+        if (dato>vctf1) dato=vctf1;
+        rinfo+='autocanestro';
+       }
+       incdato(sqsel,giocsel,dato);
+       if (giocsel<sq) rinfo+=datirec[sqsel][giocsel].dati[m-((m-vcts1)%2)]+'/'+(datirec[sqsel][giocsel].dati[m-((m-vcts1)%2)]+datirec[sqsel][giocsel].dati[m-((m-vcts1)%2)+1])+('tstft3'.substr(Math.floor((m-vcts1)/2)*2,2));
+       if ((intflag&32)!=0){
+        quintrec[quintidx[sqsel]].datipro[dato]++;
+        quintrec[quintidx[1-sqsel]].datiavv[dato]++;
+       }
+       if ((intflag&128)!=0)
+        difesarec[difesaidx[1-sqsel]].dati[dato]++;
+       if ((intflag&256)!=0)
+        attaccorec[attaccoidx[sqsel]].dati[dato]++;
+       //trova i dati dentro le parentesi quadre
+       //per aggiungere i tiri alle sequenze di tiro
+       if (qua>0){
+        t=riga.substr(qua-1,1)+riga.substring(qua+1,quc);
+        if (datirec[sqsel][giocsel].tiri.length>0)
+         if (datirec[sqsel][giocsel].tiri.substr(datirec[sqsel][giocsel].tiri.length-1)!=';')
+          datirec[sqsel][giocsel].tiri+=',';
+        datirec[sqsel][giocsel].tiri+=t;
+        if (datirec[sqsel][tot].tiri.length>0)
+         if (datirec[sqsel][tot].tiri.substr(datirec[sqsel][tot].tiri.length-1)!=';')
+          datirec[sqsel][tot].tiri+=',';
+        datirec[sqsel][tot].tiri+=t;
+       }
+       //aggiorna il risultato
+       //e prepara la variabile m per l'aggiornamento tabelloni
+       setposs(sqsel,-1);
+       if ([vcts1,vctf1,vct31,vcsc1].indexOf(dato)>=0){
+       //canestro realizzato
+        rinfo+=' '+punti(sqsel,giocsel)+'p';
+        //rileva la differenza punti per il plus/minus
+        m=punti(sqsel,tot)-daticmp[sqsel][dcpunti];
+        if (m>0)
+         cambioris=true;
+        if ((contropiede&1)!=0){
+         adrec[sqsel].cpnum++;
+         adrec[sqsel].cppun+=m;
+        }
+        if (rimbalzooff)
+         adrec[sqsel].ropun+=m;
+        if (datirec[1-sqsel][tot].dati[vcprt]>0){
+         for (i=1;i<=datirec[sqsel][tot].dati[vcprt];i++)
+          if (datirec[sqsel][i].dati[vconc]==1){
+           datirec[sqsel][i].dati[vcpm]+=m;
+           datirec[sqsel][tot].dati[vcpm]+=m;
+          }
+         for (i=1;i<=datirec[1-sqsel][tot].dati[vcprt];i++)
+          if (datirec[1-sqsel][i].dati[vconc]==1){
+           datirec[1-sqsel][i].dati[vcpm]-=m;
+           datirec[1 - sqsel][tot].dati[vcpm]-=m;
+          }
+         if ((intflag&32)!=0){
+          quintrec[quintidx[sqsel]].datipro[vcpm]+=m;
+          quintrec[quintidx[1-sqsel]].datiavv[vcpm]+=m;
+          quintrec[quintidx[sqsel]].datiavv[vcpm]-=m;
+          quintrec[quintidx[1-sqsel]].datipro[vcpm]-=m;
+         }
+         if ((intflag&128)!=0){
+          difesarec[difesaidx[1-sqsel]].dati[vcpm]+=m;
+          difesarec[difesaidx[sqsel]].dati[vcpm]-=m;
+         }
+         if ((intflag&256)!=0){
+          attaccorec[attaccoidx[sqsel]].dati[vcpm]+=m;
+          attaccorec[attaccoidx[1-sqsel]].dati[vcpm]-=m;
+         }
+        }
+        //aggiorna risultato
+        daticmp[sqsel][dcpunti]+=m;
+        setposs(1-sqsel,1);
+        if ((tempodigioco>=1)&&(ent[0]==ent[1]))
+         prt2rec.ris=daticmp[0][dcpunti]+'-'+daticmp[1][dcpunti];
+        m=(dato==vcsc1)?vcts1:dato;
+       } else {
+       //canestro sbagliato
+        if ((contropiede&1)!=0)
+         adrec[sqsel].cpnum++;
+        m=dato-1;
+        setdatocmp(sqsel,dcrdavv);
+       }
+       if ((intflag&64)!=0){
+        rl[sqsel]=getgiocperref(sqsel,giocsel)+': ';
+        if (giocsel==sq){
+         rl[sqsel]+='autocanestro avversari';
+        } else {
+         switch (dato){
+          case vcts1: rl[sqsel]+='tiro da sotto realizzato'; break;
+          case vcts0: rl[sqsel]+='tiro da sotto sbagliato'; break;
+          case vctf1: rl[sqsel]+='tiro da fuori realizzato'; break;
+          case vctf0: rl[sqsel]+='tiro da fuori sbagliato'; break;
+          case vct31: rl[sqsel]+='tiro da tre realizzato'; break;
+          case vct30: rl[sqsel]+='tiro da tre sbagliato'; break;
+          case vcsc1: rl[sqsel]+='schiacciata'; break;
+         }
+        }
+        if ((contropiede&1)!=0)
+         rl[sqsel]+=' in contropiede';
+        if ([vcts1,vctf1,vct31,vcsc1].indexOf(dato)>=0){
+         rl[2]=daticmp[0][dcpunti]+'-'+daticmp[1][dcpunti];
+         i=punti(sqsel,giocsel);
+         rl[sqsel]+=' ('+i+' punti)';
+        }
+        if (qua>0)
+         rl[sqsel]+='<div class="mappa"><canvas width="150" height="100" data-tiro="'+t+'"></canvas></div>';
+        refleggadd(rl);
+       }
+       if ((contropiede&1)!=0){
+        contropiedecmb=true;
+        if ([vcts1,vctf1,vct31,vcsc1].indexOf(dato)>=0) contropiede=0;
+        else contropiede=(sqsel==0)?2:4;
+       }
+       if (rimbalzooff) rimbalzooff=false;
+       break;
+
+      case vctl1:
+      case vctl0:
+      case (vctlm):
+       //inizia nuova serie di tl
+       if (dato==vctlm){
+        u=datirec[sqsel][tot].seqtl.lastIndexOf('/');
+        if (u<0){
+         if ((intflag&2)!=0){
+          t='ATT['+tdc+': non accettabile per assenza serie tl precedenti]';
+          righe.splice(r+1,0,t);
+         }
+         break;
+        }
+        //trova l'ultima serie che deve finire per -
+        u=datirec[sqsel][tot].seqtl.substr(u);
+        if (u.charAt(u.length-1)!='-'){
+         if ((intflag&2)!=0){
+          t='ATT['+tdc+': non accettabile per assenza - precedenti]';
+          righe.splice(r+1,0,t);
+         }
+         break;
+        }
+        if (u.length!=tdc.length-1){
+         if ((intflag&2)!=0){
+          t='ATT['+tdc+': non accettabile per lunghezza serie precedente diversa]';
+          righe.splice(r+1,0,t);
+         }
+         break
+        }
+        //incrocia le due serie
+        m=new Array();
+        m[0]=0;
+        for (i=1;i<tdc.length-1;i++){
+         m[i]=(u.charAt(i)=='-')?0:1;
+         m[i]+=(tdc.charAt(i+1)=='-')?0:1;
+         if (m[0]<m[i])
+          m[0]=m[i];
+         if ((i>1)&&(m[i]>m[i-1]))
+          m[0]=2;//setta un errore
+        }
+        if (m[0]>1){
+         if ((intflag&2)!=0){
+          t='ATT['+tdc+': non compatibile con serie precedente]';
+          righe.splice(r+1,0,t);
+         }
+         break
+        }
+        m=1;
+        t=datirec[sqsel][giocsel].seqtl.lastIndexOf('/');
+        if (t>=0)
+         if (u==datirec[sqsel][giocsel].seqtl.substr(t))
+          m=3;
+        u=m;
+       } else u=0;
+       if ((u&1)==0)
+        datirec[sqsel][tot].seqtl+='/';
+       if ((u&2)==0)
+        datirec[sqsel][giocsel].seqtl+='/';
+       //trova l'incremento per stl6
+       s=Math.floor(6/(tdc.length-2));
+       if ((intflag&64)!=0)
+        rl[sqsel]=getgiocperref(sqsel,giocsel);
+       //per ogni tl...
+       m=0;
+       for (i=2;i<tdc.length;i++){
+        t=tdc.charAt(i);
+        //sostituisce 0 o 1 nella seqtl di squadra
+        if ((u&1)!=0){
+         if (t!='-')
+          datirec[sqsel][tot].seqtl=datirec[sqsel][tot].seqtl.substr(0,datirec[sqsel][tot].seqtl.length-tdc.length+i)+t+datirec[sqsel][tot].seqtl.substr(datirec[sqsel][tot].seqtl.length-tdc.length+i+1);
+        } else {
+         //allunga la seqtl di squadra
+         datirec[sqsel][tot].seqtl+=t;
+        }
+        if ((u&2)!=0){
+         if (t!='-')
+          datirec[sqsel][giocsel].seqtl=datirec[sqsel][giocsel].seqtl.substr(0,datirec[sqsel][giocsel].seqtl.length-tdc.length+i)+t+datirec[sqsel][giocsel].seqtl.substr(datirec[sqsel][giocsel].seqtl.length-tdc.length+i+1);
+        } else {
+         //allunga la seqtl del giocatore
+         datirec[sqsel][giocsel].seqtl+=t;
+        }
+        //incrementa rtl
+        if (tdc.charAt(i-1)=='0')
+         adrec[sqsel].rtl++;
+        //incremente dato e stl6, e poi conta i punti
+        if ('01'.indexOf(t)>=0){
+         incdato(sqsel,giocsel,vctl1+1-parseInt(t,10));
+         datirec[sqsel][tot].dati[vcstl6]+=s;
+         datirec[sqsel][giocsel].dati[vcstl6]+=s;
+         if ((intflag&32)!=0){
+          quintrec[quintidx[sqsel]].datipro[vctl1+1-parseInt(t,10)]++;
+          quintrec[quintidx[1-sqsel]].datiavv[vctl1+1-parseInt(t,10)]++;
+          quintrec[quintidx[sqsel]].datipro[vcstl6]+=s;
+          quintrec[quintidx[1-sqsel]].datiavv[vcstl6]+=s;
+         }
+         if ((intflag&128)!=0){
+          difesarec[difesaidx[1-sqsel]].dati[vctl1+1-parseInt(t,10)]++;
+          difesarec[difesaidx[1 - sqsel]].dati[vcstl6]+=s;
+         }
+         if ((intflag&256)!=0){
+          attaccorec[attaccoidx[sqsel]].dati[vctl1+1-parseInt(t,10)]++;
+          attaccorec[attaccoidx[sqsel]].dati[vcstl6]+=s;
+         }
+         if (t=='1')
+          m++;
+         if ((intflag&64)!=0){
+          if (tdc.length==3){
+           if (t=='1')
+            rl[sqsel]+=': tiro libero realizzato';
+           else
+            rl[sqsel]+=': tiro libero sbagliato';
+           if ((contropiede&1)!=0)
+            rl[sqsel]+=' dopo contropiede';
+          } else {
+           if (i==2){
+            rl[sqsel]+=': tiri liberi';
+            if ((contropiede&1)!=0)
+             rl[sqsel]+=' dopo contropiede';
+           }
+           if (t!='-'){
+            switch (i){
+             case 2: rl[sqsel]+=', primo'; break;
+             case 3: rl[sqsel]+=', secondo'; break;
+             case 4: rl[sqsel]+=', terzo'; break;
+            }
+            if (t=='1')
+             rl[sqsel]+=' realizzato';
+            else
+             rl[sqsel]+=' sbagliato';
+           }
+          }
+         }
+        }
+       }
+       //incrementa stl1
+       if (tdc.charAt(tdc.length-1)=='1'){
+        datirec[sqsel][tot].dati[vcstl1]++;
+        datirec[sqsel][giocsel].dati[vcstl1]++;
+        setposs(1-sqsel,1);
+        if ((intflag&32)!=0){
+         quintrec[quintidx[sqsel]].datipro[vcstl1]++;
+         quintrec[quintidx[1-sqsel]].datiavv[vcstl1]++;
+        }
+        if ((intflag&128)!=0)
+         difesarec[difesaidx[1-sqsel]].dati[vcstl1]++;
+        if ((intflag&256)!=0)
+         attaccorec[attaccoidx[sqsel]].dati[vcstl1]++;
+       }
+       rinfo=datirec[sqsel][giocsel].dati[vctl1]+'/'+(datirec[sqsel][giocsel].dati[vctl1]+datirec[sqsel][giocsel].dati[vctl0])+'tl';
+       if (m>0){
+        if ((contropiede&1)!=0)
+         adrec[sqsel].cppun+=m;
+        if (rimbalzooff)
+         adrec[sqsel].ropun+=m;
+        rinfo+=' '+punti(sqsel,giocsel)+'p';
+        //rileva la differenza punti per il plus/minus
+        cambioris=true;
+        if (datirec[1-sqsel][tot].dati[vcprt]>0){
+         for (i=1;i<=datirec[sqsel][tot].dati[vcprt];i++)
+          if (datirec[sqsel][i].dati[vconc]==1){
+           datirec[sqsel][i].dati[vcpm]+=m;
+           datirec[sqsel][tot].dati[vcpm]+=m;
+          }
+         for (i=1;i<=datirec[1-sqsel][tot].dati[vcprt];i++)
+          if (datirec[1-sqsel][i].dati[vconc]==1){
+           datirec[1-sqsel][i].dati[vcpm]-=m;
+           datirec[1-sqsel][tot].dati[vcpm]-=m;
+          }
+         if ((intflag&32)!=0){
+          quintrec[quintidx[sqsel]].datipro[vcpm]+=m;
+          quintrec[quintidx[1-sqsel]].datiavv[vcpm]+=m;
+          quintrec[quintidx[sqsel]].datiavv[vcpm]-=m;
+          quintrec[quintidx[1-sqsel]].datipro[vcpm]-=m;
+         }
+         if ((intflag&128)!=0){
+          difesarec[difesaidx[1-sqsel]].dati[vcpm]+=m;
+          difesarec[difesaidx[sqsel]].dati[vcpm]-=m;
+         }
+         if ((intflag&256)!=0){
+          attaccorec[attaccoidx[sqsel]].dati[vcpm]+=m;
+          attaccorec[attaccoidx[1-sqsel]].dati[vcpm]-=m;
+         }
+        }
+       }
+       //aggiorna risultato
+       daticmp[sqsel][dcpunti]+=m;
+       if ((tempodigioco>=1)&&(ent[0]==ent[1]))
+        prt2rec.ris=daticmp[0][dcpunti]+'-'+daticmp[1][dcpunti];
+       if ((intflag&64)!=0){
+        if (m>0){
+         rl[2]=daticmp[0][dcpunti]+'-'+daticmp[1][dcpunti];
+         i=punti(sqsel,giocsel);
+         rl[sqsel]+=' ('+i+' punt'+((i==1)?'o)':'i)');
+        }
+        refleggadd(rl);
+       }
+       if (tdc.charAt(tdc.length-1)!='-'){
+        if ((contropiede&1)!=0){
+         contropiede=0;
+         contropiedecmb=true;
+         adrec[sqsel].cpnum++;
+        }
+        if (rimbalzooff)
+         rimbalzooff=false;
+        setdatocmp(sqsel,dcrdavv);
+        setposs(sqsel,-1);
+       }
+       break;
+
+     } //fine switch (dato)
+     //visualizza dati comparativi
+     mostra|=1;
+    }
+   }
+
+   //altri dati
+   if (sint==-1){
+    v=("NOTE'   ERR ATT ENT S   TMP CP  DA  DB  AA  AB  ").indexOf((tdc+'    ').substr(0,4));
+    dato=Math.floor(v/4)+1;
+    if ((v%4)==0){
+     sint=0;
+     switch (dato){
+      case 1: //NOTE
+       if ((intflag&64)!=0){
+        rl[2]=trim(riga.substring(qua+1,quc));
+        refleggadd(rl);
+       }
+       break;
+      case 2:
+      case 3:
+      case 4: //', ERR, ATT
+       break;
+      case 5: //ENT
+       d=[0,0];
+       t=trim(riga.substring(qua+1,quc))+' ';
+       oldtmp=parseInt(t,10)||0;
+       oldtmpf=true;
+       //trova il primo spazio
+       i=t.indexOf(' ');
+       u=('0000'+t.substring(0,i)).slice(-4);
+       //trova minuti e secondi
+       m=parseInt('0'+u.substr(0,2),10);
+       s=parseInt('0'+u.substr(2,2),10);
+       //ciclo lungo gli spazi
+       while (i>=0){
+        t=t.substr(i+1);
+        i=t.indexOf(' ');
+        u=t.substring(0,i);
+        if (u.length>0){
+         if (u.charAt(0)=='+'){
+          //cerco il giocatore
+          p=-1;
+          g=gioccerca(p,u.substr(1));
+          p=g[0];
+          g=g[1];
+          //se non ci sono entrate in quintetto
+          //setta la variabile per gestirle
+          if (datirec[p][tot].dati[vcst]==0)
+           d[p]=1;
+          //se è la prima di queste entrate per una squadra,
+          //azzero vconc e sistemo bonus e sequenze tiri e
+          //registro i parziali dei periodi
+          if (ent[p]<1){
+           ent[p]=Math.abs(ent[p])+1;
+           tempodigioco=maxent();
+           while (ent[p]>=periodi.length){
+            periodi.push({dati:[]});
+            periodi[periodi.length-1].dati[0]=new Array(voci+1);
+            periodi[periodi.length-1].dati[1]=new Array(voci+1);
+            periodoazzera(periodi.length-1);
+           }
+           if (ent[p]>1)
+            periodocopiatot(ent[p]-1,p);
+           if (tempodigioco<=camprec.tempi)
+            daticmp[p][dcbonus]=0;
+           for (n=1;n<=tot;n++){
+            //sequenze tiri
+            if (((n<=datirec[p][tot].dati[vcprt])||(n>sq))&&(d[p]==0)){
+             datirec[p][n].seqtl+=';';
+             datirec[p][n].tiri+=';';
+            }
+            //rimuove in campo
+            if ((n<=datirec[p][tot].dati[vcprt])&&(datirec[p][n].dati[vconc]==1)){
+             datirec[p][n].dati[vconc]=0;
+             //gestione minuscolo
+             mostra|=2;
+            }
+           }
+          }
+          //aggiorna i dati
+          datirec[p][g].dati[vcst]+=d[p];
+          datirec[p][tot].dati[vcst]+=d[p];
+          datirec[p][g].dati[vcmin]+=m;
+          datirec[p][tot].dati[vcmin]+=m;
+          datirec[p][g].dati[vcsec]+=s;
+          datirec[p][tot].dati[vcsec]+=s;
+          datirec[p][g].dati[vconc]=1;
+          //gestione maiuscolo
+          mostra|=2;
+         }
+        }
+       }
+       if ((intflag&32)!=0)
+        for (p=0;p<=1;p++)
+         if (ent[p]>0){
+          //cerca il quintetto
+          quintidx[p]=quintcerca(p);
+          //incrementa minuti e secondi
+          quintrec[quintidx[p]].datipro[vcmin]+=m;
+          quintrec[quintidx[p]].datipro[vcsec]+=s;
+         }
+       if ((intflag&64)!=0){
+        if (tempodigioco<=camprec.tempi)
+         rl[2]=tempodigioco+'º tempo ';
+        else
+         rl[2]=(tempodigioco-parseInt(camprec.tempi,10))+'º suppl. ';
+        tmp=m+':'+('0'+s).slice(-2);
+        rl[2]+=tmp;
+        for (p=0;p<=1;p++){
+         for (n=1;n<=datirec[p][tot].dati[vcprt];n++)
+          if (datirec[p][n].dati[vconc]==1){
+           if (rl[p].length==0)
+            rl[p]='Entrate: ';
+           else
+            rl[p]+=', ';
+           rl[p]+=getgiocperref(p,n);
+          }
+        }
+        refleggadd(rl);
+       }
+       //sistema risultati parziali
+       ent[0]=-Math.abs(ent[0]);
+       ent[1]=-Math.abs(ent[1]);
+       if (ent[0]==ent[1]){
+        if (tempodigioco==1)
+         prt2rec.parz='';
+        else if ((tempodigioco>1)&&(tempodigioco>prt2rec.parz.split(';').length)){
+         if (tempodigioco>2)
+          prt2rec.parz+=';';
+         prt2rec.parz+=daticmp[0][dcpunti]+'-'+daticmp[1][dcpunti];
+        }
+        daticmp[0][dcposs]=0;
+        daticmp[1][dcposs]=0;
+        possiniz=true;
+        //visualizza i dati comparativi
+        mostra|=1;
+       }
+       break;
+      case 6: //S
+       d=[0,0];
+       incmp=true;
+       t=trim(riga.substring(qua+1,quc))+' ';
+       oldtmp=parseInt(t,10)||0;
+       oldtmpf=true;
+       //trova il primo spazio
+       i=t.indexOf(' ');
+       u=('0000'+t.substring(0,i)).slice(-4);
+       //trova minuti e secondi
+       m=parseInt('0'+u.substr(0,2),10);
+       s=parseInt('0'+u.substr(2,2),10);
+       if ((intflag&64)!=0){
+        tmp=m+':'+('0'+s).slice(-2);
+        rl[2]+=tmp;
+       }
+       //ciclo lungo gli spazi
+       while (i>=0){
+        t=t.substr(i+1);
+        i=t.indexOf(' ');
+        u=t.substring(0,i);
+        if (u.length>0){
+         if ('+-'.indexOf(u.charAt(0))>=0){
+          //cerco il giocatore
+          p=-1;
+          g=gioccerca(p,u.substr(1));
+          p=g[0];
+          g=g[1];
+          if (u.charAt(0)=='+'){
+           if (datirec[p][g].dati[vconc]==0){
+            d[p]=1;
+            datirec[p][g].dati[vcmin]+=m;
+            datirec[p][tot].dati[vcmin]+=m;
+            datirec[p][g].dati[vcsec]+=s;
+            datirec[p][tot].dati[vcsec]+=s;
+            datirec[p][g].dati[vconc]=1;
+            if ((intflag&64)!=0){
+             if (rl[p].length==0)
+              rl[p]='Entra ';
+             else
+              rl[p]+=', entra ';
+             rl[p]+=getgiocperref(p,g);
+            }
+           } else {
+            //errore già in campo
+            if ((intflag&2)!=0){
+             u='ATT['+u+': in campo, niente sostituzione]';
+             righe.splice(r+1,0,u);
+            }
+           }
+          } else {
+           if (datirec[p][g].dati[vconc]!=0){
+            d[p]=1;
+            datirec[p][g].dati[vcmin]-=m;
+            datirec[p][tot].dati[vcmin]-=m;
+            datirec[p][g].dati[vcsec]-=s;
+            datirec[p][tot].dati[vcsec]-=s;
+            datirec[p][g].dati[vconc]=0;
+            if ((intflag&64)!=0){
+             if (rl[p].length==0)
+              rl[p]='Esce ';
+             else
+              rl[p]+=', esce ';
+             rl[p]+=getgiocperref(p,g);
+            }
+           } else {
+            //errore non in campo
+            if ((intflag&2)!=0){
+             u='ATT['+u+': fuori campo, niente sostituzione]';
+             righe.splice(r+1,0,u);
+            }
+           }
+          }
+          //gestione maiuscolo
+          mostra|=2;
+         }
+        }
+       }
+       if ((intflag&32)!=0)
+        for (p=0;p<=1;p++)
+         if (d[p]==1){
+          //decrementa minuti e secondi al precedente quintetto
+          quintrec[quintidx[p]].datipro[vcmin]-=m;
+          quintrec[quintidx[p]].datipro[vcsec]-=s;
+          //cerca il quintetto
+          quintidx[p]=quintcerca(p);
+          //incrementa minuti e secondi
+          quintrec[quintidx[p]].datipro[vcmin]+=m;
+          quintrec[quintidx[p]].datipro[vcsec]+=s;
+         }
+       if ((intflag&64)!=0)
+        refleggadd(rl);
+       break;
+      case 7: //TMP
+       t=trim(riga.substring(qua+1,quc));
+       oldtmp=parseInt(t,10)||0;
+       oldtmpf=true;
+       if ((intflag&64)!=0){
+        u=('0000'+t).slice(-4);
+        //trova minuti e secondi
+        m=parseInt('0'+u.substr(0,2),10);
+        s=parseInt('0'+u.substr(2,2),10);
+        tmp=m+':'+('0'+s).slice(-2);
+        rl[2]=tmp;
+        refleggadd(rl);
+       }
+       break;
+      case 8: //CP
+       contropiedecmb=true;
+       if ((contropiede&1)!=0)
+        contropiede=0;
+       else
+        contropiede=1;
+       break;
+      case 9:
+      case 10: //DA e DB
+       //trova la squadra
+       s=dato-9;
+       //trova la difesa
+       t=trim(riga.substring(qua+1,quc));
+       if ((intflag&64)!=0){
+        rl[s]='Difesa: '+t;
+        refleggadd(rl);
+       }
+       if ((intflag&128)!=0){
+        //cerca la difesa
+        difesaidx[s]=difesacerca(s,t);
+       }
+       break;
+      case 11:
+      case 12: //AA e AB
+       //trova la squadra
+       s=dato-11;
+       //trova l'attacco
+       t=trim(riga.substring(qua+1,quc));
+       if ((intflag&64)!=0){
+        rl[s]='Attacco: '+t;
+        refleggadd(rl);
+       }
+       if ((intflag&256)!=0){
+        //cerca l'attacco
+        attaccoidx[s]=attaccocerca(s,t);
+       }
+       break;
+     }
+    }
+   }
+   //taglia la parte della riga già elaborata
+   riga=ltrim(riga.substr(sp+1));
+  }
+  if ((intflag&1)!=0){
+   //registra le differenze comparative
+   dif.push(getdiff());
+   //registra le informazioni del referto
+   inf.push(rinfo);
+  }
+  //registra la riga
+  result.push(righe[r]);
+  //aggiorna il referto visuale
+  if ((intflag&4)!=0){
+   m=result.length-1;
+   addreftab+='<tr>';
+   addreftab+='<td><a href="javascript:modrigaref('+righereftab+');">'+result[m]+'</a></td>';
+   addreftab+='<td>'+dif[m]+'</td>';
+   addreftab+='<td>'+inf[m]+'</td>';
+   addreftab+='</tr>';
+   righereftab++;
+  }
+  //incrementa il contatore di righe
+  r++;
+ }
+ if ((intflag&4)!=0){
+  if (mostra&1)
+   mostradaticmp();
+  if (mostra&2)
+   mostragioc();
+  $('#reftab').append(addreftab);
+  $('#refdiv').scrollTop($('#reftab').height());
+ }
+ tmp=result.join('\n')+((result.length)>0?'\n':'');
+ if ((intflag&1)!=0){
+  diff+=dif.join('\n')+((result.length)>0?'\n':'');
+  info+=inf.join('\n')+((result.length)>0?'\n':'');
+ }
+ if ((intflag&8)!=0){
+  //aggiorna il referto in memoria
+  prt2rec.referto+=tmp;
+  //aggiorna il referto su disco
+  localStorage.refertotxt+=tmp;
+  if (sharing){
+   if (oldtmpf) t='add';
+   else t='adt';
+   inviodati(t,tmp);
+  }
+ }
+ oldtmpf=false;
+ return tmp;
+}
+
+function inviodati(azione,dato){
+ if (sharing){
+  spia
+   .removeClass('btn-danger btn-info btn-success')
+   .addClass('btn-warning');
+ }
+ $.ajax({
+  method:'POST',
+  url:document.sh.url.value,
+  data:{
+   user:document.sh.user.value,
+   pass:document.sh.pass.value,
+   codprt:prtrec.codprt,
+   azione:azione,
+   oldtmp:oldtmp,
+   dati:dato
+  },
+  success:function(data){
+   if (sharing){
+    spia
+     .removeClass('btn-danger btn-info btn-warning')
+     .addClass('btn-success');
+   }
+   var t=String(data);
+   if ((azione=='adt')&&(t.length>0)){
+    var d,h,i,p,r,s;
+    t=t.slice(0,-1);
+    //aggiorna oldtmp
+    s=interprete(t,0);
+    //trova la posizione dei dati immessi e inserisce il tempo
+    s=getrigheref();
+    p=s.lastIndexOf(dato);
+    r=s.split('\n');
+    p=r.length-((s.substr(p)).split('\n')).length;
+    r.splice(p,0,t);
+    setrigheref(r.join('\n'));
+    saveallref();
+    d=diff.split('\n');
+    d.splice(p,0,'');
+    diff=d.join('\n');
+    i=info.split('\n');
+    i.splice(p,0,'');
+    info=i.join('\n');
+    s=$('#reftab tr');
+    for (t=s.length-1;t>=p;t--) s.eq(t).remove();
+    s=$('#reftab');
+    for (t=p;t<r.length-1;t++){
+     h='<tr><td><a href="javascript:modrigaref('+t+');">'+r[t]+'</a></td>';
+     h+='<td>'+d[t]+'</td>';
+     h+='<td>'+i[t]+'</td></tr>';
+     s.append(h);
+    }
+    t=t-1;
+    if (r.length>1)
+     $('#refdiv').scrollTop($(document.getElementById("reftab").rows[t]).position().top-$('#reftab').position().top);
+   }
+  },
+  error:function(){
+   if (sharing){
+    spia
+     .removeClass('btn-success btn-info btn-warning')
+     .addClass('btn-danger');
+    //resetta user e password per fermare la connessione mantenendo la spia in errore
+    document.sh.pass.value=document.sh.user.value='';
+   }
+  }
+ });
+}
+
+function maxent(){
+ if (Math.abs(ent[0])>=Math.abs(ent[1]))
+  return Math.abs(ent[0]);
+ else
+  return Math.abs(ent[1]);
+}
+
+function minent(){
+ if (Math.abs(ent[1])>=Math.abs(ent[0]))
+  return Math.abs(ent[0]);
+ else
+  return Math.abs(ent[1]);
+}
+
+function periodoazzera(p){
+ var i,j;
+ for (i=0;i<=1;i++)
+  for (j=0;j<=voci;j++)
+   periodi[p].dati[i][j]=0;
+}
+
+function periodocopiatot(p,s){
+ for (var j=0;j<=voci;j++)
+  periodi[p].dati[s][j]=datirec[s][tot].dati[j];
+}
+
+function periododiff(p,s,v){
+ return periodi[p].dati[s][v]-periodi[p-1].dati[s][v];
+}
+
+function punti(s,g){
+ return (2*datirec[s][g].dati[vcts1]+2*datirec[s][g].dati[vctf1]+3*datirec[s][g].dati[vct31]+datirec[s][g].dati[vctl1]);
+}
+
+function puntia(q){
+ return 2*attaccorec[q].dati[vcts1]+2*attaccorec[q].dati[vctf1]+3*attaccorec[q].dati[vct31]+1*attaccorec[q].dati[vctl1];
+}
+
+function puntid(q){
+ return 2*difesarec[q].dati[vcts1]+2*difesarec[q].dati[vctf1]+3*difesarec[q].dati[vct31]+1*difesarec[q].dati[vctl1];
+}
+
+function puntiq(q){
+ return 2*quintrec[q].datipro[vcts1]+2*quintrec[q].datipro[vctf1]+3*quintrec[q].datipro[vct31]+1*quintrec[q].datipro[vctl1];
+}
+
+function puntiqavv(q){
+ return 2*quintrec[q].datiavv[vcts1]+2*quintrec[q].datiavv[vctf1]+3*quintrec[q].datiavv[vct31]+1*quintrec[q].datiavv[vctl1];
+}
+
+function quadra2tonda(s){
+ s=s.replace(/\[/g,'(');
+ s=s.replace(/\]/g,')');
+ return s;
+}
+
+function quintcerca(s){
+ var g,q,result;
+ q='';
+ for (g=1;g<=maxgioc;g++)
+  if (datirec[s][g].dati[vconc]==1)
+   q+=String.fromCharCode(65+s)+datirec[s][g].nmaglia+' ';
+ q=$.trim(q);
+ result=-1;
+ for (g=0;g<quintrec.length;g++)
+  if (quintrec[g].nmaglia==q){
+   //trovato
+   result=g;
+   return result;
+  }
+ //non trovato: crea un nuovo record e ne azzera i dati
+ result=quintrec.length;
+ quintrec[result]={
+  nmaglia:'',
+  datipro:[],
+  datiavv:[]
+ };
+ quintrec[result].datipro=new Array(voci+1);
+ quintrec[result].datiavv=new Array(voci+1);
+ quintrec[result].nmaglia=q;
+ for (g=0;g<=voci;g++){
+  quintrec[result].datipro[g]=0;
+  quintrec[result].datiavv[g]=0;
+ }
+ return result;
+}
+
+function refiniz(){
+ var n='\n';
+ var s='<db>'+n;
+ s+='codprt='+prtrec.codprt+n;
+ s+='codcamp='+prtrec.codcamp+n;
+ s+='codsqa='+prtrec.codsq[0]+n;
+ s+='codsqb='+prtrec.codsq[1]+n;
+ s+='dataora='+prtrec.dataora+n;
+ s+='luogo='+prtrec.luogo+n;
+ s+='giornata='+prtrec.giornata+n;
+ s+='ngara='+prtrec.ngara+n;
+ s+='sessoa='+prtrec.sesso[0]+n;
+ s+='sessob='+prtrec.sesso[1]+n;
+ s+='annosport='+camprec.annosport+n;
+ s+='nomecamp='+camprec.nomecamp+n;
+ s+='girone='+camprec.girone+n;
+ s+='fase='+camprec.fase+n;
+ s+='tempi='+camprec.tempi+n;
+ s+='durata='+camprec.durata+n;
+ s+='suppl='+camprec.suppl+n;
+ s+='maxfalli='+camprec.maxfalli+n;
+ s+='nomesqa='+prt2rec.nomesq[0]+n;
+ s+='nomesqb='+prt2rec.nomesq[1]+n;
+ s+='nomecortosqa='+prt2rec.nomecortosq[0]+n;
+ s+='nomecortosqb='+prt2rec.nomecortosq[1]+n;
+ s+='coacha='+prt2rec.coach[0]+n;
+ s+='coachb='+prt2rec.coach[1]+n;
+ s+='ris='+prt2rec.ris+n;
+ s+='parz='+prt2rec.parz+n;
+ s+='arbitri='+prt2rec.arbitri+n;
+ s+='rilevatori='+prt2rec.rilevatori+n;
+ s+='note='+prt2rec.note+n;
+ var p=prt2rec.referto.indexOf('</db>');
+ if (p<0){
+  s+='</db>\n<num>\n</num>\n';
+  prt2rec.referto=s;
+ } else {
+  prt2rec.referto=s+prt2rec.referto.substr(p);
+ }
+}
+
+function refleggadd(rl){
+ var l,i;
+ l=reflegg.length;
+ reflegg[l]={riga:['','','']};
+ for (i=0;i<=2;i++){
+  reflegg[l].riga[i]=rl[i];
+  rl[i]='';
+ }
+}
+
+function resetdati(soloprt){
+ var x,y,z;
+ if (! soloprt){
+  prtrec={
+   codprt:'',
+   codcamp:'',
+   codsq:['',''],
+   dataora:'',
+   luogo:'',
+   giornata:'',
+   ngara:'',
+   sesso:['','']
+  };
+  camprec={
+   annosport:'',
+   nomecamp:'',
+   girone:'',
+   fase:'',
+   tempi:4,
+   durata:10,
+   suppl:5,
+   maxfalli:5
+  };
+  prt2rec={
+   referto:'',
+   nomesq:['',''],
+   nomecortosq:['',''],
+   coach:['',''],
+   ris:'',
+   parz:'',
+   arbitri:'',
+   rilevatori:'',
+   note:''
+  };
+ }
+ tempodigioco=0;
+ contropiede=0;
+ contropiedecmb=false;
+ rimbalzooff=false;
+ possiniz=true;
+ selsq=0;
+ selgioc=sq;
+ diff='';
+ info='';
+ incmp=false;
+ cambioris=false;
+ ent=[0,0];
+ dq='';
+ daticmp=new Array(2);
+ daticmp[0]=new Array(dcmp+1);
+ daticmp[1]=new Array(dcmp+1);
+ datirec=new Array(2);
+ datirec[0]=new Array(tot+1);
+ datirec[1]=new Array(tot+1);
+ for (x=0;x<=1;x++){
+  for (y=dcpunti;y<=dcmp;y++){
+   daticmp[x][y]=0;
+  }
+  for (y=0;y<=tot;y++){
+   datirec[x][y]={
+    codgioc:0,
+    cognome:'',
+    nome:'',
+    anno:'',
+    altezza:'',
+    ruolo:'',
+    nmaglia:'',
+    dati:[],
+    seqtl:'',
+    tiri:''
+   };
+   datirec[x][y].dati=new Array(voci+1);
+   for (z=0;z<=voci;z++){
+    datirec[x][y].dati[z]=0
+   }
+  }
+ }
+ adrec=new Array(2);
+ for (x=0;x<=1;x++){
+  adrec[x]={
+   cpnum:0,
+   cppp:0,
+   cppun:0,
+   ropun:0,
+   pri:0,
+   pra:0,
+   rtl:0,
+   rft:0,
+   azp:0,
+   azr:0,
+   fssq:0
+  };
+ }
+ //quintetti e difese devono avere un record nell'eventualità di falli tecnici prima della partita
+ quintrec=[];
+ quintrec[0]={
+  nmaglia:'0',
+  datipro:[],
+  datiavv:[]
+ };
+ quintrec[0].datipro=new Array(voci+1);
+ quintrec[0].datiavv=new Array(voci+1);
+ quintidx=[0,0];
+ difesarec=[];
+ difesarec[0]={
+  nome:'',
+  dati:[]
+ };
+ difesarec[0].dati=new Array(voci+1);
+ difesaidx=[0,0];
+ attaccorec=[];
+ attaccorec[0]={
+  nome:'',
+  dati:[]
+ };
+ attaccorec[0].dati=new Array(voci+1);
+ attaccoidx=[0,0];
+ for (z=0;z<=voci;z++){
+  quintrec[0].datipro[z]=0;
+  quintrec[0].datiavv[z]=0;
+  difesarec[0].dati[z]=0;
+  attaccorec[0].dati[z]=0;
+ }
+ difesarec[0].dati[vcprt]=-1;
+ attaccorec[0].dati[vcprt]=-1;
+ reflegg=[];
+ periodi=[];
+ periodi[0]={dati:[]};
+ periodi[0].dati[0]=new Array(voci+1);
+ periodi[0].dati[1]=new Array(voci+1);
+ periodoazzera(0);
+}
+
+function saveallref(){
+ localStorage.refertotxt=prt2rec.referto;
+}
+
+function saveprt(){
+ var g,i,s,ndq,cg,dq,rg;
+ // per inserire ris e parz nel referto
+ refiniz();
+ s={referto:prt2rec.referto,
+  nomesqa:prt2rec.nomesq[0],nomesqb:prt2rec.nomesq[1],
+  coacha:prt2rec.coach[0],coachb:prt2rec.coach[1],
+  ris:prt2rec.ris,
+  parz:prt2rec.parz,
+  arbitri:prt2rec.arbitri,
+  rilevatori:prt2rec.rilevatori,
+  note:prt2rec.note
+ };
+ updaterec('prt2',prtrec.codprt,s);
+ deleterec('dati',function(x,y){
+  return adb.dati[x][adf.dati.codprt]==y;
+ },prtrec.codprt);
+ //salva i record dati
+ ndq=0;
+ for(i=0;i<=1;i++){
+  for(g=1;g<=tot;g++){
+   if ((g<=datirec[i][tot].dati[vcprt])||(g>=sq)){
+    if (g>=sq){
+     cg=maxgioc-g;
+     if (g==sq)
+      dq='0';
+     else
+      dq=ndq;
+    } else {
+     cg=datirec[i][g].codgioc;
+     if (datirec[i][g].dati[vcff]>=camprec.maxfalli){
+      dq=1;
+      ndq++;
+     } else
+      dq=0;
+    }
+    s={codprt:prtrec.codprt,
+     codgioc:cg,
+     codsq:prtrec.codsq[i],
+     nmaglia:datirec[i][g].nmaglia,
+     prt:datirec[i][g].dati[vcprt],dq:dq,st:datirec[i][g].dati[vcst],
+     min:datirec[i][g].dati[vcmin],sec:datirec[i][g].dati[vcsec],
+     ff:datirec[i][g].dati[vcff],fs:datirec[i][g].dati[vcfs],
+     ts1:datirec[i][g].dati[vcts1],ts0:datirec[i][g].dati[vcts0],
+     tf1:datirec[i][g].dati[vctf1],tf0:datirec[i][g].dati[vctf0],
+     t31:datirec[i][g].dati[vct31],t30:datirec[i][g].dati[vct30],
+     tl1:datirec[i][g].dati[vctl1],tl0:datirec[i][g].dati[vctl0],
+     ro:datirec[i][g].dati[vcro],rd:datirec[i][g].dati[vcrd],
+     sd:datirec[i][g].dati[vcsd],ss:datirec[i][g].dati[vcss],
+     pp:datirec[i][g].dati[vcpp],pr:datirec[i][g].dati[vcpr],
+     ass:datirec[i][g].dati[vcas],sc:datirec[i][g].dati[vcsc1],
+     pm:datirec[i][g].dati[vcpm],stl1:datirec[i][g].dati[vcstl1],
+     stl6:datirec[i][g].dati[vcstl6],seqtl:datirec[i][g].seqtl,
+     tiri:datirec[i][g].tiri};
+    rg=newrec('dati');
+    updaterec('dati',rg,s);
+   }
+  }
+ }
+ savedb();
+ alert('INFORMAZIONE\nSalvataggio dati eseguito!');
+ localStorage.removeItem('refertotxt');
+ sessionStorage.removeItem('refertoold');
+ localStorage.removeItem('abflag');
+ vai('index.htm');
+}
+
+function setdatocmp(s,d){
+ switch (d){
+  case dcff:
+   daticmp[s][d]=datirec[s][tot].dati[vcff];
+   break;
+  case dcfs:
+   daticmp[s][d]=datirec[s][tot].dati[vcfs]+adrec[s].fssq;
+   break;
+  case dcrd:
+   daticmp[s][d]=datirec[s][tot].dati[vcrd]+adrec[s].rft;
+   break;
+  case dcrdavv:
+   daticmp[s][d]=datirec[s][tot].dati[vcts0]+datirec[s][tot].dati[vctf0]+datirec[s][tot].dati[vct30]+datirec[s][tot].dati[vctl0]-datirec[s][tot].dati[vcro]-adrec[s].rtl;
+   break;
+  case dcsd:
+   daticmp[s][d]=datirec[s][tot].dati[vcsd];
+   break;
+  case dcss:
+   daticmp[s][d]=datirec[s][tot].dati[vcss];
+   break;
+  case dcpp:
+   daticmp[s][d]=datirec[s][tot].dati[vcpp]+adrec[s].azp;
+   break;
+  case dcpr:
+   daticmp[s][d]=datirec[s][tot].dati[vcpr]+adrec[s].azr;
+   break;
+ }
+}
+
+function setposs(s,v){
+ if ((possiniz)&&(v==-1)){
+  possiniz=false;
+  daticmp[s][dcposs]++;
+  adrec[s].pra++;
+ }
+ daticmp[s][dcposs]+=v;
+}
+
+function setrigheref(s){
+ var r='</num>\n';
+ r=prt2rec.referto.indexOf(r)+r.length;
+ prt2rec.referto=prt2rec.referto.substr(0,r)+s;
+}
+
+function sharingoff(){
+ if (sharing){
+  inviodati('end','');
+ }
+ sharing=false;
+ spia
+  .removeClass('btn-warning btn-success btn-danger')
+  .addClass('btn-info');
+}
+
+function sharingon(){
+ sharing=true;
+ spia
+  .removeClass('btn-warning btn-info btn-danger')
+  .addClass('btn-success');
+ inviodati('ref',prt2rec.referto);
+}
+
+//funzione di controllo della sintassi prima dell'invio al server
+//con settaggio di selgioc e selsq
+function sintassi(testo,intflag){
+/*stati intflag:
+1 gestione visuale selgioc
+2 mantieni selgioc precedente
+4 riassegna i tipi di tiro basandosi sulle coordinate*/
+ var dato,dist,errore,giocsel,i,pselgioc,pselgiocidx,pselsq,pu,puflag,qua,quc,r,s,selflag,sep,sint,sp,t,tdc,v,x,y;
+ var righe=[];
+ var d=[0,1];
+ testo=testo.toUpperCase();
+ if ((intflag&2)!=0){
+  pselsq=selsq;
+  pselgioc=selgioc;
+  pselgiocidx=selgiocidx;
+ }
+ selflag=false;
+ giocsel='AB'.charAt(selsq)+datirec[selsq][selgioc].nmaglia;
+ testo=ltrim(giocsel+' '+testo+' ');
+ pu=-1;
+ while (testo.length>0){
+  //puflag è vero se prima c'era un punto
+  puflag=(pu>=0);
+  //trova i separatori spazio, punto e parentesi quadre
+  sp=testo.indexOf(' ',((puflag)?1:0));
+  qua=testo.indexOf('[',((puflag)?1:0));
+  if ((qua>=0)&&(qua<sp)){
+   quc=testo.indexOf(']',qua);
+   if (quc<0){
+    quc=testo.length-1;
+    testo=testo.substring(0,quc)+'] ';
+   }
+   sp=testo.indexOf(' ',quc);
+   pu=testo.indexOf('.',quc);
+  } else {
+   pu=testo.indexOf('.',((puflag)?1:0));
+  }
+  if ((pu>=0)&&(pu<sp)){
+   if (testo.charAt(pu+1)==' '){
+    testo=testo.substr(0,pu)+' '+testo.substr(pu+1);
+    sp=pu;
+    pu=-1;
+   } else {
+    sp=pu;
+   }
+  } else {
+   pu=-1;
+  }
+  if (pu>=0)
+   puflag=false;
+  //trova il separatore principale, quello che limita il dato da cercare
+  if ((qua>=0)&&(qua<sp)){
+   sep=qua;
+  } else {
+   sep=sp;
+   qua=-1;
+   quc=-1;
+  }
+  //se abbiamo il punto all'inizio, aggiunge A o B se necessario
+  if (puflag){
+   i=testo.charAt(1);
+   //se non è ro o as
+   if (([3,13].indexOf(d[selsq])<0)&&('AB'.indexOf(i)<0)){
+    testo=testo.substr(0,1)+('BA'.charAt(selsq))+testo.substr(1);
+    if (sp>=0){
+     sp++;
+     sep++;
+    }
+   }
+  }
+  tdc=trim(testo.substr(((puflag)?1:0),sep-((puflag)?1:0)));
+  //cerca un giocatore della squadra selezionata
+  sint=-1;
+  s=selsq;
+  dato=gioccerca(s,tdc);
+  s=dato[0];
+  dato=dato[1];
+  //cerca un giocatore di entrambe le squadre
+  if (dato==0){
+   s=-1;
+   dato=gioccerca(s,tdc);
+   s=dato[0];
+   dato=dato[1];
+  }
+  //se trova un giocatore
+  if (dato>0){
+   sint=0;
+   //trova il dato contrario per il punto
+   if (puflag){
+    if (d[s]!=0){
+     t=' '+('FF FS RO RD SD SS PP PR FFPFSPFFAFSAAS '.substr(d[s]*3-3,3))+' ';
+     //se assist, inserisce precedentemente nelle righe,
+     if ((d[s]==13)&&(dato!=sq)){
+      righe.splice(righe.length-1,0,('AB'.charAt(s))+datirec[s][dato].nmaglia+' '+trim(t));
+     } else { //altrimenti inserisce nel testo
+      testo=testo.substring(0,sp)+t+testo.substr(sp);
+     }
+    } else {
+     sint=-1;
+     puflag=false;
+    }
+   }
+   if (sint==0){
+    //se non erano puflag e assist, modifica selsq selgioc selgiocidx giocsel
+    if (!(puflag&&(d[s]==13)&&(dato!=sq))){
+     selsq=s;
+     selgioc=dato;
+     giocsel=('AB'.charAt(s))+datirec[selsq][selgioc].nmaglia;
+     if (selgioc==sq){
+      selgiocidx=datirec[selsq][tot].dati[vcprt]+1;
+     } else {
+      selgiocidx=selgioc;
+     }
+     selflag=true;
+    }
+    //aggiunge un warning se non era in campo
+    if ((dato<sq)&&(datirec[s][dato].dati[vconc]==0)){
+     //warning non in campo
+     //da non inserite in righe perché qui non vengono gestite le sostituzioni
+     sint=1; //warning non in campo
+     errore=rtrim(numeri[selsq].substr(selgiocidx*4-4,4));
+    }
+   }
+  }
+  //cerca dato stat
+  if (sint==-1){
+   v='FF FS TS1TS0TF1TF0T31T30TL1TL0RO RD SD SS PP PR AS SC1PRIAP RFTFFPFSPFFAFSATL-TX1TX0TY1TY0'.indexOf((tdc+'   ').substr(0,3));
+   dato=Math.floor(v/3)+vcff;
+   if ((v%3)==0){
+    sint=0;
+    //se selgioc=sq scarta alcuni dati
+    if ((selgioc==sq)&&([vcts0,vctf0,vct30,vctl1,vctl0,vcsd,vcss,vcas,vcsc1,vctlm,vctx0,vcty0].indexOf(dato)>=0)){
+     sint=2; //error no alla squadra
+     errore=quadra2tonda(trim(testo.substr(0,sp)));
+    }
+    if (sint==0){
+     switch (dato){
+
+      //dati che non siano tiri
+      case vcff:
+      case vcfs:
+      case vcro:
+      case vcrd:
+      case vcsd:
+      case vcss:
+      case vcpp:
+      case vcpr:
+      case vcas:
+      case vcpri:
+      case vcap:
+      case vcrft:
+      case vcffp:
+      case vcfsp:
+      case vcffa:
+      case vcfsa:
+       if ((tdc.length>3)&&(dato>vcsc1)){
+        sint=3; //warning sintassi troppo lunga
+        errore=quadra2tonda(trim(testo.substr(0,sp-1)));
+        tdc=tdc.substr(0,3);
+       }
+       if ((dato==vcap)||(dato==vcrft)) righe.push(trim(('AB'.charAt(selsq))+'SQ '+tdc));
+       else righe.push(trim(giocsel+' '+tdc));
+       break;
+
+      //tiri dal campo
+      case vcts1:
+      case vcts0:
+      case vctf1:
+      case vctf0:
+      case vct31:
+      case vct30:
+      case vcsc1:
+      case vctx1:
+      case vctx0:
+      case vcty1:
+      case vcty0:
+       //trova i dati dentro le parentesi quadre
+       if (qua>=0){
+        t=testo.substring(qua+1,quc);
+        i=t.indexOf('X');
+        s=t.indexOf('Y');
+        x=parseInt(t.substring(i+1,s),10)||0;
+        y=parseInt(t.substring(s+1),10)||0;
+        if (dato>vcsc1){ //tiri indefinito
+         if ((selsq==1)!=(dato>=vcty1)){
+          x=24850-x;
+          y=-y;
+         }
+        }
+        //se le coordinate non sono corrette, vengono azzerate
+        if (((x<-1575)&&(x>26425))||(Math.abs(y)>7500)){
+         x=0;
+         y=0;
+        }
+        dist=Math.sqrt(x*x+y*y);
+        //se il tiro è indefinito (TX o TY), oppure vogliamo modificarlo in base a tsinarea, lo trasforma
+        if ((dato>vcsc1)||(((intflag&4)!=0)&&(dato<vcsc1))){
+         if ((dist>6750)||((x<1415)&&(Math.abs(y)>6600))){
+          dato=vct30-parseInt(tdc.charAt(2),10);
+          //testo:=T3
+          tdc='T3'+tdc.substr(2);
+         //distingue i TS tra 3 metri o in area
+         } else if (((!tsinarea)&&(dist<=3000))||(tsinarea&&((Math.abs(y)<=2450)&&(x<=5800-1575)))){
+          dato=vcts0-parseInt(tdc.charAt(2),10);
+          //testo:=TS
+          tdc='TS'+tdc.substr(2);
+         } else {
+          dato=vctf0-parseInt(tdc.charAt(2),10);
+          //testo:=TF
+          tdc='TF'+tdc.substr(2);
+         }
+        }
+        //controlla la coincidenza tipoditiro-coordinate
+        i='CSF3'.indexOf(tdc.charAt(1));
+        if (i==0) i=1;
+        if ((dist>6750)||((x<1415)&&(Math.abs(y)>6600))) s=3; //T3
+        else if (((!tsinarea)&&(dist<=3000))||(tsinarea&&((Math.abs(y)<=2450)&&(x<=5800-1575)))) s=1; //TS
+        else s=2; //TF
+        if (i!=s){
+         sint=4; //warning coordinate tiro errate
+         errore=tdc+'(X'+x+'Y'+y+')';
+        }
+       }
+       if (dato>vcsc1){
+        sint=5; //errore tiro indefinito
+        errore=quadra2tonda(trim(testo.substring(0,sp)));
+       }
+       if (sint!=5){
+        t=giocsel+' '+tdc;
+        if (qua>=0)
+         t+='[X'+x+'Y'+y+']';
+        righe.push(t);
+       }
+       break;
+
+      //tiri liberi
+      case vctl1:
+      case vctl0:
+      case vctlm:
+       if ((tdc.length>5)||(['-','--','---','0-0'].indexOf((tdc.substr(2)).replace(/1/g,'0'))>=0)){
+        sint=-1;
+        errore=tdc;
+       } else
+        for (i=2;i<tdc.length;i++)
+         if ('-01'.indexOf(tdc.charAt(i))<0){
+          sint=-1;
+          errore=tdc;
+         }
+       if (sint==0){
+        righe.push(giocsel+' '+tdc);
+        if (tdc.charAt(tdc.length-1)=='0')
+         dato=vctl0;
+       }
+       break;
+
+     }
+
+     if ([0,1,3,4].indexOf(sint)>=0){
+      if (pu>=0){
+       //setta posizione in 'FF FS RO RD SD SS PP PR FFPFSPFFAFSAAS '
+       switch (dato){
+        case vcff:
+        case vcfs:
+         d[selsq]=0;
+         t=dato-vcff;
+         d[1-selsq]=2-(t&1);
+         break;
+        case vcsd:
+        case vcss:
+        case vcpp:
+        case vcpr:
+         d[selsq]=0;
+         t=dato-vcsd;
+         d[1-selsq]=6-(t&1)+(t&2);
+         break;
+        case vcap:
+         d[selsq]=0;
+         d[1-selsq]=8;
+         break;
+        case vcffp:
+        case vcfsp:
+        case vcffa:
+        case vcfsa:
+         d[selsq]=0;
+         t=dato-vcffp;
+         d[1-selsq]=10-(t&1)+(t&2);
+         break;
+        case vcts0:
+        case vctf0:
+        case vct30:
+        case vctl0:
+         d[selsq]=3;
+         d[1-selsq]=4;
+         break;
+        case vcts1:
+        case vctf1:
+        case vct31:
+        case vctl1:
+        case vcsc1:
+         d[selsq]=13;
+         d[1-selsq]=0;
+         break;
+        default:
+         d[0]=0;
+         d[1]=0;
+         break;
+       }
+      }
+     }
+    }
+   }
+  }
+  //altre voci
+  if (sint==-1){
+   v=("NOTE'   ERR ATT ENT S   TMP CP  DA  DB  AA  AB  ").indexOf((tdc+'    ').substr(0,4));
+   dato=Math.floor(v/4)+1;
+   if ((v%4)==0){
+    switch (dato){
+     case 1:
+     case 2:
+     case 3:
+     case 9:
+     case 10:
+     case 11:
+     case 12: //NOTE, ', ERR, DA, DB, AA e AB
+      if (qua>=0){
+       sint=0;
+       righe.push(trim(testo.substr(0,sp)));
+      }
+      break;
+     case 4: //ATT
+      sint=0;
+      break;
+     case 5: //ENT
+      if (qua>=0){
+       sint=0;
+       r=trim(testo.substring(qua+1,quc))+' ';
+       i=r.indexOf(' ');
+       t=parseInt(r.substring(0,i),10)||0;
+       while (i>=0){
+        r=ltrim(r.substr(i+1));
+        i=r.indexOf(' ');
+        tdc=r.substring(0,i);
+        if (tdc.length>0){
+         if (tdc.charAt(0)=='+'){
+          s=-1;
+          g=gioccerca(s,tdc.substr(1));
+          s=g[0];
+          g=g[1];
+          if ((g>0)&&(g<sq)){
+           t+=' '+tdc;
+          }
+         }
+        }
+       }
+       righe.push('ENT['+t+']');
+      }
+      break;
+     case 6: //S
+      if (qua>=0){
+       sint=0;
+       r=trim(testo.substring(qua+1,quc))+' ';
+       i=r.indexOf(' ');
+       t=parseInt(r.substring(0,i),10)||0;
+       while (i>=0){
+        r=ltrim(r.substr(i+1));
+        i=r.indexOf(' ');
+        tdc=r.substring(0,i);
+        if (tdc.length>0){
+         if ('+-'.indexOf(tdc.charAt(0))>=0){
+          s=-1;
+          g=gioccerca(s,tdc.substr(1));
+          s=g[0];
+          g=g[1];
+          if ((g>0)&&(g<sq)){
+           t+=' '+tdc;
+          }
+         }
+        }
+       }
+       righe.push('S['+t+']');
+      }
+      break;
+     case 7: //TMP
+      if (qua>=0){
+       sint=0;
+       r=trim(testo.substring(qua+1,quc))+' ';
+       t=parseInt(r,10)||0;
+       righe.push('TMP['+t+']');
+      }
+      break;
+     case 8: //CP
+      sint=0;
+      righe.push(tdc);
+      break;
+    }
+   }
+  }
+  //aggiunge avvertenze ed errori di sintassi
+  switch (sint){
+   case -1:
+    righe.push('ERR['+trim(testo.substring(0,sp))+': non accettabile]');
+    break;
+   case 0: //OK
+   case 1: //non in campo
+    break;
+   case 2:
+    righe.push('ERR['+errore+': non attribuibile alla squadra]');
+    break;
+   case 3:
+    righe.push('ATT['+errore+': sintassi troppo lunga]');
+    break;
+   case 4:
+    righe.push('ATT['+errore+': coordinate di tiro errate]');
+    break;
+   case 5:
+    righe.push('ERR['+errore+': tiro indefinito]');
+    break;
+  }
+  //taglia la parte di testo già elaborata
+  testo=ltrim(testo.substr(sp));
+ }
+ if (((intflag&1)!=0)&&selflag){
+  mostragioc();
+ }
+ if ((intflag&2)!=0){
+  selsq=pselsq;
+  selgioc=pselgioc;
+  selgiocidx=pselgiocidx;
+ }
+ return (righe.join('\n'));
+}
+
+function stpattacchi(esporta){
+ var i,j,mlt,possessi,q,s,t,x;
+ resetdati(true);
+ caricaprtdaref();
+ caricanummag();
+ interprete(getrigheref(),256);
+ var w='';
+ if (esporta){
+  w+='<!DOCTYPE html>';
+  w+='<html lang="it">';
+  w+='<head>';
+  w+='<meta charset="UTF-8">';
+  w+='<meta name="format-detection" content="telephone=no">';
+  w+='<title>Analisi attacchi</title>';
+  w+='<style>';
+ } else
+  w+='<style scoped>';
+ w+='h2, h3 {text-align: center !important;}';
+ w+='.ctr {margin-left: auto; margin-right: auto; white-space: nowrap;}';
+ w+='table {border-collapse: collapse; border: 1px solid;}';
+ w+='table > colgroup {border-left: 1px solid; border-right: 1px solid;}';
+ w+='.titolo {border-right: 1px solid;}';
+ w+='tr:nth-of-type(odd){border-top: 1px solid;}';
+ w+='.tac {text-align: center !important;}';
+ w+='.tal {text-align: left !important;}';
+ w+='.tar {text-align: right !important;}';
+ w+='.lrg {font-size: larger;}';
+ w+='</style>';
+ if (esporta){
+  w+='</head>';
+  w+='<body>';
+ }
+ w+='<h3>'+htmlentities(prt2rec.nomecortosq[0]+' - '+prt2rec.nomecortosq[1])+' '+prt2rec.ris+'</h3>';
+ w+='<h2>Analisi degli attacchi</h2>';
+ w+='<table class="ctr">';
+ w+='<colgroup></colgroup>';
+ w+='<colgroup></colgroup>';
+ w+='<colgroup></colgroup>';
+ w+='<colgroup></colgroup>';
+ w+='<colgroup></colgroup>';
+ w+='<colgroup span="3"></colgroup>';
+ w+='<colgroup span="3"></colgroup>';
+ w+='<colgroup span="4"></colgroup>';
+ w+='<colgroup></colgroup>';
+ w+='<colgroup></colgroup>';
+ w+='<colgroup></colgroup>';
+ w+='<colgroup></colgroup>';
+ w+='<colgroup></colgroup>';
+ w+='<colgroup></colgroup>';
+ w+='<colgroup></colgroup>';
+ w+='<colgroup></colgroup>';
+ w+='<colgroup></colgroup>';
+ w+='<colgroup></colgroup>';
+ for (s=0;s<=1;s++){
+  if (datirec[s][tot].dati[vcprt]==0)
+   continue;
+  w+='<tr class="tac"><td colspan="25" class="titolo lrg"><b>'+htmlentities(prt2rec.nomesq[s])+'</b></td></tr>';
+  w+='<tr class="tar">';
+  w+='<td class="tac"><i>ATTACCO</i></td>';
+  w+='<td><i>POSS</i></td>';
+  w+='<td><i>PUN</i></td>';
+  w+='<td><i>FF</i></td>';
+  w+='<td><i>FS</i></td>';
+  w+='<td class="tac" colspan="3"><i>T2</i></td>';
+  w+='<td class="tac" colspan="3"><i>T3</i></td>';
+  w+='<td class="tac" colspan="4"><i>TL(stl)</i></td>';
+  w+='<td><i>RO</i></td>';
+  w+='<td><i>RD</i></td>';
+  w+='<td><i>SD</i></td>';
+  w+='<td><i>SS</i></td>';
+  w+='<td><i>PP</i></td>';
+  w+='<td><i>PR</i></td>';
+  w+='<td><i>AS</i></td>';
+  w+='<td><i>VAL</i></td>';
+  w+='<td class="tac"><i>OERR</i></td>';
+  w+='<td><i>&plusmn;</i></td></tr>';
+  for (q=1;q<attaccorec.length;q++){
+   if (attaccorec[q].dati[vcprt]!=s)
+    continue;
+   w+='<tr class="tar">';
+   w+='<td class="tac" rowspan="2">'+htmlentities(attaccorec[q].nome)+'</td>';
+   possessi=attaccorec[q].dati[vcts1]+attaccorec[q].dati[vcts0]+attaccorec[q].dati[vctf1]+attaccorec[q].dati[vctf0]+attaccorec[q].dati[vct31]+attaccorec[q].dati[vct30]+attaccorec[q].dati[vcpp]-attaccorec[q].dati[vcro]+Math.floor(attaccorec[q].dati[vcstl6]/6);
+   w+='<td>'+possessi+'</td>';
+   w+='<td>'+puntia(q)+'</td>';
+   for (i=vcff;i<=vcfs;i++)
+    w+='<td>'+attaccorec[q].dati[i]+'</td>';
+   i=vcts1;
+   while (i<vctl0){
+    j=attaccorec[q].dati[i];
+    if (i==vcts1)
+     j+=attaccorec[q].dati[vctf1];
+    t='<td>'+j+'/</td>';
+    x=j;
+    j+=attaccorec[q].dati[i+1];
+    if (i==vcts1){
+     i=vctf1;
+     j+=attaccorec[q].dati[vctf0];
+    }
+    t+='<td>'+j+'</td><td rowspan="2">';
+    if (j>0)
+     t+=(100*x/j).toFixed(1).replace('.',',')+'%';
+    t+='</td>';
+    w+=t;
+    i+=2;
+   }
+   if (attaccorec[q].dati[vcstl6]==0){
+    w+='<td></td>';
+   } else {
+    x=(attaccorec[q].dati[vcstl6]%6)==0?0:1;
+    w+='<td>('+(attaccorec[q].dati[vcstl6]/6).toFixed(x).replace('.',',')+')</td>';
+   }
+   for (i=vcro;i<=vcas;i++)
+    w+='<td>'+attaccorec[q].dati[i]+'</td>';
+   w+='<td>'+valuta(q)+'</td>';
+   //j=possessi+attaccorec[q].dati[vcro];
+   j=possessi;
+   if (j>0)
+    t=(puntia(q)/j).toFixed(3).replace('.',',');
+   else
+    t='';
+   w+='<td rowspan="2">'+t+'</td>';
+   w+='<td>'+attaccorec[q].dati[vcpm]+'</td>';
+   w+='</tr>';
+   w+='<tr class="tar">';
+   w+='<td>100</td>';
+   mlt=100/possessi;
+   w+='<td>'+(puntia(q)*mlt).toFixed(1).replace('.',',')+'</td>';
+   for (i=vcff;i<=vcfs;i++)
+    w+='<td>'+(attaccorec[q].dati[i]*mlt).toFixed(1).replace('.',',')+'</td>';
+   i=vcts1;
+   while (i<vctl0){
+    j=attaccorec[q].dati[i];
+    if (i==vcts1)
+     j+=attaccorec[q].dati[vctf1];
+    t='<td>'+(j*mlt).toFixed(1).replace('.',',')+'/</td>';
+    j+=attaccorec[q].dati[i+1];
+    if (i==vcts1){
+     i=vctf1;
+     j+=attaccorec[q].dati[vctf0];
+    }
+    t+='<td>'+(j*mlt).toFixed(1).replace('.',',')+'</td>';
+    w+=t;
+    i+=2;
+   }
+   if (attaccorec[q].dati[vcstl6]==0){
+    w+='<td></td>';
+   } else {
+    w+='<td>('+(attaccorec[q].dati[vcstl6]/6*mlt).toFixed(1).replace('.',',')+')</td>';
+   }
+   for (i=vcro;i<=vcas;i++)
+    w+='<td>'+(attaccorec[q].dati[i]*mlt).toFixed(1).replace('.',',')+'</td>';
+   w+='<td>'+(valuta(q)*mlt).toFixed(1).replace('.',',')+'</td>';
+   w+='<td>'+(attaccorec[q].dati[vcpm]*mlt).toFixed(1).replace('.',',')+'</td>';
+   w+='</tr>';
+  }
+ }
+ w+='</table>';
+ if (esporta){
+  w+='</body>';
+  w+='</html>';
+  return w;
+ }
+ sessionStorage.stampa=w;
+ sessionStorage.ritorna='prtgest.htm';
+ vai('stampe.htm');
+}
+
+function stpdifese(esporta){
+ var i,j,mlt,possessi,q,s,t,x;
+ resetdati(true);
+ caricaprtdaref();
+ caricanummag();
+ interprete(getrigheref(),128);
+ var w='';
+ if (esporta){
+  w+='<!DOCTYPE html>';
+  w+='<html lang="it">';
+  w+='<head>';
+  w+='<meta charset="UTF-8">';
+  w+='<meta name="format-detection" content="telephone=no">';
+  w+='<title>Analisi difese</title>';
+  w+='<style>';
+ } else
+  w+='<style scoped>';
+ w+='h2, h3 {text-align: center !important;}';
+ w+='.ctr {margin-left: auto; margin-right: auto; white-space: nowrap;}';
+ w+='table {border-collapse: collapse; border: 1px solid;}';
+ w+='table > colgroup {border-left: 1px solid; border-right: 1px solid;}';
+ w+='.titolo {border-right: 1px solid;}';
+ w+='tr:nth-of-type(odd){border-top: 1px solid;}';
+ w+='.tac {text-align: center !important;}';
+ w+='.tal {text-align: left !important;}';
+ w+='.tar {text-align: right !important;}';
+ w+='.lrg {font-size: larger;}';
+ w+='</style>';
+ if (esporta){
+  w+='</head>';
+  w+='<body>';
+ }
+ w+='<h3>'+htmlentities(prt2rec.nomecortosq[0]+' - '+prt2rec.nomecortosq[1])+' '+prt2rec.ris+'</h3>';
+ w+='<h2>Analisi delle difese</h2>';
+ w+='<table class="ctr">';
+ w+='<colgroup></colgroup>';
+ w+='<colgroup></colgroup>';
+ w+='<colgroup></colgroup>';
+ w+='<colgroup></colgroup>';
+ w+='<colgroup></colgroup>';
+ w+='<colgroup span="3"></colgroup>';
+ w+='<colgroup span="3"></colgroup>';
+ w+='<colgroup span="4"></colgroup>';
+ w+='<colgroup></colgroup>';
+ w+='<colgroup></colgroup>';
+ w+='<colgroup></colgroup>';
+ w+='<colgroup></colgroup>';
+ w+='<colgroup></colgroup>';
+ w+='<colgroup></colgroup>';
+ w+='<colgroup></colgroup>';
+ w+='<colgroup></colgroup>';
+ w+='<colgroup></colgroup>';
+ w+='<colgroup></colgroup>';
+ for (s=0;s<=1;s++){
+  if (datirec[1-s][tot].dati[vcprt]==0)
+   continue;
+  w+='<tr class="tac"><td colspan="25" class="titolo lrg"><b>'+htmlentities(prt2rec.nomesq[s])+'</b></td></tr>';
+  w+='<tr class="tar">';
+  w+='<td class="tac"><i>DIFESA</i></td>';
+  w+='<td><i>POSS</i></td>';
+  w+='<td><i>PUN</i></td>';
+  w+='<td><i>FF</i></td>';
+  w+='<td><i>FS</i></td>';
+  w+='<td class="tac" colspan="3"><i>T2</i></td>';
+  w+='<td class="tac" colspan="3"><i>T3</i></td>';
+  w+='<td class="tac" colspan="4"><i>TL(stl)</i></td>';
+  w+='<td><i>RO</i></td>';
+  w+='<td><i>RD</i></td>';
+  w+='<td><i>SD</i></td>';
+  w+='<td><i>SS</i></td>';
+  w+='<td><i>PP</i></td>';
+  w+='<td><i>PR</i></td>';
+  w+='<td><i>AS</i></td>';
+  w+='<td><i>VAL</i></td>';
+  w+='<td class="tac"><i>OERR</i></td>';
+  w+='<td><i>&plusmn;</i></td></tr>';
+  for (q=1;q<difesarec.length;q++){
+   if (difesarec[q].dati[vcprt]!=s)
+    continue;
+   w+='<tr class="tar">';
+   w+='<td class="tac" rowspan="2">'+htmlentities(difesarec[q].nome)+'</td>';
+   possessi=difesarec[q].dati[vcts1]+difesarec[q].dati[vcts0]+difesarec[q].dati[vctf1]+difesarec[q].dati[vctf0]+difesarec[q].dati[vct31]+difesarec[q].dati[vct30]+difesarec[q].dati[vcpp]-difesarec[q].dati[vcro]+Math.floor(difesarec[q].dati[vcstl6]/6);
+   w+='<td>'+possessi+'</td>';
+   w+='<td>'+puntid(q)+'</td>';
+   for (i=vcff;i<=vcfs;i++)
+    w+='<td>'+difesarec[q].dati[i]+'</td>';
+   i=vcts1;
+   while (i<vctl0){
+    j=difesarec[q].dati[i];
+    if (i==vcts1)
+     j+=difesarec[q].dati[vctf1];
+    t='<td>'+j+'/</td>';
+    x=j;
+    j+=difesarec[q].dati[i+1];
+    if (i==vcts1){
+     i=vctf1;
+     j+=difesarec[q].dati[vctf0];
+    }
+    t+='<td>'+j+'</td><td rowspan="2">';
+    if (j>0)
+     t+=(100*x/j).toFixed(1).replace('.',',')+'%';
+    t+='</td>';
+    w+=t;
+    i+=2;
+   }
+   if (difesarec[q].dati[vcstl6]==0){
+    w+='<td></td>';
+   } else {
+    x=(difesarec[q].dati[vcstl6]%6)==0?0:1;
+    w+='<td>('+(difesarec[q].dati[vcstl6]/6).toFixed(x).replace('.',',')+')</td>';
+   }
+   for (i=vcro;i<=vcas;i++)
+    w+='<td>'+difesarec[q].dati[i]+'</td>';
+   w+='<td>'+valutd(q)+'</td>';
+   //j=possessi+difesarec[q].dati[vcro];
+   j=possessi;
+   if (j>0)
+    t=(puntid(q)/j).toFixed(3).replace('.',',');
+   else
+    t='';
+   w+='<td rowspan="2">'+t+'</td>';
+   w+='<td>'+difesarec[q].dati[vcpm]+'</td>';
+   w+='</tr>';
+   w+='<tr class="tar">';
+   w+='<td>100</td>';
+   mlt=100/possessi;
+   w+='<td>'+(puntid(q)*mlt).toFixed(1).replace('.',',')+'</td>';
+   for (i=vcff;i<=vcfs;i++)
+    w+='<td>'+(difesarec[q].dati[i]*mlt).toFixed(1).replace('.',',')+'</td>';
+   i=vcts1;
+   while (i<vctl0){
+    j=difesarec[q].dati[i];
+    if (i==vcts1)
+     j+=difesarec[q].dati[vctf1];
+    t='<td>'+(j*mlt).toFixed(1).replace('.',',')+'/</td>';
+    x=j;
+    j+=difesarec[q].dati[i+1];
+    if (i==vcts1){
+     i=vctf1;
+     j+=difesarec[q].dati[vctf0];
+    }
+    t+='<td>'+(j*mlt).toFixed(1).replace('.',',')+'</td>';
+    w+=t;
+    i+=2;
+   }
+   if (difesarec[q].dati[vcstl6]==0){
+    w+='<td></td>';
+   } else {
+    w+='<td>('+(difesarec[q].dati[vcstl6]/6*mlt).toFixed(1).replace('.',',')+')</td>';
+   }
+   for (i=vcro;i<=vcas;i++)
+    w+='<td>'+(difesarec[q].dati[i]*mlt).toFixed(1).replace('.',',')+'</td>';
+   w+='<td>'+(valutd(q)*mlt).toFixed(1).replace('.',',')+'</td>';
+   w+='<td>'+(difesarec[q].dati[vcpm]*mlt).toFixed(1).replace('.',',')+'</td>';
+   w+='</tr>';
+  }
+ }
+ w+='</table>';
+ if (esporta){
+  w+='</body>';
+  w+='</html>';
+  return w;
+ }
+ sessionStorage.stampa=w;
+ sessionStorage.ritorna='prtgest.htm';
+ vai('stampe.htm');
+}
+
+function stpmappe(s,esporta){
+ var g,i,j,mlt,t,x,y;
+ var nl="\n";
+ y=3; //numero di colonne della tabella
+ var w='';
+ if (esporta){
+  w+='<!DOCTYPE html>';
+  w+='<html lang="it">';
+  w+='<head>';
+  w+='<meta charset="UTF-8">';
+  w+='<meta name="format-detection" content="telephone=no">';
+  w+='<title>Mappe tiro</title>';
+  w+='<style>';
+ } else
+  w+='<style scoped>';
+ w+='h2, h3 {text-align: center !important;}';
+ w+='.ctr {margin-left: auto; margin-right: auto;}';
+ w+='table.ctr {border-collapse: collapse;}';
+ w+='.ctr td {border: 1px solid; text-align: center !important;}';
+ w+='.nobrd td {border: 0px; text-align: left !important;}';
+ w+='table.ctr > td {width: '+(100/y).toFixed(1)+'%;}';
+ w+='td.tac {text-align: center !important;}';
+ w+='div.mappa {margin: 0; padding: 0; border: 1px solid blue;}';
+ w+='</style>';
+ if (esporta){
+  w+='</head>';
+  w+='<body>';
+ }
+ w+='<h3>'+htmlentities(prt2rec.nomecortosq[0]+' - '+prt2rec.nomecortosq[1])+' '+prt2rec.ris+'</h3>';
+ w+='<h2>Mappe di tiro '+htmlentities(prt2rec.nomecortosq[s])+'</h2>';
+ w+='<table class="ctr">';
+ x=2;
+ for (g=1;g<=datirec[s][tot].dati[vcprt];g++){
+  x++;
+  if (x>=y){
+   if (g>1)
+    w+='</tr>';
+   x=0;
+   w+='<tr>';
+  }
+  w+='<td>';
+  w+='<table class="nobrd">';
+  w+='<tr><td class="tac" colspan="2">';
+  w+=datirec[s][g].nmaglia+' '+htmlentities(datirec[s][g].cognome+' '+datirec[s][g].nome);
+  w+='</td></tr>';
+  w+='<tr><td>';
+  w+='<div class="mappa">';
+  w+='<canvas width="200" height="200" data-tiro="'+datirec[s][g].tiri+'"></canvas>';
+  w+='</div>';
+  w+='</td><td>';
+  i=vcts1;
+  while (i<vctl0){
+   j=datirec[s][g].dati[i];
+   t='TSTFT3TL'.substr(i-vcts1,2)+'&nbsp;'+j+'/';
+   mlt=j;
+   j+=datirec[s][g].dati[i+1];
+   t+=j;
+   if (j>0)
+    t+='&nbsp;'+(100*mlt/j).toFixed(1).replace('.',',')+'%';
+   if (i<vctl1)
+    t+='<br>';
+   w+=t;
+   i+=2;
+  }
+  w+='</td></tr>';
+  w+='<tr><td colspan="2">';
+  w+='SeqTL:'+datirec[s][g].seqtl;
+  w+='</td></tr>';
+  w+='</table>';
+  w+='</td>';
+ }
+ for (g=x+1;g<y;g++){
+  w+='<td></td>';
+ }
+ if (datirec[s][tot].dati[vcprt]>=1)
+  w+='</tr>';
+ w+='</table>';
+ if (esporta){
+  w+='<script>'+nl;
+  w+='var cvs=document.getElementsByTagName("canvas");'+nl;
+  w+='if (cvs.length>0){'+nl;
+  w+=' for (var c=0;c<cvs.length;c++){'+nl;
+  w+='  disvert(cvs[c],cvs[c].height,cvs[c].width);'+nl;
+  w+='  distiri(cvs[c],cvs[c].dataset.tiro+",");'+nl;
+  w+=' }'+nl;
+  w+='}'+nl;
+  w+=disvert.toString()+nl;
+  w+=distiri.toString()+nl;
+  w+='</script>'+nl;
+  w+='</body>';
+  w+='</html>';
+  return w;
+ }
+ sessionStorage.stampa=w;
+ sessionStorage.ritorna='prtgest.htm';
+ vai('stampe.htm');
+}
+
+function stpmappaint(esporta){
+ var g;
+ var nl="\n";
+ var ta=new Array(new Array(),new Array());
+ var w='';
+ if (esporta){
+  w+='<!DOCTYPE html>';
+  w+='<html lang="it">';
+  w+='<head>';
+  w+='<meta charset="UTF-8">';
+  w+='<meta name="format-detection" content="telephone=no">';
+  w+='<title>Mappa tiro interattiva</title>';
+  w+='<style>';
+ } else
+  w+='<style scoped>';
+ w+='.tal {text-align: left !important;}';
+ w+='.tac {text-align: center !important;}';
+ w+='</style>';
+ if (esporta){
+  w+='</head>';
+  w+='<body>';
+ }
+ w+='<h3 style="text-align: center;">'+htmlentities(prt2rec.nomecortosq[0]+' - '+prt2rec.nomecortosq[1])+' '+prt2rec.ris+'</h3>';
+ w+='<h2 style="text-align: center;">Mappa tiro interattiva</h2>';
+ w+='<form name="mappa">';
+ w+='<table class="table table-striped table-bordered" style="margin-left: auto; margin-right: auto;">';
+ w+='<thead><tr><th class="tal"><div class="checkbox"><label><input name="sq[]" type="checkbox" checked>'+htmlentities(prt2rec.nomecortosq[0])+'</label></div></th>';
+ for (g=1;g<=tempodigioco;g++){
+  w+='<th><div class="checkbox"><label><input name="tempo[]" type="checkbox" checked>';
+  if (g<=camprec.tempi)
+   w+=g+'&ordm; tempo';
+  else
+   w+=(g-camprec.tempi)+'&ordm; suppl.';
+  w+='</label></div></th>';
+ }
+ w+='<th class="tal"><div class="checkbox"><label><input name="sq[]" type="checkbox" checked>'+htmlentities(prt2rec.nomecortosq[1])+'</label></div></th>';
+ w+='</tr></thead><tbody>';
+ if (datirec[0][tot].dati[vcprt]>=datirec[1][tot].dati[vcprt]) m=datirec[0][tot].dati[vcprt];
+ else m=datirec[1][tot].dati[vcprt];
+ for (g=1;g<=m;g++){
+  w+='<tr>';
+  if (g<=datirec[0][tot].dati[vcprt]){
+   w+='<td class="tal"><div class="checkbox"><label><input name="gioca[]" type="checkbox" checked>';
+   w+=datirec[0][g].nmaglia+' '+htmlentities(datirec[0][g].cognome)+' ';
+   w+=htmlentities(datirec[0][g].nome)+'</label></div></td>';
+   ta[0][g-1]=datirec[0][g].tiri.split(';');
+  } else {
+   w+='<td></td>';
+  }
+  if (g==1){
+   w+='<td rowspan="'+m+'" colspan="'+tempodigioco+'" style="background-color: white;">';
+   w+='<div id="campodiv" style="margin: auto; width: 300px; height: 560px; padding: 0; border: 1px solid blue;';
+   if (!esporta)
+    w+=' background-image: url(\'img/campov.jpg\');';
+   w+='">';
+   w+='<canvas id="disegno" width="300" height="560">';
+   w+='</canvas></div>';
+   w+='</td>';
+  }
+  if (g<=datirec[1][tot].dati[vcprt]){
+   w+='<td class="tal"><div class="checkbox"><label><input name="giocb[]" type="checkbox" checked>';
+   w+=datirec[1][g].nmaglia+' '+htmlentities(datirec[1][g].cognome)+' ';
+   w+=htmlentities(datirec[1][g].nome)+'</label></div></td>';
+   ta[1][g-1]=datirec[1][g].tiri.split(';');
+  } else {
+   w+='<td></td>';
+  }
+  w+='</tr>';
+ }
+ w+='</tbody></table>';
+ w+='</form>';
+ if (esporta){
+  w+='<script>'+nl;
+  w+='var c,cvs,e,i,ta;'+nl;
+  w+='cvs=document.getElementById("disegno");'+nl;
+  w+='disvert(cvs,560,300,true);'+nl;
+  w+=' var ta='+JSON.stringify(ta)+';'+nl;
+  w+='ridisegna();'+nl;
+  w+='e=(document.mappa.elements[\'sq[]\'])||new Array();'+nl;
+  w+='for (i=0;i<e.length;i++) e[i].onclick=Function(\'setsqclick(\'+i+\',this.checked);\');'+nl;
+  w+='e=(document.mappa.elements[\'tempo[]\'])||new Array();'+nl;
+  w+='for (i=0;i<e.length;i++) e[i].onclick=ridisegna;'+nl;
+  w+='for (c=0;c<=1;c++){'+nl;
+  w+=' e=(document.mappa.elements[\'gioc\'+((\'ab\').charAt(c))+\'[]\'])||new Array();'+nl;
+  w+=' for (i=0;i<e.length;i++) e[i].onclick=ridisegna;'+nl;
+  w+='}'+nl;
+  w+=nl;
+  w+='function setsqclick(s,c){'+nl;
+  w+=' var g,gioc;'+nl;
+  w+=' gioc=(document.mappa.elements[\'gioc\'+((\'ab\').charAt(s))+\'[]\'])||new Array();'+nl;
+  w+=' for (g=0;g<gioc.length;g++) gioc[g].checked=c;'+nl;
+  w+=' ridisegna();'+nl;
+  w+='}'+nl;
+  w+=nl;
+  w+='function ridisegna(){'+nl;
+  w+=' var g,gioc,s,t,tmp;'+nl;
+  w+=' tmp=(document.mappa.elements[\'tempo[]\'])||new Array();'+nl;
+  w+=' disvert(cvs,560,300,false);'+nl;
+  w+=' for (s=0;s<=1;s++){'+nl;
+  w+='  gioc=(document.mappa.elements[\'gioc\'+((\'ab\').charAt(s))+\'[]\'])||new Array();'+nl
+  w+='  for (t=0;t<tmp.length;t++) if (tmp[t].checked) for (g=0;g<gioc.length;g++) if (gioc[g].checked) distiri(cvs,ta[s][g][t]+\',\',s);'+nl;
+  w+=' }'+nl;
+  w+='}'+nl;
+  w+=nl;
+  w+=disvert.toString()+nl;
+  w+=distiri.toString()+nl;
+  w+='</script>'+nl;
+  w+='</body>'+nl;
+  w+='</html>';
+  return w;
+ }
+ sessionStorage.stampa=w;
+ sessionStorage.ritorna='prtgest.htm';
+ sessionStorage.tiriarray=JSON.stringify(ta);
+ vai('stampe.htm');
+}
+
+function stppresroster(esporta){
+ var d,g,m,s,y;
+  var w='';
+ if (esporta){
+  w+='<!DOCTYPE html>';
+  w+='<html lang="it">';
+  w+='<head>';
+  w+='<meta charset="UTF-8">';
+  w+='<meta name="format-detection" content="telephone=no">';
+  w+='<title>Presentazione Squadre</title>';
+  w+='<style>';
+ } else
+  w+='<style scoped>';
+ w+='h1, h2, h3, h4, h5 {text-align: center !important;}';
+ w+='.ctr {margin-left: auto; margin-right: auto; white-space: nowrap;}';
+ w+='.ctr td {padding: 2px !important;}';
+ w+='.tac {text-align: center !important;}';
+ w+='.tal {text-align: left !important;}';
+ w+='.tar {text-align: right !important;}';
+ w+='</style>';
+ if (esporta){
+  w+='</head>';
+  w+='<body>';
+ }
+ w+='<h4>Anno sportivo '+camprec.annosport+'</h4>';
+ w+='<h2>'+htmlentities(camprec.nomecamp)+'</h2>';
+ w+='<h3>Girone '+htmlentities(camprec.girone+' - '+camprec.fase)+'</h3>';
+ w+='<h4>'+prtrec.giornata+'&ordf; giornata - ';
+ s=prtrec.dataora;
+ y=parseInt(s.substr(0,4),10);
+ m=parseInt(s.substr(5,2),10);
+ g=parseInt(s.substr(8,2),10);
+ d=new Date(y,m-1,g);
+ w+='DOMLUNMARMERGIOVENSAB'.substr(d.getDay()*3,3)+' '+g+'/'+m+'/'+y+' ore'+s.substr(10);
+ w+=' - '+htmlentities(prtrec.luogo)+'</h4>';
+ w+='<h5>Arbitri: '+htmlentities(prt2rec.arbitri)+'</h5>';
+ w+='<h1>'+htmlentities(prt2rec.nomesq[0])+'<br>vs<br>'+htmlentities(prt2rec.nomesq[1])+'</h1>';
+ w+='<table class="ctr">';
+ for (s=0;s<=1;s++){
+  w+='<tr class="tac"><td colspan="5"><h3>'+htmlentities(prt2rec.nomecortosq[s])+'</h3>All.: '+htmlentities(prt2rec.coach[s])+'</td></tr>';
+  w+='<tr><th>#</th><th></th><th>Anno</th><th>Alt.</th><th>Ruolo</th></tr>';
+  for (g=1;g<=datirec[s][tot].dati[vcprt];g++){
+   w+='<tr class="tar">';
+   w+='<td>'+datirec[s][g].nmaglia+'</td>';
+   w+='<td class="tal">'+htmlentities(datirec[s][g].nome+' '+datirec[s][g].cognome)+'</td>';
+   w+='<td>'+datirec[s][g].anno+'</td>';
+   w+='<td>'+datirec[s][g].altezza+'</td>';
+   w+='<td>'+datirec[s][g].ruolo+'</td>';
+   w+='</tr>';
+  }
+  if (s==0)
+   w+='<tr><td colspan="5"><h1>&nbsp;</h1></td></tr>';
+ }
+ w+='</table>';
+ if (esporta){
+  w+='</body>';
+  w+='</html>';
+  return w;
+ }
+ sessionStorage.stampa=w;
+ sessionStorage.ritorna='prtgest.htm';
+ vai('stampe.htm');
+}
+
+function stpquintetti(esporta){
+ var g,i,j,q,s,t,tdc,x;
+ resetdati(true);
+ caricaprtdaref();
+ caricanummag();
+ interprete(getrigheref(),32);
+ var w='';
+ if (esporta){
+  w+='<!DOCTYPE html>';
+  w+='<html lang="it">';
+  w+='<head>';
+  w+='<meta charset="UTF-8">';
+  w+='<meta name="format-detection" content="telephone=no">';
+  w+='<title>Analisi quintetti</title>';
+  w+='<style>';
+ } else
+  w+='<style scoped>';
+ w+='h2, h3 {text-align: center !important;}';
+ w+='.ctr {margin-left: auto; margin-right: auto; white-space: nowrap;}';
+ w+='table {border-collapse: collapse; border: 1px solid;}';
+ w+='table > colgroup {border-left: 1px solid; border-right: 1px solid;}';
+ w+='.titolo {border-right: 1px solid;}';
+ w+='tr:nth-of-type(odd){border-top: 1px solid;}';
+ w+='.tac {text-align: center !important;}';
+ w+='.tal {text-align: left !important;}';
+ w+='.tar {text-align: right !important;}';
+ w+='.lrg {font-size: larger;}';
+ w+='</style>';
+ if (esporta){
+  w+='</head>';
+  w+='<body>';
+ }
+ w+='<h3>'+htmlentities(prt2rec.nomecortosq[0]+' - '+prt2rec.nomecortosq[1])+' '+prt2rec.ris+'</h3>';
+ w+='<h2>Analisi dei quintetti</h2>';
+ w+='<table class="ctr">';
+ w+='<colgroup span="5"></colgroup>';
+ w+='<colgroup></colgroup>';
+ w+='<colgroup></colgroup>';
+ w+='<colgroup></colgroup>';
+ w+='<colgroup></colgroup>';
+ w+='<colgroup></colgroup>';
+ w+='<colgroup span="3"></colgroup>';
+ w+='<colgroup span="3"></colgroup>';
+ w+='<colgroup span="4"></colgroup>';
+ w+='<colgroup></colgroup>';
+ w+='<colgroup></colgroup>';
+ w+='<colgroup></colgroup>';
+ w+='<colgroup></colgroup>';
+ w+='<colgroup></colgroup>';
+ w+='<colgroup></colgroup>';
+ w+='<colgroup></colgroup>';
+ w+='<colgroup></colgroup>';
+ w+='<colgroup></colgroup>';
+ w+='<colgroup></colgroup>';
+ for (s=0;s<=1;s++){
+  if (datirec[s][tot].dati[vcprt]==0)
+   continue;
+  w+='<tr class="tac"><td colspan="30" class="lrg"><b>'+htmlentities(prt2rec.nomesq[s])+'</b></td></tr>';
+  w+='<tr class="tar">';
+  w+='<td colspan="5" class="tac"><i>QUINTETTO</i></td>';
+  w+='<td></td><td><i>PUN</i></td>';
+  w+='<td class="tac"><i>MIN</i></td>';
+  w+='<td><i>FF</i></td>';
+  w+='<td><i>FS</i></td>';
+  w+='<td class="tac" colspan="3"><i>T2</i></td>';
+  w+='<td class="tac" colspan="3"><i>T3</i></td>';
+  w+='<td class="tac" colspan="4"><i>TL(stl)</i></td>';
+  w+='<td><i>RO</i></td>';
+  w+='<td><i>RD</i></td>';
+  w+='<td><i>SD</i></td>';
+  w+='<td><i>SS</i></td>';
+  w+='<td><i>PP</i></td>';
+  w+='<td><i>PR</i></td>';
+  w+='<td><i>AS</i></td>';
+  w+='<td><i>VAL</i></td>';
+  w+='<td class="tac"><i>OERR</i></td>';
+  w+='<td><i>&plusmn;</i></td></tr>';
+  for (q=1;q<quintrec.length;q++){
+   if (quintrec[q].nmaglia.charCodeAt()-65!=s)
+    continue;
+   w+='<tr class="tar">';
+   t=quintrec[q].nmaglia+' ';
+   while (t.length>0){
+    i=t.indexOf(' ');
+    if (i>=0){
+     tdc=t.substr(0,i);
+     g=numeri[s].indexOf((tdc+'    ').substr(0,4));
+     if ((g%4)==0)
+      g=Math.floor(g/4)+1;
+     w+='<td class="tac" rowspan="2">'+htmlentities(datirec[s][g].cognome)+'<br>'+htmlentities(datirec[s][g].nome)+'</td>';
+     t=ltrim(t.substr(i));
+    }
+   }
+   w+='<td class="tal"><i>Quintetto</i></td>';
+   w+='<td>'+puntiq(q)+'</td>';
+   j=quintrec[q].datipro[vcmin]*60+quintrec[q].datipro[vcsec];
+   i=Math.floor(j/60);
+   j=j%60;
+   t=i+'&prime;'+(('0'+j).slice(-2))+'&Prime;';
+   w+='<td rowspan="2">'+t+'</td>';
+   for (i=vcff;i<=vcfs;i++)
+    w+='<td>'+quintrec[q].datipro[i]+'</td>';
+   i=vcts1;
+   while (i<vctl0){
+    j=quintrec[q].datipro[i];
+    if (i==vcts1)
+     j+=quintrec[q].datipro[vctf1];
+    t='<td>'+j+'/</td>';
+    x=j;
+    j+=quintrec[q].datipro[i+1];
+    if (i==vcts1){
+     i=vctf1;
+     j+=quintrec[q].datipro[vctf0];
+    }
+    t+='<td>'+j+'</td><td>';
+    if (j>0)
+     t+=(100*x/j).toFixed(1).replace('.',',')+'%';
+    t+='</td>';
+    w+=t;
+    i+=2;
+   }
+   if (quintrec[q].datipro[vcstl6]==0){
+    w+='<td></td>';
+   } else {
+    x=(quintrec[q].datipro[vcstl6]%6)==0?0:1;
+    w+='<td>('+(quintrec[q].datipro[vcstl6]/6).toFixed(x).replace('.',',')+')</td>';
+   }
+   for (i=vcro;i<=vcas;i++)
+    w+='<td>'+quintrec[q].datipro[i]+'</td>';
+   w+='<td>'+valutq(q)+'</td>';
+   j=quintrec[q].datipro[vcts1]+quintrec[q].datipro[vcts0]+quintrec[q].datipro[vctf1]+quintrec[q].datipro[vctf0]+quintrec[q].datipro[vct31]+quintrec[q].datipro[vct30]+quintrec[q].datipro[vcpp]-quintrec[q].datipro[vcro];
+   j=j*6+quintrec[q].datipro[vcstl6];
+   if (j>0)
+    t=(6*puntiq(q)/j).toFixed(3).replace('.',',');
+   else
+    t='';
+   w+='<td>'+t+'</td>';
+   w+='<td>'+quintrec[q].datipro[vcpm]+'</td>';
+   w+='</tr>';
+   w+='<tr class="tar">';
+   w+='<td class="tal"><i>Avversari</i></td>';
+   w+='<td>'+puntiqavv(q)+'</td>';
+   for (i=vcff;i<=vcfs;i++)
+    w+='<td>'+quintrec[q].datiavv[i]+'</td>';
+   i=vcts1;
+   while (i<vctl0){
+    j=quintrec[q].datiavv[i];
+    if (i==vcts1)
+     j+=quintrec[q].datiavv[vctf1];
+    t='<td>'+j+'/</td>';
+    x=j;
+    j+=quintrec[q].datiavv[i+1];
+    if (i==vcts1){
+     i=vctf1;
+     j+=quintrec[q].datiavv[vctf0];
+    }
+    t+='<td>'+j+'</td><td>';
+    if (j>0)
+     t+=(100*x/j).toFixed(1).replace('.',',')+'%';
+    t+='</td>';
+    w+=t;
+    i+=2;
+   }
+   if (quintrec[q].datiavv[vcstl6]==0){
+    w+='<td></td>';
+   } else {
+    x=(quintrec[q].datiavv[vcstl6]%6)==0?0:1;
+    w+='<td>('+(quintrec[q].datiavv[vcstl6]/6).toFixed(x).replace('.',',')+')</td>';
+   }
+   for (i=vcro;i<=vcas;i++)
+    w+='<td>'+quintrec[q].datiavv[i]+'</td>';
+   w+='<td>'+valutqavv(q)+'</td>';
+   j=quintrec[q].datiavv[vcts1]+quintrec[q].datiavv[vcts0]+quintrec[q].datiavv[vctf1]+quintrec[q].datiavv[vctf0]+quintrec[q].datiavv[vct31]+quintrec[q].datiavv[vct30]+quintrec[q].datiavv[vcpp]-quintrec[q].datiavv[vcro];
+   j=j*6+quintrec[q].datiavv[vcstl6];
+   if (j>0)
+    t=(6*puntiqavv(q)/j).toFixed(3).replace('.',',');
+   else
+    t='';
+   w+='<td>'+t+'</td>';
+   w+='<td>'+quintrec[q].datiavv[vcpm]+'</td>';
+   w+='</tr>';
+  }
+ }
+ w+='</table>';
+ if (esporta){
+  w+='</body>';
+  w+='</html>';
+  return w;
+ }
+ sessionStorage.stampa=w;
+ sessionStorage.ritorna='prtgest.htm';
+ vai('stampe.htm');
+}
+
+function stpreflegg(esporta){
+ var d,nl,r;
+ nl="\n";
+ resetdati(true);
+ caricaprtdaref();
+ caricanummag();
+ interprete(getrigheref(),64);
+ var w='';
+ if (esporta){
+  w+='<!DOCTYPE html>';
+  w+='<html lang="it">';
+  w+='<head>';
+  w+='<meta charset="UTF-8">';
+  w+='<meta name="format-detection" content="telephone=no">';
+  w+='<title>Referto leggibile</title>';
+  w+='<style>';
+ } else
+  w+='<style scoped>';
+ w+='.ctr {margin-left: auto; margin-right: auto;}';
+ w+='table {border-collapse: collapse;}';
+ w+='td {border: 1px solid; text-align: center !important;}';
+ w+='.tac {text-align: center !important;}';
+ w+='div.mappa {margin: 0; padding: 0; border: 1px solid blue; float: left;}';
+ w+='</style>';
+ if (esporta){
+  w+='</head>';
+  w+='<body>';
+ }
+ w+='<h3 class="tac">'+htmlentities(prt2rec.nomecortosq[0]+' - '+prt2rec.nomecortosq[1])+' '+prt2rec.ris+'</h3>';
+ w+='<h2 class="tac">Referto leggibile</h2>';
+ w+='<table class="ctr">';
+ w+='<col style="width: 40%;">';
+ w+='<col style="width: 20%;">';
+ w+='<col style="width: 40%;">';
+ for (r=0;r<reflegg.length;r++){
+  w+='<tr>';
+  d=reflegg[r].riga[0].indexOf('<div');
+  if (d>0)
+   d=reflegg[r].riga[0].substr(d)+htmlentities(reflegg[r].riga[0].substr(0,d));
+  else
+   d=htmlentities(reflegg[r].riga[0]);
+  w+='<td>'+d+'</td>';
+  w+='<td>'+htmlentities(reflegg[r].riga[2])+'</td>';
+  d=reflegg[r].riga[1].indexOf('<div');
+  if (d>0)
+   d=reflegg[r].riga[1].substr(d)+htmlentities(reflegg[r].riga[1].substr(0,d));
+  else
+   d=htmlentities(reflegg[r].riga[1]);
+  w+='<td>'+d+'</td>';
+  w+='</tr>';
+ }
+ w+='</table>';
+ if (esporta){
+  w+='<script>'+nl;
+  w+='var cvs=document.getElementsByTagName("canvas");'+nl;
+  w+='if (cvs.length>0){'+nl;
+  w+=' for (var c=0;c<cvs.length;c++){'+nl;
+  w+='  disvert(cvs[c],cvs[c].height,cvs[c].width);'+nl;
+  w+='  distiri(cvs[c],cvs[c].dataset.tiro+",");'+nl;
+  w+=' }'+nl;
+  w+='}'+nl;
+  w+=disvert.toString()+nl;
+  w+=distiri.toString()+nl;
+  w+='</script>'+nl;
+  w+='</body>';
+  w+='</html>';
+  return w;
+ }
+ sessionStorage.stampa=w;
+ sessionStorage.ritorna='prtgest.htm';
+ vai('stampe.htm');
+}
+
+function stpstatistiche(esporta){
+ var d,flag,g,i,j,m,oerd,r,s,t,x,y;
+ var w='';
+ var numcol=((datirec[0][tot].dati[vcprt]==0)||(datirec[1][tot].dati[vcprt]==0))?26:27;
+ if (esporta){
+  w+='<!DOCTYPE html>';
+  w+='<html lang="it">';
+  w+='<head>';
+  w+='<meta charset="UTF-8">';
+  w+='<meta name="format-detection" content="telephone=no">';
+  w+='<title>Statistiche</title>';
+  w+='<style>';
+ } else
+  w+='<style scoped>';
+ w+='.ctr {margin-left: auto; margin-right: auto; white-space: nowrap; font-family: Helvetica,Arial,sans-serif;}';
+ w+='.ctr td {padding: 2px !important;}';
+ w+='.nobrd td {border: 0px !important;}';
+ w+='.tac {text-align: center !important;}';
+ w+='.tal {text-align: left !important;}';
+ w+='.tar {text-align: right !important;}';
+ w+='.lrg {font-size: larger;}';
+ w+='</style>';
+ if (esporta){
+  w+='</head>';
+  w+='<body>';
+ }
+ w+='<table class="ctr nobrd">';
+ w+='<tr class="tac"><td colspan="'+numcol+'"><b>';
+ w+=camprec.nomecamp+' Gir. '+camprec.girone+'<br>';
+ s=prtrec.dataora;
+ y=parseInt(s.substr(0,4),10);
+ m=parseInt(s.substr(5,2),10);
+ g=parseInt(s.substr(8,2),10);
+ d=new Date(y,m-1,g);
+ w+='DOMLUNMARMERGIOVENSAB'.substr(d.getDay()*3,3)+' '+g+'/'+m+'/'+y+s.substr(10);
+ w+=' '+prtrec.giornata+'&ordf; giornata Gara '+prtrec.ngara+'<br>';
+ w+='Rilevazioni di '+htmlentities(prt2rec.rilevatori)+'<br><br>';
+ w+='<i>'+htmlentities(prt2rec.nomecortosq[0]+' - '+prt2rec.nomecortosq[1])+' '+prt2rec.ris;
+ w+=' ('+prt2rec.parz+') &bull; Arbitri: '+htmlentities(prt2rec.arbitri);
+ w+='</i></b></td></tr>';
+ if (tempodigioco>1)
+  for (s=0;s<=1;s++)
+   periodocopiatot(tempodigioco,s);
+ for (s=0;s<=1;s++){
+  if (datirec[s][tot].dati[vcprt]==0)
+   continue;
+  j=datirec[s][tot].dati[vcts1]+datirec[s][tot].dati[vcts0]+datirec[s][tot].dati[vctf1]+datirec[s][tot].dati[vctf0]+datirec[s][tot].dati[vct31]+datirec[s][tot].dati[vct30]+datirec[s][tot].dati[vcpp];
+  j=j*6+datirec[s][tot].dati[vcstl6];
+  if (j>0)
+   oerd=-(6*punti(s,tot)/j);
+  else
+   oerd=0;
+  j-=6*datirec[s][tot].dati[vcro];
+  if (j>0)
+   oerd+=(6*punti(s,tot)/j);
+  else
+   oerd=0;
+  w+='<tr class="tac"><td colspan="'+numcol+'"><br><b class="lrg">'+htmlentities(prt2rec.nomesq[s]);
+  w+='</b><br>All.: '+htmlentities(prt2rec.coach[s])+'<br></td></tr>';
+  w+='<tr class="tar">';
+  w+='<td><i>#</i></td>';
+  w+='<td></td>';
+  if (prtrec.sesso[s]=='F')
+   t='GIOCATRICE';
+  else
+   t='GIOCATORE';
+  w+='<td class="tal"><i>'+t+'</i></td>';
+  w+='<td><i>PUN</i></td>';
+  w+='<td class="tac"><i>MIN</i></td>';
+  w+='<td><i>FF</i></td>';
+  w+='<td><i>FS</i></td>';
+  w+='<td class="tac" colspan="3"><i>T2</i></td>';
+  w+='<td class="tac" colspan="3"><i>T3</i></td>';
+  w+='<td class="tac" colspan="4"><i>TL(stl)</i></td>';
+  w+='<td><i>RO</i></td>';
+  w+='<td><i>RD</i></td>';
+  w+='<td><i>SD</i></td>';
+  w+='<td><i>SS</i></td>';
+  w+='<td><i>PP</i></td>';
+  w+='<td><i>PR</i></td>';
+  w+='<td><i>AS</i></td>';
+  w+='<td><i>VAL</i></td>';
+  w+='<td class="tac"><i>OERR</i></td>';
+  if (numcol==27)
+   w+='<td><i>&plusmn;</i></td>';
+  w+='</tr>';
+  for (g=1;g<=tot;g++){
+   if ((g<=datirec[s][tot].dati[vcprt])||(g>=sq)){
+    flag=(g!=sq);
+    w+='<tr class="tar">';
+    if (g<sq){
+     w+='<td>'+datirec[s][g].nmaglia+'</td>';
+     if (datirec[s][g].dati[vcst]==0)
+      t='';
+     else
+      t='*';
+     w+='<td>'+t+'</td>';
+     w+='<td class="tal">'+htmlentities(datirec[s][g].cognome+' '+datirec[s][g].nome)+'</td>';
+    } else {
+     w+='<td></td>';
+     w+='<td></td>';
+     w+='<td class="tal">'+datirec[s][g].cognome+'</td>';
+    }
+    t=punti(s,g);
+    if ((!flag)&&(t==0)) t='';
+    w+='<td>'+t+'</td>';
+    if (flag){
+     j=datirec[s][g].dati[vcmin]*60+datirec[s][g].dati[vcsec];
+     i=Math.floor(j/60);
+     j=j%60;
+     t=i+'&prime;'+(('0'+j).slice(-2))+'&Prime;';
+    } else t='';
+    w+='<td>'+t+'</td>';
+    w+='<td>'+datirec[s][g].dati[vcff]+'</td><td>';
+    if (flag) w+=datirec[s][g].dati[vcfs];
+    w+='</td>';
+    i=vcts1;
+    while (i<vctl0){
+     x=datirec[s][g].dati[i];
+     if (i==vcts1)
+      x+=datirec[s][g].dati[vctf1];
+     if ((flag)||(x!=0)){
+      t='<td>'+x+'/</td>';
+      j=x+datirec[s][g].dati[i+1];
+      if (i==vcts1) j+=datirec[s][g].dati[vctf0];
+      t+='<td>'+j+'</td><td>';
+      if (j>0){
+       t+=(100*x/j).toFixed(1).replace('.',',')+'%';
+      }
+      t+='</td>';
+     } else {
+      t='<td colspan="3"></td>';
+     }
+     if (i==vcts1) i=vctf1;
+     w+=t;
+     i+=2;
+    }
+    if (flag){
+     t=datirec[s][g].dati[vcstl6];
+     if (t==0){
+      t='';
+     } else {
+      x=(t%6)==0?0:1;
+      t='('+(t/6).toFixed(x).replace('.',',')+')';
+     }
+    } else
+     t='';
+    w+='<td>'+t+'</td>';
+    for (i=vcro;i<=vcas;i++){
+     if ((flag)||([vcro,vcrd,vcpp].indexOf(i)>=0))
+      t=datirec[s][g].dati[i];
+     else
+      t='';
+     w+='<td>'+t+'</td>';
+    }
+    w+='<td>'+valut(s,g)+'</td>';
+    j=datirec[s][g].dati[vcts1]+datirec[s][g].dati[vcts0]+datirec[s][g].dati[vctf1]+datirec[s][g].dati[vctf0]+datirec[s][g].dati[vct31]+datirec[s][g].dati[vct30]+datirec[s][g].dati[vcpp];
+    j=j*6+datirec[s][g].dati[vcstl6];
+    if (j>0){
+     t=(6*punti(s,g)/j);
+     if (datirec[s][g].dati[vcro]>0)
+      t=t+(datirec[s][g].dati[vcro]/datirec[s][tot].dati[vcro])*oerd;
+     t=t.toFixed(3).replace('.',',');
+    } else if (datirec[s][g].dati[vcro]>0){
+     t=((datirec[s][g].dati[vcro]/datirec[s][tot].dati[vcro])*oerd).toFixed(3).replace('.',',');
+    } else
+     t='';
+    w+='<td>'+t+'</td>';
+    if (numcol==27){
+     if (flag) //else non serve perché t='', ma adesso riserve
+      t=datirec[s][g].dati[vcpm];
+     else
+      t='';
+     w+='<td>'+t+'</td>';
+    }
+    w+='</tr>';
+   }
+  }
+  if (tempodigioco>1){
+   for (g=1;g<=Math.abs(ent[s]);g++){
+    w+='<tr class="tar">';
+    if (g<=camprec.tempi)
+     t=g+'&ordm; tempo';
+    else
+     t=(g-camprec.tempi)+'&ordm; suppl.';
+    w+='<td></td>';
+    w+='<td></td>';
+    w+='<td class="tal"><i>'+t+'</i></td>';
+    r=2*periododiff(g,s,vcts1)+2*periododiff(g,s,vctf1)+3*periododiff(g,s,vct31)+periododiff(g,s,vctl1);
+    w+='<td>'+r+'</td>';
+    j=periododiff(g,s,vcmin)*60+periododiff(g,s,vcsec);
+    i=Math.floor(j/60);
+    j=j%60;
+    t=i+'&prime;'+(('0'+j).slice(-2))+'&Prime;';
+    w+='<td>'+t+'</td>';
+    for (i=vcff;i<=vcfs;i++)
+     w+='<td>'+periododiff(g,s,i)+'</td>';
+    i=vcts1;
+    while (i<vctl0){
+     j=periododiff(g,s,i);
+     if (i==vcts1)
+      j=j+periododiff(g,s,vctf1);
+     t='<td>'+j+'/</td>';
+     x=j;
+     j=j+periododiff(g,s,i+1);
+     if (i==vcts1){
+      i=vctf1;
+      j=j+periododiff(g,s,vctf0);
+     }
+     t+='<td>'+j+'</td><td>';
+     if (j>0){
+      t+=(100*x/j).toFixed(1).replace('.',',')+'%';
+     }
+     t+='</td>';
+     w+=t;
+     i+=2;
+    }
+    t=periododiff(g,s,vcstl6);
+    if (t==0){
+     t='';
+    } else {
+     x=(t%6)==0?0:1;
+     t='('+(t/6).toFixed(x).replace('.',',')+')';
+    }
+    w+='<td>'+t+'</td>';
+    for (i=vcro;i<=vcas;i++){
+     t=periododiff(g,s,i);
+     w+='<td>'+t+'</td>';
+    }
+    t=r+periododiff(g,s,vcfs)+periododiff(g,s,vcro)+periododiff(g,s,vcrd)+periododiff(g,s,vcsd)+periododiff(g,s,vcpr)+periododiff(g,s,vcas)-periododiff(g,s,vcff)-periododiff(g,s,vcts0)-periododiff(g,s,vctf0)-periododiff(g,s,vct30)-periododiff(g,s,vctl0)-periododiff(g,s,vcss)-periododiff(g,s,vcpp);
+    w+='<td>'+t+'</td>';
+    j=periododiff(g,s,vcts1)+periododiff(g,s,vcts0)+periododiff(g,s,vctf1)+periododiff(g,s,vctf0)+periododiff(g,s,vct31)+periododiff(g,s,vct30)+periododiff(g,s,vcpp)-periododiff(g,s,vcro);
+    j=j*6+periododiff(g,s,vcstl6);
+    if (j>0)
+     t=(r*6/j).toFixed(3).replace('.',',');
+    else
+     t='';
+    w+='<td>'+t+'</td>';
+    if (numcol==27){
+     t=periododiff(g,s,vcpm);
+     w+='<td>'+t+'</td>';
+    }
+    w+='</tr>';
+   }
+  }
+  w+='<tr><td class="tal" colspan="'+numcol+'">SeqTL:'+datirec[s][tot].seqtl+'</td></tr>';
+  w+='<tr><td class="tal" colspan="'+numcol+'">Punti dopo RO: '+adrec[s].ropun+'. RFT: '+adrec[s].rft+'. AzP:'+adrec[s].azp+'. AzR:'+adrec[s].azr+'. FsSq:'+adrec[s].fssq+'.';
+  if (datirec[1-s][tot].dati[vcprt]!=0)
+   w+=' PRI: '+adrec[s].pri+'+'+adrec[s].pra+'.';
+  if (adrec[s].cpnum>0)
+   w+=' Contropiedi: '+adrec[s].cpnum+', '+adrec[s].cppun+'pun, '+adrec[s].cppp+'pp.';
+  w+='</td></tr>';
+ }
+ w+='</table>';
+ if (esporta){
+  w+='</body>';
+  w+='</html>';
+  return w;
+ }
+ sessionStorage.stampa=w;
+ sessionStorage.ritorna='prtgest.htm';
+ vai('stampe.htm');
+}
+
+function stptabcsv(esporta){
+ var nl='\n';
+ var w='';
+ if (! esporta)
+  w+='<pre>';
+ w+='"'+camprec.nomecamp+' Gir. '+camprec.girone+'"'+nl;
+ var s=prtrec.dataora;
+ var y=parseInt(s.substr(0,4),10);
+ var m=parseInt(s.substr(5,2),10);
+ var g=parseInt(s.substr(8,2),10);
+ var d=new Date(y,m-1,g);
+ var p=[punti(0,sq),punti(1,sq)];
+ w+='"'+g+'/'+m+'/'+y+ '"'+nl;
+ w+=nl;
+ w+=nl;
+ w+='"'+prt2rec.nomesq[0]+'";;'+punti(0,tot)+nl;
+ w+='"'+prt2rec.nomesq[1]+'";;'+punti(1,tot)+nl;
+ w+=nl;
+ w+='=A5;;;;=A6'+nl;
+ w+='"N";"GIOCATORE";"PTI";;"N";"GIOCATORE";"PTI"'+nl;
+ if (datirec[0][tot].dati[vcprt]>=datirec[1][tot].dati[vcprt])
+  m=datirec[0][tot].dati[vcprt];
+ else
+  m=datirec[1][tot].dati[vcprt];
+ for (var i=1;i<=m;i++){
+  if (i<=datirec[0][tot].dati[vcprt]){
+   w+='"'+datirec[0][i].nmaglia+'"'+';';
+   w+='"'+datirec[0][i].cognome+' '+datirec[0][i].nome+'";';
+   w+=punti(0,i)+';';
+  } else w+=';;;';
+  w+=';';
+  if (i<=datirec[1][tot].dati[vcprt]){
+   w+='"'+datirec[1][i].nmaglia+'"'+';';
+   w+='"'+datirec[1][i].cognome+' '+datirec[1][i].nome+'";';
+   w+=punti(1,i)+';';
+  }
+  w+=nl;
+ }
+ for (i=m+1;i<=12;i++)
+  w+=';;;;;;' + nl;
+ if (p[0]+p[1]!=0){
+  if (p[0]!=0){
+   w+=';';
+   w+='"Squadra (autocanestro)";';
+   w+=p[0]+';';
+  } else w+=';;;';
+  w+=';';
+  if (p[1]!=0){
+   w+=';';
+   w+='"Squadra (autocanestro)";';
+   w+=p[1]+';';
+  }
+  w+=nl;
+  i=22;
+ } else i=21;
+ w+='"All.";"'+prt2rec.coach[0]+'";=SOMMA(C10:C'+i+');;"All.";"'+prt2rec.coach[1]+'";=SOMMA(G10:G'+i+')'+nl;
+ if (esporta)
+  return w;
+ w+='</pre>';
+ sessionStorage.stampa=w;
+ sessionStorage.ritorna='prtgest.htm';
+ vai('stampe.htm');
+}
+
+function stptabtxt(esporta){
+ var nl='\n';
+ var w='';
+ if (! esporta)
+  w+='<pre style="white-space: pre-wrap; white-space: -moz-pre-wrap; white-space: -pre-wrap; white-space: -o-pre-wrap; word-wrap: break-word;">';
+ w+=prt2rec.nomecortosq[0]+' - '+prt2rec.nomecortosq[1]+' '+prt2rec.ris+nl;
+ w+='('+prt2rec.parz+')'+nl;
+ for (var s=0;s<=1;s++){
+  w+=nl;
+  w+=prt2rec.nomesq[s]+': ';
+  for (var i=1;i<=datirec[s][tot].dati[vcprt];i++){
+   if (i>1)
+    w+=', ';
+   w+=datirec[s][i].cognome+' '+datirec[s][i].nome;
+   var p=punti(s,i);
+   if (p>0)
+    w+=' '+p;
+  }
+  p=punti(s,sq);
+  if (p!=0) w+='. Squadra '+p+' (autocanestro)';
+  w+='. All.: '+prt2rec.coach[s]+'.'+nl;
+ }
+ w+=nl+'Arbitri: '+prt2rec.arbitri+nl;
+ if (esporta)
+  return w;
+ w+='</pre>';
+ sessionStorage.stampa=w;
+ sessionStorage.ritorna='prtgest.htm';
+ vai('stampe.htm');
+}
+
+function stpul(){
+ // per inserire ris e parz nel referto
+ refiniz();
+ saveallref();
+ var stp=new Array();
+ stp[0]='stats.htm';
+ stp[1]=stpstatistiche(1);
+ stp[2]='attacchi.htm';
+ stp[3]=stpattacchi(1);
+ stp[4]='difese.htm';
+ stp[5]=stpdifese(1);
+ stp[6]='quint.htm';
+ stp[7]=stpquintetti(1);
+ stp[8]='tab.csv';
+ stp[9]=stptabcsv(1);
+ stp[10]='tab.txt';
+ stp[11]=stptabtxt(1);
+ stp[12]='presroster.htm';
+ stp[13]=stppresroster(1);
+ stp[14]='reflegg.htm';
+ stp[15]=stpreflegg(1);
+ stp[16]='mappea.htm';
+ stp[17]=stpmappe(0,1);
+ stp[18]='mappeb.htm';
+ stp[19]=stpmappe(1,1);
+ stp[20]='mappaint.htm';
+ stp[21]=stpmappaint(1);
+ sessionStorage.stampa=JSON.stringify(stp);
+ sessionStorage.ritorna='prtgest.htm';
+ vai('stpexport.htm');
+}
+
+function valut(s,g){
+ return datirec[s][g].dati[vcfs]+punti(s,g)+datirec[s][g].dati[vcro]+datirec[s][g].dati[vcrd]+datirec[s][g].dati[vcsd]+datirec[s][g].dati[vcpr]+datirec[s][g].dati[vcas]-datirec[s][g].dati[vcff]-datirec[s][g].dati[vcts0]-datirec[s][g].dati[vctf0]-datirec[s][g].dati[vct30]-datirec[s][g].dati[vctl0]-datirec[s][g].dati[vcss]-datirec[s][g].dati[vcpp];
+}
+
+function valuta(q){
+ return attaccorec[q].dati[vcfs]+puntia(q)+attaccorec[q].dati[vcro]+attaccorec[q].dati[vcrd]+attaccorec[q].dati[vcsd]+attaccorec[q].dati[vcpr]+attaccorec[q].dati[vcas]-attaccorec[q].dati[vcff]-attaccorec[q].dati[vcts0]-attaccorec[q].dati[vctf0]-attaccorec[q].dati[vct30]-attaccorec[q].dati[vctl0]-attaccorec[q].dati[vcss]-attaccorec[q].dati[vcpp];
+}
+
+function valutd(q){
+ return difesarec[q].dati[vcfs]+puntid(q)+difesarec[q].dati[vcro]+difesarec[q].dati[vcrd]+difesarec[q].dati[vcsd]+difesarec[q].dati[vcpr]+difesarec[q].dati[vcas]-difesarec[q].dati[vcff]-difesarec[q].dati[vcts0]-difesarec[q].dati[vctf0]-difesarec[q].dati[vct30]-difesarec[q].dati[vctl0]-difesarec[q].dati[vcss]-difesarec[q].dati[vcpp];
+}
+
+function valutq(q){
+ return quintrec[q].datipro[vcfs]+puntiq(q)+quintrec[q].datipro[vcro]+quintrec[q].datipro[vcrd]+quintrec[q].datipro[vcsd]+quintrec[q].datipro[vcpr]+quintrec[q].datipro[vcas]-quintrec[q].datipro[vcff]-quintrec[q].datipro[vcts0]-quintrec[q].datipro[vctf0]-quintrec[q].datipro[vct30]-quintrec[q].datipro[vctl0]-quintrec[q].datipro[vcss]-quintrec[q].datipro[vcpp];
+}
+
+function valutqavv(q){
+ return quintrec[q].datiavv[vcfs]+puntiqavv(q)+quintrec[q].datiavv[vcro]+quintrec[q].datiavv[vcrd]+quintrec[q].datiavv[vcsd]+quintrec[q].datiavv[vcpr]+quintrec[q].datiavv[vcas]-quintrec[q].datiavv[vcff]-quintrec[q].datiavv[vcts0]-quintrec[q].datiavv[vctf0]-quintrec[q].datiavv[vct30]-quintrec[q].datiavv[vctl0]-quintrec[q].datiavv[vcss]-quintrec[q].datiavv[vcpp];
+}
+-->
+</script>
+</body>
+</html>

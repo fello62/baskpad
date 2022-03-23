@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>BaskPad</title>
+<link href="img/basket.ico" rel="shortcut icon" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="css/bp.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+ <div class="container-fluid">
+  <div class="navbar-header">
+   <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+    <span class="sr-only">Toggle navigation</span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+   </button>
+   <a class="navbar-brand" href="javascript:void(0);">BaskPad: Database Campionati</a>
+  </div>
+  <div id="navbar" class="navbar-collapse collapse">
+   <ul class="nav navbar-nav navbar-right">
+    <li><a href="javascript:vai('index.htm');">Chiudi <span>&times;</span></a></li>
+   </ul>
+  </div>
+ </div>
+</nav>
+
+<div class="container">
+ <div class="row">
+  <div class="col-xs-8 col-xs-offset-1">
+   <h4>Gestione campionati</h4>
+  </div>
+  <div class="col-xs-2">
+   <button type="button" class="btn btn-default" data-toggle="modal" data-target="#modModal" data-riga="0"><span class="glyphicon glyphicon-plus"></span> Nuovo</button>
+  </div>
+ </div>
+ <form name="a" class="form-horizontal">
+  <div class="form-group">
+   <label class="col-xs-3 col-xs-offset-3 control-label">Anno sportivo</label>
+   <div class="col-xs-3">
+    <select name="annosport" class="form-control">
+    </select>
+   </div>
+  </div>
+ </form>
+ <div class="row">
+  <div class="col-xs-12 table-responsive">
+   <table class="table table-hover">
+    <thead>
+     <tr id="intest">
+      <th>Modifica</th>
+      <th>Elimina</th>
+      <th data-ord="nomecamp">Nome<b class="caret-su"></b></th>
+      <th data-ord="girone">Girone</th>
+      <th data-ord="fase">Fase</th>
+      <th data-ord="tempi">Tempi</th>
+      <th data-ord="durata">Durata</th>
+      <th data-ord="suppl">Suppl.</th>
+      <th data-ord="maxfalli">Max falli</th>
+      <th data-ord="codcamp">Codice</th>
+     </tr>
+    </thead>
+    <tbody id="righe">
+    </tbody>
+   </table>
+  </div>
+ </div>
+</div>
+
+<form name="f" class="form-horizontal">
+ <div class="modal fade" id="modModal" tabindex="-1">
+  <div class="modal-dialog">
+   <div class="modal-content">
+    <div class="modal-header">
+     <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+     <h4 class="modal-title">camp</h4>
+    </div>
+    <div class="modal-body">
+     <div class="form-group">
+      <label class="col-xs-4 control-label">Anno sportivo</label>
+      <div class="col-xs-8">
+       <input type="text" class="form-control mod" name="annosport">
+       <p class="form-control-static eli" id="eliannosport"></p>
+      </div>
+     </div>
+     <div class="form-group">
+      <label class="col-xs-4 control-label">Nome campionato</label>
+      <div class="col-xs-8">
+       <input type="text" class="form-control mod" name="nomecamp">
+       <p class="form-control-static eli" id="elinomecamp"></p>
+      </div>
+     </div>
+     <div class="form-group">
+      <label class="col-xs-4 control-label">Girone</label>
+      <div class="col-xs-8">
+       <input type="text" class="form-control mod" name="girone">
+       <p class="form-control-static eli" id="eligirone"></p>
+      </div>
+     </div>
+     <div class="form-group">
+      <label class="col-xs-4 control-label">Fase</label>
+      <div class="col-xs-8">
+       <input type="text" class="form-control mod" name="fase">
+       <p class="form-control-static eli" id="elifase"></p>
+      </div>
+     </div>
+     <div class="form-group">
+      <label class="col-xs-4 control-label">Numero tempi di gioco</label>
+      <div class="col-xs-8">
+       <input type="text" class="form-control mod" name="tempi">
+       <p class="form-control-static eli" id="elitempi"></p>
+      </div>
+     </div>
+     <div class="form-group">
+      <label class="col-xs-4 control-label">Durata</label>
+      <div class="col-xs-8">
+       <input type="text" class="form-control mod" name="durata">
+       <p class="form-control-static eli" id="elidurata"></p>
+      </div>
+     </div>
+     <div class="form-group">
+      <label class="col-xs-4 control-label">Durata supplementari</label>
+      <div class="col-xs-8">
+       <input type="text" class="form-control mod" name="suppl">
+       <p class="form-control-static eli" id="elisuppl"></p>
+      </div>
+     </div>
+     <div class="form-group">
+      <label class="col-xs-4 control-label">Limite falli</label>
+      <div class="col-xs-8">
+       <input type="text" class="form-control mod" name="maxfalli">
+       <p class="form-control-static eli" id="elimaxfalli"></p>
+      </div>
+     </div>
+    </div>
+    <div class="modal-footer">
+     <button type="button" class="btn btn-lg btn-default" data-dismiss="modal">Annulla</button>
+     <button type="submit" class="btn btn-lg btn-primary"></button>
+    </div>
+   </div>
+  </div>
+ </div>
+</form>
+
+<script src="js/jquery-1.11.2.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/localforage.min.js"></script>
+<script src="js/ctrldata.js"></script>
+<script src="js/bp.js"></script>
+<script>
+<!--
+var rg;
+var act;
+var ansp='';
+var ordine='nomecamp';
+var verso='asc';
+leggioptas();
+
+$('#intest > th[data-ord]')
+.css('cursor','pointer')
+.click(function(event){
+ var button=$(this);
+ $('#intest').find('b').remove();
+ if ((ordine!=button.data('ord'))||(verso=='desc')){
+  verso='asc';
+  button.html(button.html()+'<b class="caret-su"></b>');
+ } else {
+  verso='desc';
+  button.html(button.html()+'<b class="caret"></b>');
+ }
+ ordine=button.data('ord');
+ leggirighe();
+});
+
+$('#modModal').on('show.bs.modal',function(event){
+ // trova il Button che ha aperto il Modal
+ var button=$(event.relatedTarget);
+ // trova la riga del Button
+ rg=button.data('riga');
+ act=button.hasClass('eli');
+ var modal=$(this);
+ var titolo;
+ var bt;
+ var hid;
+ var vis;
+ if (act){
+  titolo='Eliminazione';
+  vis='.eli';
+  hid='.mod';
+  bt='Elimina';
+  $('#eliannosport').text(ansp);
+  $('#elinomecamp').text($('#rg'+rg+'a').text());
+  $('#eligirone').text($('#rg'+rg+'b').text());
+  $('#elifase').text($('#rg'+rg+'c').text());
+  $('#elitempi').text($('#rg'+rg+'d').text());
+  $('#elidurata').text($('#rg'+rg+'e').text());
+  $('#elisuppl').text($('#rg'+rg+'f').text());
+  $('#elimaxfalli').text($('#rg'+rg+'g').text());
+ } else {
+  if (rg=="0") {
+   titolo='Nuovo';
+   var d=new Date();
+   var y=d.getFullYear();
+   if (d.getMonth()<7)
+    y--;
+   document.f.annosport.value=''+y+'-'+String(1+y).slice(-2);
+   document.f.nomecamp.value='';
+   document.f.girone.value='';
+   document.f.fase.value='';
+   document.f.tempi.value='4';
+   document.f.durata.value='10';
+   document.f.suppl.value='5';
+   document.f.maxfalli.value='5';
+  } else {
+   titolo='Modifica';
+   document.f.annosport.value=ansp;
+   document.f.nomecamp.value=$('#rg'+rg+'a').text();
+   document.f.girone.value=$('#rg'+rg+'b').text();
+   document.f.fase.value=$('#rg'+rg+'c').text();
+   document.f.tempi.value=$('#rg'+rg+'d').text();
+   document.f.durata.value=$('#rg'+rg+'e').text();
+   document.f.suppl.value=$('#rg'+rg+'f').text();
+   document.f.maxfalli.value=$('#rg'+rg+'g').text();
+  }
+  vis='.mod';
+  hid='.eli';
+  bt='Salva';
+ }
+ modal.find(vis).css({'visible':'true','display':'block'});
+ modal.find(hid).css({'visible':'false','display':'none'});
+ modal.find('.modal-title').text(titolo+' campionato');
+ modal.find('button[type=submit]').text(bt);
+});
+
+$('#modModal').on('shown.bs.modal',function(event){
+ if (act){
+  $(this).find('button[type=submit]').focus();
+ } else {
+  var o=document.f.annosport;
+  o.focus();
+  o.setSelectionRange(0,o.value.length);
+ }
+});
+
+$(document.a.annosport).on('change',function(event){
+ ansp=$(this).val();
+ leggirighe();
+});
+
+$(document.f.nomecamp).on('blur',function(event){
+ return maiusc(this);
+});
+
+$(document.f.girone).on('blur',function(event){
+ return maiusc(this);
+});
+
+$(document.f.fase).on('blur',function(event){
+ return maiusc(this);
+});
+
+$(document.f.tempi).on('blur',function(event){
+ return ctrlnumero(this,1,99);
+});
+
+$(document.f.durata).on('blur',function(event){
+ return ctrlnumero(this,1,99);
+});
+
+$(document.f.suppl).on('blur',function(event){
+ return ctrlnumero(this,1,99);
+});
+
+$(document.f.maxfalli).on('blur',function(event){
+ return ctrlnumero(this,1,9);
+});
+
+$(document.f).on('submit',function(event){
+ var ar;
+ if (act){
+  deleterec('camp',function(x,y){
+   return adb.camp[x][0]==y;
+  },rg);
+ } else {
+  maiusc(document.f.nomecamp);
+  maiusc(document.f.girone);
+  maiusc(document.f.fase);
+  ctrlnumero(document.f.tempi,1,99);
+  ctrlnumero(document.f.durata,1,99);
+  ctrlnumero(document.f.suppl,1,99);
+  ctrlnumero(document.f.maxfalli,1,9);
+  ansp=document.f.annosport.value;
+  ar={annosport:ansp,nomecamp:document.f.nomecamp.value,girone:document.f.girone.value,fase:document.f.fase.value,tempi:document.f.tempi.value,durata:document.f.durata.value,suppl:document.f.suppl.value,maxfalli:document.f.maxfalli.value};
+  if (rg==0)
+   rg=newrec('camp');
+  updaterec('camp',rg,ar);
+ }
+ $('#modModal').modal('hide');
+ savedb();
+ leggioptas();
+ return false;
+});
+
+function leggioptas(){
+ var d,h,i,r,t,sel,v1;
+ if (leggendo){
+  setTimeout(function(){leggioptas();},100);
+  return;
+ }
+ r={};
+ d=adf.camp.annosport;
+ for(i=0;i<adb.camp.length;i++)
+  r[adb.camp[i][d]]=i;
+ r=Object.keys(r);
+ r.sort(function(a,b){
+  return ((a==b)?0:((a>b)?-1:1));
+ });
+ h=v1='';
+ for(i=0;i<r.length;i++){
+  t=r[i];
+  if (i==0)
+   v1=t;
+  if ((ansp.length>0)&&(ansp==t))
+   v1=t;
+  h+='<option>'+t+'</option>';
+ }
+ ansp=v1;
+ sel=$(document.a.annosport);
+ sel.html(h);
+ if (ansp.length>0)
+  sel.val(ansp);
+ leggirighe();
+}
+
+function leggirighe(){
+ var c,d,h,i,j,r,ar,chiavi,mappa;
+ if (ansp.length==0){
+  $('#righe').html('');
+  return;
+ }
+ chiavi=Object.keys(adf.camp);
+ chiavi.pop();
+ r=chiavi.length;
+ d=adf.camp.annosport;
+ mappa=[];
+ for(i=0;i<adb.camp.length;i++)
+  if (adb.camp[i][d]==ansp){
+   h={};
+   for(j=0;j<r;j++)
+    h[chiavi[j]]=adb.camp[i][j];
+   mappa.push(h);
+  }
+ if (adf.camp.tipo[adf.camp[ordine]]=='n')
+  mappa.sort(function(a,b){
+   return (a[ordine]-b[ordine])*(verso=='asc'?1:-1);
+  });
+ else
+  mappa.sort(function(a,b){
+   return ((a[ordine]==b[ordine])?0:((a[ordine]>b[ordine])?1:-1))*(verso=='asc'?1:-1);
+  });
+ h='';
+ for(i=0;i<mappa.length;i++){
+  r=mappa[i];
+  c=r.codcamp;
+  ar=[];
+  ar.push(r.nomecamp);
+  ar.push(r.girone);
+  ar.push(r.fase);
+  ar.push(r.tempi);
+  ar.push(r.durata);
+  ar.push(r.suppl);
+  ar.push(r.maxfalli);
+  ar.push(c);
+  h+='<tr><td><button type="button" class="btn btn-default" data-toggle="modal" data-target="#modModal" data-riga="'+c+'"><span class="glyphicon glyphicon-pencil"></span></button></td>';
+  h+='<td><button type="button" class="btn btn-default eli" data-toggle="modal" data-target="#modModal" data-riga="'+c+'"><span class="glyphicon glyphicon-remove"></span></button></td>';
+  for(j=0;j<ar.length;j++){
+   h+='<td id="rg'+c+String.fromCharCode(97+j)+'">'+htmlentities(ar[j])+'</td>';
+  }
+  h+='</tr>';
+ }
+ $('#righe').html(h);
+}
+-->
+</script>
+</body>
+</html>

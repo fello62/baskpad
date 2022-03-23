@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="it" manifest="baskpad.manifest">
+<head>
+<meta charset="UTF-8">
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+</head>
+<body>
+<script src="js/jquery-1.11.2.min.js"></script>
+<script>
+<!--
+var appCache,cacheProperties,displayProgress,offlineReady;
+appCache=window.applicationCache;
+offlineReady=parent.offlineReady;
+displayProgress=parent.displayProgress;
+
+cacheProperties=parent.cacheProperties;
+
+$('#manualUpdate',window.parent.document).click(function(event){
+ event.preventDefault();
+ parent.getTotalFiles();
+ setTimeout(function(){appCache.update();},2000);
+});
+
+$(appCache).on('checking',function(event){
+ displayProgress('Esecuzione in corso');
+ offlineReady(false);
+});
+
+$(appCache).on('noupdate',function(event){
+ displayProgress('Nessun aggiornamento');
+ offlineReady(true);
+});
+
+$(appCache).on('downloading',function(event){
+ displayProgress('Caricamento file cache');
+ cacheProperties=parent.cacheProperties;
+});
+
+$(appCache).on('progress',function(event){
+ displayProgress();
+});
+
+$(appCache).on('cached',function(event){
+ displayProgress('Caricati tutti i files');
+ offlineReady(true);
+});
+
+$(appCache).on('updateready',function(event){
+ displayProgress('Nuovi files disponibili');
+ appCache.swapCache();
+ setTimeout(function(){
+  window.parent.location.reload();
+ },2000);
+});
+
+$(appCache).on('error',function(event){
+ displayProgress('Errore nel controllo');
+ offlineReady((parent.swOK)||(parent.acOK));
+});
+-->
+</script>
+</body>
+</html>

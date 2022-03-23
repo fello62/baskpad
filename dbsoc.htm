@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>BaskPad</title>
+<link href="img/basket.ico" rel="shortcut icon" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="css/bp.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+ <div class="container-fluid">
+  <div class="navbar-header">
+   <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+    <span class="sr-only">Toggle navigation</span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+   </button>
+   <a class="navbar-brand" href="javascript:void(0);">BaskPad: Database Societ&agrave;</a>
+  </div>
+  <div id="navbar" class="navbar-collapse collapse">
+   <ul class="nav navbar-nav navbar-right">
+    <li><a href="javascript:vai('index.htm');">Chiudi <span>&times;</span></a></li>
+   </ul>
+  </div>
+ </div>
+</nav>
+
+<div class="container">
+ <div class="row">
+  <div class="col-xs-8 col-xs-offset-1">
+   <h4>Gestione societ&agrave;</h4>
+  </div>
+  <div class="col-xs-2">
+   <button type="button" class="btn btn-default" data-toggle="modal" data-target="#modModal" data-riga="0"><span class="glyphicon glyphicon-plus"></span> Nuova</button>
+  </div>
+ </div>
+ <div class="row">
+  <div class="col-xs-10 col-xs-offset-1">
+   <div class="table-responsive">
+    <table class="table table-hover">
+     <thead>
+      <tr id="intest">
+       <th>Modifica</th>
+       <th>Elimina</th>
+       <th data-ord="societa">Nome societ&agrave;<b class="caret-su"></b></th>
+       <th data-ord="codsoc">Codice</th>
+      </tr>
+     </thead>
+     <tbody id="righe">
+     </tbody>
+    </table>
+   </div>
+  </div>
+ </div>
+</div>
+
+<form name="f" class="form-horizontal">
+ <div class="modal fade" id="modModal" tabindex="-1">
+  <div class="modal-dialog">
+   <div class="modal-content">
+    <div class="modal-header">
+     <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+     <h4 class="modal-title">soc</h4>
+    </div>
+    <div class="modal-body">
+     <div class="form-group">
+      <label class="col-xs-4 control-label">Nome societ&agrave;</label>
+      <div class="col-xs-8">
+       <input type="text" class="form-control mod" name="nome">
+       <p class="form-control-static eli" id="elinome"></p>
+      </div>
+     </div>
+    </div>
+    <div class="modal-footer">
+     <button type="button" class="btn btn-lg btn-default" data-dismiss="modal">Annulla</button>
+     <button type="submit" class="btn btn-lg btn-primary"></button>
+    </div>
+   </div>
+  </div>
+ </div>
+</form>
+
+<script src="js/jquery-1.11.2.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/localforage.min.js"></script>
+<script src="js/ctrldata.js"></script>
+<script src="js/bp.js"></script>
+<script>
+<!--
+var rg;
+var act;
+var ordine='societa';
+var verso='asc';
+leggirighe();
+
+$('#intest > th[data-ord]')
+.css('cursor','pointer')
+.click(function (event) {
+ var button=$(this);
+ $('#intest').find('b').remove();
+ if ((ordine!=button.data('ord'))||(verso=='desc')){
+  verso='asc';
+  button.html(button.html()+'<b class="caret-su"></b>');
+ } else {
+  verso='desc';
+  button.html(button.html()+'<b class="caret"></b>');
+ }
+ ordine=button.data('ord');
+ leggirighe();
+});
+
+$('#modModal').on('show.bs.modal',function(event){
+ // trova il Button che ha aperto il Modal
+ var button=$(event.relatedTarget);
+ // trova la riga del Button
+ rg=button.data('riga');
+ act=button.hasClass('eli');
+ var modal=$(this);
+ var titolo;
+ var bt;
+ var hid;
+ var vis;
+ if (act){
+  titolo='Eliminazione';
+  $('#elinome').text($('#rg'+rg).text());
+  vis='.eli';
+  hid='.mod';
+  bt='Elimina';
+ } else {
+  if (rg=="0"){
+   titolo='Nuova';
+   document.f.nome.value='';
+  } else {
+   titolo='Modifica';
+   document.f.nome.value=$('#rg'+rg).text();
+  }
+  vis='.mod';
+  hid='.eli';
+  bt='Salva';
+ }
+ modal.find(vis).css({'visible':'true','display':'block'});
+ modal.find(hid).css({'visible':'false','display':'none'});
+ modal.find('.modal-title').text(titolo+' società');
+ modal.find('button[type=submit]').text(bt);
+});
+
+$('#modModal').on('shown.bs.modal',function(event){
+ if (act){
+  $(this).find('button[type=submit]').focus();
+ } else {
+  var o=document.f.nome;
+  o.focus();
+  o.setSelectionRange(0,o.value.length);
+ }
+});
+
+$(document.f.nome).on('blur',function(event){
+  return maiusc(this);
+});
+
+$(document.f).on('submit',function(event){
+ var ar;
+ if (act){
+  deleterec('soc',function(x,y){
+   return adb.soc[x][0]==y;
+  },rg);
+ } else {
+  if (rg==0)
+   rg=newrec('soc');
+  maiusc(document.f.nome);
+  ar={societa:document.f.nome.value};
+  updaterec('soc',rg,ar);
+ }
+ $('#modModal').modal('hide');
+ savedb();
+ leggirighe();
+ return false;
+});
+
+function leggirighe(){
+ var c,i,h,r,mappa,chiavi;
+ if (leggendo){
+  setTimeout(function(){leggirighe();},100);
+  return;
+ }
+ chiavi=Object.keys(adf.soc);
+ chiavi.pop();
+ mappa=adb.soc.map(function(el){
+  h={};
+  for(i=0;i<chiavi.length;i++)
+   h[chiavi[i]]=el[i];
+  return h;
+ });
+ if (adf.soc.tipo[adf.soc[ordine]]=='n')
+  mappa.sort(function(a,b){
+   return (a[ordine]-b[ordine])*(verso=='asc'?1:-1);
+  });
+ else
+  mappa.sort(function(a,b){
+   return ((a[ordine]==b[ordine])?0:((a[ordine]>b[ordine])?1:-1))*(verso=='asc'?1:-1);
+  });
+ h='';
+ for(i=0;i<mappa.length;i++){
+  r=mappa[i];
+  c=r.codsoc;
+  j=r.societa;
+  h+='<tr><td><button type="button" class="btn btn-default" data-toggle="modal" data-target="#modModal" data-riga="'+c+'"><span class="glyphicon glyphicon-pencil"></span></button></td>';
+  h+='<td><button type="button" class="btn btn-default eli" data-toggle="modal" data-target="#modModal" data-riga="'+c+'"><span class="glyphicon glyphicon-remove"></span></button></td>';
+  h+='<td id="rg'+c+'">'+htmlentities(j)+'</td>';
+  h+='<td>'+c+'</td></tr>';
+ }
+ $('#righe').html(h);
+}
+-->
+</script>
+</body>
+</html>

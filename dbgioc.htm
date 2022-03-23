@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>BaskPad</title>
+<link href="img/basket.ico" rel="shortcut icon" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="css/bp.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+ <div class="container-fluid">
+  <div class="navbar-header">
+   <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+    <span class="sr-only">Toggle navigation</span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+   </button>
+   <a class="navbar-brand" href="javascript:void(0);">BaskPad: Database Giocatori</a>
+  </div>
+  <div id="navbar" class="navbar-collapse collapse">
+   <ul class="nav navbar-nav navbar-right">
+    <li><a href="javascript:vai('index.htm');">Chiudi <span>&times;</span></a></li>
+   </ul>
+  </div>
+ </div>
+</nav>
+
+<div class="container">
+ <div class="row">
+  <div class="col-xs-8 col-xs-offset-1">
+   <h4>Gestione giocatori</h4>
+  </div>
+  <div class="col-xs-2">
+   <button type="button" class="btn btn-default" data-toggle="modal" data-target="#modModal" data-riga="0"><span class="glyphicon glyphicon-plus"></span> Nuovo</button>
+  </div>
+ </div>
+ <div class="row">
+  <div class="col-xs-10 col-xs-offset-1">
+   <div class="table-responsive">
+    <table class="table table-hover">
+     <thead>
+      <tr id="intest">
+       <th>Modifica</th>
+       <th>Elimina</th>
+       <th data-ord="cognome">Cognome<b class="caret-su"></b></th>
+       <th data-ord="nome">Nome</th>
+       <th data-ord="anno">Anno</th>
+       <th data-ord="altezza">Altezza</th>
+       <th data-ord="ruolo">Ruolo</th>
+       <th data-ord="codgioc">Codice</th>
+      </tr>
+     </thead>
+     <tbody id="righe">
+     </tbody>
+    </table>
+   </div>
+  </div>
+ </div>
+</div>
+
+<form name="f" class="form-horizontal">
+ <div class="modal fade" id="modModal" tabindex="-1">
+  <div class="modal-dialog">
+   <div class="modal-content">
+    <div class="modal-header">
+     <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+     <h4 class="modal-title">gioc</h4>
+    </div>
+    <div class="modal-body">
+     <div class="form-group">
+      <label class="col-xs-4 control-label">Cognome</label>
+      <div class="col-xs-8">
+       <input type="text" class="form-control mod" name="cognome">
+       <p class="form-control-static eli" id="elicognome"></p>
+      </div>
+     </div>
+     <div class="form-group">
+      <label class="col-xs-4 control-label">Nome</label>
+      <div class="col-xs-8">
+       <input type="text" class="form-control mod" name="nome">
+       <p class="form-control-static eli" id="elinome"></p>
+      </div>
+     </div>
+     <div class="form-group">
+      <label class="col-xs-4 control-label">Anno</label>
+      <div class="col-xs-8">
+       <input type="text" class="form-control mod" name="anno">
+       <p class="form-control-static eli" id="elianno"></p>
+      </div>
+     </div>
+     <div class="form-group">
+      <label class="col-xs-4 control-label">Altezza</label>
+      <div class="col-xs-8">
+       <input type="text" class="form-control mod" name="altezza">
+       <p class="form-control-static eli" id="elialtezza"></p>
+      </div>
+     </div>
+     <div class="form-group">
+      <label class="col-xs-4 control-label">Ruolo</label>
+      <div class="col-xs-8">
+       <select name="ruolo" class="form-control mod">
+        <option label="&lt;nessuno&gt;"></option>
+        <option>P</option>
+        <option>P-G</option>
+        <option>G</option>
+        <option>G-A</option>
+        <option>A</option>
+        <option>A-C</option>
+        <option>C</option>
+       </select>
+       <p class="form-control-static eli" id="eliruolo"></p>
+      </div>
+     </div>
+    </div>
+    <div class="modal-footer">
+     <button type="button" class="btn btn-lg btn-default" data-dismiss="modal">Annulla</button>
+     <button type="submit" class="btn btn-lg btn-primary"></button>
+    </div>
+   </div>
+  </div>
+ </div>
+</form>
+
+<script src="js/jquery-1.11.2.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/localforage.min.js"></script>
+<script src="js/ctrldata.js"></script>
+<script src="js/bp.js"></script>
+<script>
+<!--
+var rg;
+var act;
+var ordine='cognome';
+var verso='asc';
+leggirighe();
+
+$('#intest > th[data-ord]')
+.css('cursor','pointer')
+.click(function(event){
+ var button=$(this);
+ $('#intest').find('b').remove();
+ if ((ordine!=button.data('ord'))||(verso=='desc')){
+  verso='asc';
+  button.html(button.html()+'<b class="caret-su"></b>');
+ } else {
+  verso='desc';
+  button.html(button.html()+'<b class="caret"></b>');
+ }
+ ordine=button.data('ord');
+ leggirighe();
+});
+
+$('#modModal').on('show.bs.modal',function(event){
+ // trova il Button che ha aperto il Modal
+ var button=$(event.relatedTarget);
+ // trova la riga del Button
+ rg=button.data('riga');
+ act=button.hasClass('eli');
+ var modal=$(this);
+ var titolo;
+ var bt;
+ var hid;
+ var vis;
+ if (act){
+  titolo='Eliminazione';
+  $('#elicognome').text($('#rg'+rg+'a').text());
+  $('#elinome').text($('#rg'+rg+'b').text());
+  $('#elianno').text($('#rg'+rg+'c').text());
+  $('#elialtezza').text($('#rg'+rg+'d').text());
+  $('#eliruolo').text($('#rg'+rg+'e').text());
+  vis='.eli';
+  hid='.mod';
+  bt='Elimina';
+ } else {
+  if (rg=="0"){
+   titolo='Nuovo';
+   document.f.cognome.value='';
+   document.f.nome.value='';
+   document.f.anno.value='';
+   document.f.altezza.value='';
+   document.f.ruolo.value='';
+  } else {
+   titolo='Modifica';
+   document.f.cognome.value=$('#rg'+rg+'a').text();
+   document.f.nome.value=$('#rg'+rg+'b').text();
+   document.f.anno.value=$('#rg'+rg+'c').text();
+   document.f.altezza.value=$('#rg'+rg+'d').text();
+   document.f.ruolo.value=$('#rg'+rg+'e').text();
+  }
+  vis='.mod';
+  hid='.eli';
+  bt='Salva';
+ }
+ modal.find(vis).css({'visible':'true','display':'block'});
+ modal.find(hid).css({'visible':'false','display':'none'});
+ modal.find('.modal-title').text(titolo+' giocatore');
+ modal.find('button[type=submit]').text(bt);
+});
+
+$('#modModal').on('shown.bs.modal',function(event){
+ if (act){
+  $(this).find('button[type=submit]').focus();
+ } else {
+  var o=document.f.cognome;
+  o.focus();
+  o.setSelectionRange(0,o.value.length);
+ }
+});
+
+$(document.f.cognome).on('blur',function(event){
+ novirgole(this);
+ return maiusc(this);
+});
+
+$(document.f.nome).on('blur',function(event){
+ novirgole(this);
+ return proper(this);
+});
+
+$(document.f.anno).on('blur',function(event){
+ if (this.value=='')
+  return true;
+ return ctrlanno(this);
+});
+
+$(document.f.altezza).on('blur',function(event){
+ if (this.value=='')
+  return true;
+ return ctrlnumero(this,1,300);
+});
+
+$(document.f).on('submit',function(event){
+ var ar;
+ if (act) {
+  deleterec('gioc',function(x,y){
+   return adb.gioc[x][0]==y;
+  },rg);
+ } else {
+  novirgole(document.f.cognome);
+  maiusc(document.f.cognome);
+  novirgole(document.f.nome);
+  proper(document.f.nome);
+  if (document.f.anno.value!='')
+   ctrlanno(document.f.anno);
+  if (document.f.altezza.value!='')
+   ctrlnumero(document.f.altezza,1,300);
+  ar={cognome:document.f.cognome.value,nome:document.f.nome.value,anno:document.f.anno.value,altezza:document.f.altezza.value,ruolo:document.f.ruolo.value};
+  if (rg==0)
+   rg=newrec('gioc');
+  updaterec('gioc',rg,ar);
+ }
+ $('#modModal').modal('hide');
+ savedb();
+ leggirighe();
+ return false;
+});
+
+function novirgole(o){
+ var v=o.value;
+ o.value=v.replace(/,/g,'');
+}
+
+function leggirighe(){
+ var c,d,h,i,j,r,ar,mappa;
+ if (leggendo){
+  setTimeout(function(){leggirighe();},100);
+  return;
+ }
+ d=adf.gioc[ordine];
+ mappa=adb.gioc.map(function(el,i){
+  return {indice:i,valore:el[d]};
+ });
+ if (adf.gioc.tipo[d]=='n')
+  mappa.sort(function(a,b){
+   return (a.valore-b.valore)*(verso=='asc'?1:-1);
+  });
+ else
+  mappa.sort(function(a,b){
+   return ((a.valore==b.valore)?0:((a.valore>b.valore)?1:-1))*(verso=='asc'?1:-1);
+  });
+ h='';
+ for(i=0;i<mappa.length;i++){
+  r=adb.gioc[mappa[i].indice];
+  c=r[adf.gioc.codgioc];
+  ar=[];
+  ar.push(r[adf.gioc.cognome]);
+  ar.push(r[adf.gioc.nome]);
+  ar.push(r[adf.gioc.anno]);
+  ar.push(r[adf.gioc.altezza]);
+  ar.push(r[adf.gioc.ruolo]);
+  ar.push(c);
+  h+='<tr><td><button type="button" class="btn btn-default" data-toggle="modal" data-target="#modModal" data-riga="'+c+'"><span class="glyphicon glyphicon-pencil"></span></button></td>';
+  h+='<td><button type="button" class="btn btn-default eli" data-toggle="modal" data-target="#modModal" data-riga="'+c+'"><span class="glyphicon glyphicon-remove"></span></button></td>';
+  for(j=0;j<ar.length;j++){
+   h+='<td id="rg'+c+String.fromCharCode(97+j)+'">'+htmlentities(ar[j])+'</td>';
+  }
+  h+='</tr>';
+ }
+ $('#righe').html(h);
+}
+-->
+</script>
+</body>
+</html>

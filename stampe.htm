@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="format-detection" content="telephone=no">
+<title>BaskPad</title>
+<link href="img/basket.ico" rel="shortcut icon" />
+</head>
+<body>
+<div id="cmd">
+<button type="button" id="stp">Stampa</button>
+<button type="button" id="chiudi">Chiudi</button>
+Cliccare qualsiasi punto della pagina per far riapparire i bottoni dopo la stampa.
+</div>
+<div id="stampa">
+</div>
+<script src="js/jquery-1.11.2.min.js"></script>
+<script src="js/localforage.min.js"></script>
+<script src="js/bp.js"></script>
+<script>
+<!--
+$('#stampa').html(sessionStorage.stampa);
+
+$('#chiudi').click(function (event) {
+ vai(sessionStorage.ritorna);
+});
+
+$('#stp').click(function (event) {
+ $('#cmd').hide();
+ setTimeout(function (){
+  window.print();
+  $(document).on('click touchstart', function (ev) {
+   $('#cmd').show();
+   $(document).off('click touchstart');
+  });
+ }, 500);
+});
+
+var c,cvs,e,i,ta;
+cvs=document.getElementById('disegno');
+if (cvs){
+ ta=JSON.parse(sessionStorage.tiriarray);
+ ridisegna();
+ e=(document.mappa.elements['sq[]'])||new Array();
+ for (i=0;i<e.length;i++) e[i].onclick=Function('setsqclick('+i+',this.checked);');
+ e=(document.mappa.elements['tempo[]'])||new Array();
+ for (i=0;i<e.length;i++) e[i].onclick=ridisegna;
+ for (c=0;c<=1;c++){
+  e=(document.mappa.elements['gioc'+(('ab').charAt(c))+'[]'])||new Array();
+  for (i=0;i<e.length;i++) e[i].onclick=ridisegna;
+ }
+} else {
+ cvs=document.getElementsByTagName('canvas');
+ if (cvs.length>0){
+  for (c=0;c<cvs.length;c++){
+   disvert(cvs[c],cvs[c].height,cvs[c].width);
+   distiri(cvs[c],cvs[c].dataset.tiro+",");
+  }
+ }
+}
+
+function setsqclick(s,c){
+ var g,gioc;
+ gioc=(document.mappa.elements['gioc'+(('ab').charAt(s))+'[]'])||new Array();
+ for (g=0;g<gioc.length;g++) gioc[g].checked=c;
+ ridisegna();
+}
+
+function ridisegna(){
+ var g,gioc,s,t,tmp;
+ tmp=(document.mappa.elements['tempo[]'])||new Array();
+ disvert(cvs,560,300,true);
+ for (s=0;s<=1;s++){
+  gioc=(document.mappa.elements['gioc'+(('ab').charAt(s))+'[]'])||new Array();
+  for (t=0;t<tmp.length;t++) if (tmp[t].checked) for (g=0;g<gioc.length;g++) if (gioc[g].checked) distiri(cvs,ta[s][g][t]+',',s);
+ }
+}
+-->
+</script>
+</body>
+</html>

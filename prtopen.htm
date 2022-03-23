@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>BaskPad</title>
+<link href="img/basket.ico" rel="shortcut icon" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="css/bp.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+ <div class="container-fluid">
+  <div class="navbar-header">
+   <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+    <span class="sr-only">Toggle navigation</span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+   </button>
+   <a class="navbar-brand" href="javascript:void(0);">BaskPad: Apri Partita</a>
+  </div>
+  <div id="navbar" class="navbar-collapse collapse">
+   <ul class="nav navbar-nav navbar-right">
+    <li><a href="javascript:vai('index.htm');">Chiudi <span>&times;</span></a></li>
+   </ul>
+  </div>
+ </div>
+</nav>
+
+<div class="container">
+ <div class="row">
+  <div class="col-xs-8 col-xs-offset-1">
+   <h4>Apri partita</h4>
+  </div>
+ </div>
+ <form name="a" class="form-horizontal">
+  <div class="form-group">
+   <label class="col-xs-3 control-label">Anno sportivo</label>
+   <div class="col-xs-3">
+    <select name="annosport" class="form-control">
+    </select>
+   </div>
+   <label class="col-xs-2 control-label">Campionato</label>
+   <div class="col-xs-4">
+    <select name="codcamp" class="form-control">
+    </select>
+   </div>
+  </div>
+ </form>
+ <div class="row">
+  <div class="col-xs-12 table-responsive">
+   <table class="table table-hover">
+    <thead>
+     <tr id="intest">
+      <th>Scegli</th>
+      <th data-ord="ngara">Gara</th>
+      <th data-ord="giornata">Giornata</th>
+      <th data-ord="dataora">Data</th>
+      <th>Ora</th>
+      <th data-ord="nomesqa">Squadra A</th>
+      <th data-ord="nomesqb">Squadra B</th>
+      <th data-ord="luogo">Luogo</th>
+      <th data-ord="codprt">Codice<b class="caret-su"></b></th>
+     </tr>
+    </thead>
+    <tbody id="righe">
+    </tbody>
+   </table>
+  </div>
+ </div>
+</div>
+
+<script src="js/jquery-1.11.2.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/localforage.min.js"></script>
+<script src="js/ctrldata.js"></script>
+<script src="js/bp.js"></script>
+<script>
+<!--
+if (localStorage.refertotxt){
+  if (confirm('CONFERMA\nTrovata una partita aperta: la ricarico?'))
+   lanciaprt('');
+}
+
+var rg;
+var ansp='';
+var codcamp;
+var codsq;
+var ordine='codprt';
+var verso='asc';
+
+leggioptas();
+
+$('#intest > th[data-ord]')
+.css('cursor','pointer')
+.click(function (event) {
+ var button=$(this);
+ $('#intest').find('b').remove();
+ if ((ordine!=button.data('ord'))||(verso=='desc')) {
+  verso='asc';
+  button.html(button.html()+'<b class="caret-su"></b>');
+ } else {
+  verso='desc';
+  button.html(button.html()+'<b class="caret"></b>');
+ }
+ ordine=button.data('ord');
+ leggirighe();
+});
+
+$(document.a.annosport).on('change', function (event) {
+ ansp=$(this).val();
+ leggioptcc();
+});
+
+$(document.a.codcamp).on('change', function (event) {
+ codcamp=$(this).val();
+ leggirighe();
+});
+
+function leggioptas(){
+ var t,h,i,d,r,v1,sel;
+ if (leggendo){
+  setTimeout(function(){leggioptas();},100);
+  return;
+ }
+ r={};
+ d=adf.camp.annosport;
+ for(i=0;i<adb.camp.length;i++)
+  r[adb.camp[i][d]]=i;
+ r=Object.keys(r);
+ r.sort(function(a,b){
+  return ((a==b)?0:((a>b)?-1:1));
+ });
+ h=v1='';
+ for(i=0;i<r.length;i++){
+  t=r[i];
+  if (i==0)
+   v1=t;
+  if ((ansp.length>0)&&(ansp==t))
+   v1=t;
+  h+='<option>'+t+'</option>';
+ }
+ ansp=v1;
+ sel=$(document.a.annosport);
+ sel.html(h);
+ if (ansp.length>0)
+  sel.val(ansp);
+ leggioptcc();
+}
+
+function leggioptcc(){
+ var c,d,h,i,r,mappa,sel,v1;
+ c=adf.camp.annosport;
+ mappa=[];
+ for(i=0;i<adb.camp.length;i++)
+  if (adb.camp[i][c]==ansp){
+   h={codcamp:adb.camp[i][adf.camp.codcamp],nomecamp:adb.camp[i][adf.camp.nomecamp],girone:adb.camp[i][adf.camp.girone],fase:adb.camp[i][adf.camp.fase]};
+   mappa.push(h);
+  }
+ if (mappa.length>0){
+  h=Object.keys(mappa[0]);
+  for(i=3;i>=1;i--)
+   mappa.sort(function(a,b){
+    return ((a[h[i]]==b[h[i]])?0:((a[h[i]]>b[h[i]])?1:-1));
+   });
+ }
+ h=v1='';
+ for(i=0;i<mappa.length;i++){
+  r=mappa[i];
+  c=r.codcamp;
+  if (i==0)
+   v1=c;
+  h+='<option value="'+c+'">'+r.nomecamp+', '+r.girone+', '+r.fase+'</option>';
+ }
+ codcamp=v1;
+ sel=$(document.a.codcamp);
+ sel.html(h);
+ if (codcamp.length>0)
+  sel.val(codcamp);
+ leggirighe();
+}
+
+function leggirighe(){
+ var c,d,h,i,j,r,ar,chiavi,csa,csb,mappa,mappacodsq;
+ if (codcamp.length==0){
+  $('#righe').html('');
+  return;
+ }
+ d=adf.sq.nomesq;
+ mappacodsq=[];
+ for(i=0;i<adb.sq.length;i++)
+  mappacodsq[adb.sq[i][0]]=adb.sq[i][d];
+ chiavi=Object.keys(adf.sq);
+ d=chiavi.indexOf('nomesq');
+ mappa=[];
+ chiavi=Object.keys(adf.prt);
+ chiavi.pop();
+ c=adf.prt.codcamp;
+ csa=adf.prt.codsqa;
+ csb=adf.prt.codsqb;
+ for(i=0;i<adb.prt.length;i++)
+  if (adb.prt[i][c]==codcamp){
+   h={};
+   for(j=0;j<chiavi.length;j++)
+    h[chiavi[j]]=adb.prt[i][j];
+   h.nomesqa=mappacodsq[h.codsqa];
+   h.nomesqb=mappacodsq[h.codsqb];
+   mappa.push(h);
+  }
+ d=chiavi.indexOf(ordine);
+ if (d<adf.sq.tipo.length)
+  h=adf.sq.tipo[d];
+ else
+  h='s';
+ if (h=='n')
+  mappa.sort(function(a,b){
+   return (a[ordine]-b[ordine])*(verso=='asc'?1:-1);
+  });
+ else
+  mappa.sort(function(a,b){
+   return ((a[ordine]==b[ordine])?0:((a[ordine]>b[ordine])?1:-1))*(verso=='asc'?1:-1);
+  });
+ h='';
+ for(i=0;i<mappa.length;i++){
+  r=mappa[i];
+  c=r.codprt;
+  csa=r.codsqa;
+  csb=r.codsqb;
+  ar=[];
+  ar.push(r.ngara);
+  ar.push(r.giornata);
+  d=sql2dataora(r.dataora);
+  ar.push(d[0]);
+  ar.push(d[1]);
+  ar.push(r.nomesqa);
+  ar.push(r.nomesqb);
+  ar.push(r.luogo);
+  ar.push(c);
+  h+='<tr><td><button class="btn btn-default" data-codprt="'+c+'"><span class="glyphicon glyphicon-ok"></span></button></td>';
+  for(j=0;j<ar.length;j++){
+   h+='<td id="rg'+c+String.fromCharCode(97+j)+'">'+htmlentities(ar[j])+'</td>';
+  }
+  h+='</tr>';
+ }
+ $('#righe').html(h);
+ $('button[data-codprt]').click(function (event) {
+  lanciaprt($(this).data('codprt'));
+ });
+}
+
+function lanciaprt(cp) {
+ sessionStorage.codprt=cp;
+ vai('prtgest.htm');
+}
+-->
+</script>
+</body>
+</html>

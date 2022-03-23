@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>BaskPad</title>
+<link href="img/basket.ico" rel="shortcut icon" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="css/bp.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+ <div class="container-fluid">
+  <div class="navbar-header">
+   <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+    <span class="sr-only">Toggle navigation</span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+   </button>
+   <a class="navbar-brand" href="javascript:void(0);">BaskPad: Database Squadre</a>
+  </div>
+  <div id="navbar" class="navbar-collapse collapse">
+   <ul class="nav navbar-nav navbar-right">
+    <li><a href="javascript:vai('index.htm');">Chiudi <span>&times;</span></a></li>
+   </ul>
+  </div>
+ </div>
+</nav>
+
+<div class="container">
+ <div class="row">
+  <div class="col-xs-8 col-xs-offset-1">
+   <h4>Gestione squadre</h4>
+  </div>
+  <div class="col-xs-2">
+   <button type="button" class="btn btn-default" data-toggle="modal" data-target="#modModal" data-riga="0"><span class="glyphicon glyphicon-plus"></span> Nuova</button>
+  </div>
+ </div>
+ <form name="a" class="form-horizontal">
+  <div class="form-group">
+   <label class="col-xs-3 col-xs-offset-3 control-label">Anno sportivo</label>
+   <div class="col-xs-3">
+    <select name="annosport" class="form-control">
+    </select>
+   </div>
+  </div>
+ </form>
+ <div class="row">
+  <div class="col-xs-12 table-responsive">
+   <table class="table table-hover">
+    <thead>
+     <tr id="intest">
+      <th>Modifica</th>
+      <th>Elimina</th>
+      <th data-ord="nomesq">Nome squadra<b class="caret-su"></b></th>
+      <th data-ord="societa">Societ&agrave;</th>
+      <th data-ord="cat">Categoria</th>
+      <th data-ord="sesso">Sesso</th>
+      <th data-ord="codsq">Codice</th>
+     </tr>
+    </thead>
+    <tbody id="righe">
+    </tbody>
+   </table>
+  </div>
+ </div>
+</div>
+
+<form name="f" class="form-horizontal">
+ <div class="modal fade" id="modModal" tabindex="-1">
+  <div class="modal-dialog">
+   <div class="modal-content">
+    <div class="modal-header">
+     <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+     <h4 class="modal-title">sq</h4>
+    </div>
+    <div class="modal-body">
+     <div class="form-group">
+      <label class="col-xs-4 control-label">Anno sportivo</label>
+      <div class="col-xs-8">
+       <input type="text" class="form-control mod" name="annosport">
+       <p class="form-control-static eli" id="eliannosport"></p>
+      </div>
+     </div>
+     <div class="form-group">
+      <label class="col-xs-4 control-label">Societ&agrave;</label>
+      <div class="col-xs-8">
+       <select name="codsoc" class="form-control mod">
+       </select>
+       <p class="form-control-static eli" id="elisocieta"></p>
+      </div>
+     </div>
+     <div class="form-group">
+      <label class="col-xs-4 control-label">Nome squadra</label>
+      <div class="col-xs-8">
+       <input type="text" class="form-control mod" name="nomesq">
+       <p class="form-control-static eli" id="elinomesq"></p>
+      </div>
+     </div>
+     <div class="form-group">
+      <label class="col-xs-4 control-label">Categoria</label>
+      <div class="col-xs-8">
+       <input type="text" class="form-control mod" name="cat">
+       <p class="form-control-static eli" id="elicat"></p>
+      </div>
+     </div>
+     <div class="form-group">
+      <label class="col-xs-4 control-label">Sesso</label>
+      <div class="col-xs-8">
+       <div class="mod">
+        <label class="radio-inline">
+         <input type="radio" name="sesso" value="M"> M
+        </label>
+        <label class="radio-inline">
+         <input type="radio" name="sesso" value="F"> F
+        </label>
+       </div>
+       <p class="form-control-static eli" id="elisesso"></p>
+      </div>
+     </div>
+    </div>
+    <div class="modal-footer">
+     <button type="button" class="btn btn-lg btn-default" data-dismiss="modal">Annulla</button>
+     <button type="submit" class="btn btn-lg btn-primary"></button>
+    </div>
+   </div>
+  </div>
+ </div>
+</form>
+
+<script src="js/jquery-1.11.2.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/localforage.min.js"></script>
+<script src="js/ctrldata.js"></script>
+<script src="js/bp.js"></script>
+<script>
+<!--
+var rg;
+var act;
+var ansp='';
+var cs;
+var ordine='nomesq';
+var verso='asc';
+leggioptas();
+
+$('#intest > th[data-ord]')
+.css('cursor','pointer')
+.click(function(event){
+ var button=$(this);
+ $('#intest').find('b').remove();
+ if ((ordine!=button.data('ord'))||(verso=='desc')){
+  verso='asc';
+  button.html(button.html()+'<b class="caret-su"></b>');
+ } else {
+  verso='desc';
+  button.html(button.html()+'<b class="caret"></b>');
+ }
+ ordine=button.data('ord');
+ leggirighe();
+});
+
+$('#modModal').on('show.bs.modal',function(event){
+ // trova il Button che ha aperto il Modal
+ var button=$(event.relatedTarget);
+ // trova la riga del Button
+ rg=button.data('riga');
+ act=button.hasClass('eli');
+ cs=button.data('codsoc');
+ var modal=$(this);
+ var titolo;
+ leggioptsoc();
+ var bt;
+ var hid;
+ var vis;
+ if (act){
+  titolo='Eliminazione';
+  vis='.eli';
+  hid='.mod';
+  bt='Elimina';
+  $('#eliannosport').text(ansp);
+  $('#elisocieta').text($('#rg'+rg+'b').text());
+  $('#elinomesq').text($('#rg'+rg+'a').text());
+  $('#elicat').text($('#rg'+rg+'c').text());
+  $('#elisesso').text($('#rg'+rg+'d').text());
+ } else {
+  if (rg=="0"){
+   titolo='Nuova';
+   var d=new Date();
+   var y=d.getFullYear();
+   if (d.getMonth()<7)
+    y--;
+   document.f.annosport.value=''+y+'-'+String(1+y).substr(String(1+y).length-2,2);
+   document.f.nomesq.value='';
+   document.f.cat.value='';
+   document.f.sesso[0].checked=true;
+   document.f.sesso[1].checked=false;
+  } else {
+   titolo='Modifica';
+   document.f.annosport.value=ansp;
+   document.f.nomesq.value=$('#rg'+rg+'a').text();
+   document.f.cat.value=$('#rg'+rg+'c').text();
+   document.f.sesso[0].checked=($('#rg'+rg+'d').text()=='M');
+   document.f.sesso[1].checked=($('#rg'+rg+'d').text()=='F');
+  }
+  vis='.mod';
+  hid='.eli';
+  bt='Salva';
+ }
+ modal.find(vis).css({'visible':'true','display':'block'});
+ modal.find(hid).css({'visible':'false','display':'none'});
+ modal.find('.modal-title').text(titolo+' squadra');
+ modal.find('button[type=submit]').text(bt);
+});
+
+$('#modModal').on('shown.bs.modal',function(event){
+ if (act){
+  $(this).find('button[type=submit]').focus();
+ } else {
+  var o=document.f.annosport;
+  o.focus();
+  o.setSelectionRange(0,o.value.length);
+ }
+});
+
+$(document.a.annosport).on('change',function(event){
+ ansp=$(this).val();
+ leggirighe();
+});
+
+$(document.f.nomesq).on('blur',function(event){
+ return maiusc(this);
+});
+
+$(document.f.cat).on('blur',function(event){
+ return maiusc(this);
+});
+
+$(document.f).on('submit',function(event){
+ var s;
+ var ar=new Array();
+ if (act){
+  deleterec('sq',function(x,y){
+   return adb.sq[x][0]==y;
+  },rg);
+ } else {
+  maiusc(document.f.nomesq);
+  maiusc(document.f.cat);
+  cs=document.f.codsoc.value;
+  ansp=document.f.annosport.value;
+  ar={codsoc:cs,annosport:ansp,nomesq:document.f.nomesq.value,cat:document.f.cat.value,sesso:(document.f.sesso[0].checked?'M':'F')};
+  if (rg==0)
+   rg=newrec('sq');
+  updaterec('sq',rg,ar);
+ }
+ $('#modModal').modal('hide');
+ savedb();
+ leggioptas();
+ return false;
+});
+
+function leggioptas(){
+ var d,h,i,r,t,sel,v1;
+ if (leggendo){
+  setTimeout(function(){leggioptas();},100);
+  return;
+ }
+ r={};
+ d=adf.sq.annosport;
+ for(i=0;i<adb.sq.length;i++)
+  r[adb.sq[i][d]]=i;
+ r=Object.keys(r);
+ r.sort(function(a,b){
+  return ((a==b)?0:((a>b)?-1:1));
+ });
+ h=v1='';
+ for(i=0;i<r.length;i++){
+  t=r[i];
+  if (i==0)
+   v1=t;
+  if ((ansp.length>0)&&(ansp==t))
+   v1=t;
+  h+='<option>'+t+'</option>';
+ }
+ ansp=v1;
+ sel=$(document.a.annosport);
+ sel.html(h);
+ if (ansp.length>0)
+  sel.val(ansp);
+ leggirighe();
+}
+
+function leggirighe(){
+ var c,d,h,i,j,r,ar,ccodsoc,chiavi,mappa,mappasoc;
+ if (ansp.length==0){
+  $('#righe').html('');
+  return;
+ }
+ d=adf.soc.societa;
+ mappasoc=[];
+ for(i=0;i<adb.soc.length;i++)
+  mappasoc[adb.soc[i][0]]=adb.soc[i][d];
+ chiavi=Object.keys(adf.sq);
+ chiavi.pop();
+ r=chiavi.length;
+ chiavi.push('societa');
+ c=adf.sq.codsoc;
+ d=adf.sq.annosport;
+ mappa=[];
+ for(i=0;i<adb.sq.length;i++)
+  if (adb.sq[i][d]==ansp){
+   h={};
+   for(j=0;j<r;j++)
+    h[chiavi[j]]=adb.sq[i][j];
+   h.societa=mappasoc[adb.sq[i][c]];
+   mappa.push(h);
+  }
+ d=chiavi.indexOf(ordine);
+ if (d<adf.sq.tipo.length)
+  h=adf.sq.tipo[d];
+ else
+  h='s';
+ if (h=='n')
+  mappa.sort(function(a,b){
+   return (a[ordine]-b[ordine])*(verso=='asc'?1:-1);
+  });
+ else
+  mappa.sort(function(a,b){
+   return ((a[ordine]==b[ordine])?0:((a[ordine]>b[ordine])?1:-1))*(verso=='asc'?1:-1);
+  });
+ h='';
+ for(i=0;i<mappa.length;i++){
+  r=mappa[i];
+  c=r.codsq;
+  ccodsoc=r.codsoc;
+  ar=[];
+  ar.push(r.nomesq);
+  ar.push(r.societa);
+  ar.push(r.cat);
+  ar.push(r.sesso);
+  ar.push(c);
+  h+='<tr><td><button type="button" class="btn btn-default" data-toggle="modal" data-target="#modModal" data-riga="'+c+'" data-codsoc="'+ccodsoc+'"><span class="glyphicon glyphicon-pencil"></span></button></td>';
+  h+='<td><button type="button" class="btn btn-default eli" data-toggle="modal" data-target="#modModal" data-riga="'+c+'"><span class="glyphicon glyphicon-remove"></span></button></td>';
+  for (var j=0; j<ar.length; j++) {
+   h+='<td id="rg'+c+String.fromCharCode(97+j)+'">'+htmlentities(ar[j])+'</td>';
+  }
+  h+='</tr>';
+ }
+ $('#righe').html(h);
+}
+
+function leggioptsoc(){
+ var c,d,h,i,r,s,chiavi,mappa;
+ chiavi=Object.keys(adf.soc);
+ chiavi.pop();
+ mappa=adb.soc.map(function(el){
+  h={};
+  for(i=0;i<chiavi.length;i++)
+   h[chiavi[i]]=el[i];
+  return h;
+ });
+ mappa.sort(function(a,b){
+  return ((a.societa==b.societa)?0:((a.societa>b.societa)?1:-1));
+ });
+ h='';
+ for(i=0;i<mappa.length;i++){
+  r=mappa[i];
+  c=r.codsoc;
+  s=r.societa;
+  h+='<option value="'+c+'">'+htmlentities(s)+'</option>';
+ }
+ $(document.f.codsoc).html(h);
+ if (typeof cs=='undefined'){
+  if (adb.soc.length)
+   cs=mappa[0].codsoc;
+  else {
+   alert('ATTENZIONE!\nImmettere prima almeno una società.');
+   vai('index.htm');
+  }
+ }
+ $(document.f.codsoc).val(cs);
+}
+-->
+</script>
+</body>
+</html>

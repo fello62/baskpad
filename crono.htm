@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>BaskPad</title>
+<link href="img/basket.ico" rel="shortcut icon" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="css/bp.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+ <div class="container-fluid">
+  <div class="navbar-header">
+   <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+    <span class="sr-only">Toggle navigation</span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+   </button>
+   <a class="navbar-brand" href="javascript:void(0);"><span id="sharespy" class="btn-info">BaskPad</span>: Cronometro sharing</a>
+  </div>
+  <div id="navbar" class="navbar-collapse collapse">
+   <ul class="nav navbar-nav">
+    <li><a href="javascript:impshareshow();">Impostazioni</a></li>
+   </ul>
+   <ul class="nav navbar-nav navbar-right">
+    <li><a href="javascript:esci();">Chiudi <span>&times;</span></a></li>
+   </ul>
+  </div>
+ </div>
+</nav>
+
+<div class="container">
+ <div class="row">
+  <div class="col-xs-10 col-xs-offset-1">
+   <h4>Cronometro sharing</h4>
+  </div>
+ </div>
+ <form name="a" class="form-horizontal" method="post" target="_blank">
+  <input type="hidden" name="decimi" value="0">
+  <div class="form-group form-group-lg">
+   <label class="col-xs-2 col-xs-offset-2 control-label">Minuti</label>
+   <div class="col-xs-2">
+    <input type="number" class="form-control" name="minuti" max="99" min="0" step="1" value="10">
+   </div>
+   <label class="col-xs-2 control-label">Secondi</label>
+   <div class="col-xs-2">
+    <input type="number" class="form-control" name="secondi" max="59" min="0" step="1" value="0">
+   </div>
+  </div>
+  <div class="form-group">
+   <div class="col-xs-8 col-xs-offset-2">
+    <button type="submit" class="btn btn-lg btn-block btn-success" id="startstop">Start/Stop</button>
+   </div>
+  </div>
+ </form>
+</div>
+
+<form name="sh" class="form-horizontal">
+ <div class="modal fade" id="modSharing" tabindex="-1">
+  <div class="modal-dialog">
+   <div class="modal-content">
+    <div class="modal-header">
+     <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+     <h4 class="modal-title">Impostazioni sharing</h4>
+    </div>
+    <div class="modal-body">
+     <div class="form-group">
+      <label class="col-xs-3 control-label">URL</label>
+      <div class="col-xs-9">
+       <input type="text" class="form-control" name="url" value="sharing.php">
+      </div>
+     </div>
+     <div class="form-group">
+      <label class="col-xs-3 control-label">Utente</label>
+      <div class="col-xs-9">
+       <input type="password" class="form-control" name="user">
+      </div>
+     </div>
+     <div class="form-group">
+      <label class="col-xs-3 control-label">Password</label>
+      <div class="col-xs-9">
+       <input type="password" class="form-control" name="pass">
+      </div>
+     </div>
+    </div>
+    <div class="modal-footer">
+     <button type="button" class="btn btn-lg btn-danger" data-dismiss="modal">Disattiva</button>
+     <button type="button" class="btn btn-lg btn-success" data-dismiss="modal">Attiva</button>
+    </div>
+   </div>
+  </div>
+ </div>
+</form>
+
+<script src="js/jquery-1.11.2.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/localforage.min.js"></script>
+<script src="js/ctrldata.js"></script>
+<script src="js/bp.js"></script>
+<script>
+<!--
+var acceso,b,codprt,sharing,spia;
+
+if (typeof sessionStorage.crono=='undefined')
+ codprt='';
+else {
+ codprt=sessionStorage.crono;
+ sessionStorage.removeItem('crono');
+}
+
+b=$('#startstop');
+spia=$('#sharespy');
+acceso=false;
+sharing=false;
+
+b.click(function(){
+ acceso=!acceso;
+ if (acceso){
+  b.removeClass('btn-success');
+  b.addClass('btn-danger');
+ } else {
+  b.removeClass('btn-danger');
+  b.addClass('btn-success');
+ }
+ return false;
+});
+
+$([document.a,document.sh]).on('submit',function(){return false;});
+
+$('#modSharing').find('.btn-danger').click(function(){
+  sharing=false;
+  spia
+   .removeClass('btn-warning btn-success btn-danger')
+   .addClass('btn-info');
+  inviodati('end','');
+ });
+$('#modSharing').find('.btn-success').click(function(){
+  sharing=true;
+  spia
+   .removeClass('btn-warning btn-info btn-danger')
+   .addClass('btn-success');
+ });
+
+$([document.a.minuti,document.a.secondi]).on('blur',function(){
+ ctrlnumero(document.a.minuti,0,99);
+ ctrlnumero(document.a.secondi,0,59);
+ document.a.decimi.value='0';
+});
+
+setInterval(function(){
+ if (!acceso) return;
+ var d,m,s;
+ m=parseInt(document.a.minuti.value,10)||0;
+ s=parseInt(document.a.secondi.value,10)||0;
+ d=parseInt(document.a.decimi.value,10)||0;
+ if ((d|s|m)==0){
+  acceso=false;
+  b.removeClass('btn-danger');
+  b.addClass('btn-success');
+  return;
+ }
+ d--;
+ if (d<0){
+  d=9;
+  s--;
+  if (s<0){
+   s=59;
+   m--;
+   document.a.minuti.value=m;
+  }
+  document.a.secondi.value=s;
+ }
+ document.a.decimi.value=d;
+ if ((d|s|m)==0){
+  b.removeClass('btn-danger');
+  b.addClass('btn-success');
+  return;
+ }
+ if ((sharing)&&(s%10==0)&&(d==0)){
+  //posta il tempo
+  inviodati('tmp',parseInt(''+m+('0'+s).slice(-2),10));
+ }
+},100);
+
+function chiudiconn(){
+ inviodati('end','');
+}
+
+function esci(){
+ if (sharing){
+  alert('Disattivare lo sharing prima di chiudere!');
+  return;
+ }
+ vai('prtgest.htm');
+}
+
+function impshareshow(){
+ if (codprt!='') $('#modSharing').modal('show');
+}
+
+function inviodati(azione,dato){
+ if (sharing){
+  spia
+   .removeClass('btn-danger btn-info btn-success')
+   .addClass('btn-warning');
+ }
+ $.ajax({
+  method:'POST',
+  url:document.sh.url.value,
+  data:{
+   user:document.sh.user.value,
+   pass:document.sh.pass.value,
+   codprt:codprt,
+   azione:azione,
+   oldtmp:0,
+   dati:dato
+  },
+  success:function(){
+   if (sharing){
+    spia
+     .removeClass('btn-danger btn-info btn-warning')
+     .addClass('btn-success');
+   }
+  },
+  error:function(){
+   if (sharing){
+    spia
+     .removeClass('btn-success btn-info btn-warning')
+     .addClass('btn-danger');
+   }
+  }
+ });
+}
+-->
+</script>
+</body>
+</html>

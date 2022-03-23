@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>BaskPad</title>
+<link href="img/basket.ico" rel="shortcut icon" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="css/bp.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+ <div class="container-fluid">
+  <div class="navbar-header">
+   <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+    <span class="sr-only">Toggle navigation</span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+   </button>
+   <a class="navbar-brand" href="javascript:void(0);">BaskPad: Stampe Esportazione</a>
+  </div>
+  <div id="navbar" class="navbar-collapse collapse">
+   <ul class="nav navbar-nav navbar-right">
+    <li><a href="javascript:vai(sessionStorage.ritorna);">Chiudi <span>&times;</span></a></li>
+   </ul>
+  </div>
+ </div>
+</nav>
+
+<div class="container">
+ <div class="row">
+  <div class="col-xs-10 col-xs-offset-1">
+   <h4>Esportazione stampe</h4>
+  </div>
+ </div>
+ <form name="a" class="form-horizontal" method="post" target="_blank">
+  <input type="hidden" name="nomefile" value="stampe.txt">
+  <input type="hidden" name="ritorno" value="prtgest.htm">
+  <div class="form-group">
+   <label class="col-xs-2 col-xs-offset-1 control-label">Testo stampe in formato JSON</label>
+   <div class="col-xs-8">
+    <textarea class="form-control" name="txt" rows="6"></textarea>
+   </div>
+  </div>
+  <div class="form-group">
+   <label class="col-xs-2 col-xs-offset-1 control-label">URL per salvare</label>
+   <div class="col-xs-8">
+    <input type="text" name="url" class="form-control" value="salvatxt.php">
+   </div>
+  </div>
+  <div class="form-group">
+   <div class="col-xs-10 col-xs-offset-1" style="text-align: right;">
+    <button type="submit" class="btn btn-lg btn-primary">Salva</button>
+    <a href="#" id="intsave" target="_blank" class="btn btn-lg btn-default">Salvataggio interno</a>
+   </div>
+  </div>
+ </form>
+</div>
+
+<script src="js/jquery-1.11.2.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/localforage.min.js"></script>
+<script src="js/ctrldata.js"></script>
+<script src="js/bp.js"></script>
+<script>
+<!--
+document.a.txt.value=sessionStorage.stampa;
+document.a.ritorno.value=sessionStorage.ritorna;
+$("#intsave").attr('href', 'data:application/octet-stream,'+encodeURIComponent(document.a.txt.value));
+
+$(document.a).on('submit', function (event) {
+ this.action=document.a.url.value;
+ return true;
+});
+-->
+</script>
+</body>
+</html>

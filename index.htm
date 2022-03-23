@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<title>BaskPad</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="manifest" href="manifest.json">
+<link rel="shortcut icon" href="img/basket.ico">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="css/bp.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+ <div class="container-fluid">
+  <div class="navbar-header">
+   <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+    <span class="sr-only">Toggle navigation</span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+   </button>
+   <a class="navbar-brand" href="javascript:void(0);">BaskPad</a>
+  </div>
+  <div id="navbar" class="navbar-collapse collapse">
+   <ul class="nav navbar-nav">
+    <li class="dropdown">
+     <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown">Database <b class="caret"></b></a>
+     <ul class="dropdown-menu">
+      <li><a href="javascript:vai('dbsoc.htm');">Societ&agrave;</a></li>
+      <li><a href="javascript:vai('dbsq.htm');">Squadre</a></li>
+      <li><a href="javascript:vai('dbcamp.htm');">Campionati</a></li>
+      <li><a href="javascript:vai('dbcampsq.htm');">Campionati-Squadre</a></li>
+      <li><a href="javascript:vai('dbgioc.htm');">Giocatori</a></li>
+      <li><a href="javascript:vai('dbsqgioc.htm');">Squadre-Giocatori</a></li>
+      <li><a href="javascript:vai('dbprt.htm');">Partite</a></li>
+      <li class="divider"></li>
+      <li><a href="javascript:vai('dbreset.htm');">Reset</a></li>
+      <li><a href="javascript:vai('dbimport.htm');">Importa</a></li>
+      <li><a href="javascript:vai('dbexport.htm');">Esporta</a></li>
+     </ul>
+    </li>
+    <li><a href="javascript:vai('gnropen.htm');">Generali</a></li>
+    <li><a href="javascript:vai('prtopen.htm');">Partita</a></li>
+   </ul>
+  </div>
+ </div>
+</nav>
+
+<div class="container">
+ <div class="jumbotron">
+  <h1>BaskPad</h1>
+  <p>Web App per la rilevazione delle statistiche nel basket</p>
+  <small>
+   Autore: Fabrizio Fellini<br>
+   <span id="versione">Versione</span> - <span id="offlinestate">OFFLINE non disponibile</span><br>
+  </small>
+  <a class="btn btn-sm btn-default" id="manualUpdate" href="javascript:void(0);">Controllo aggiornamenti<br><span class="badge" id="cacheProgress">Caricamento pagina</span></a>
+ </div>
+ <p>BaskPad è una "web app", cioè un'applicazione in grado di girare con il supporto di un navigatore web;
+ grazie alle caratteristiche dei browser moderni, è in grado di lavorare anche offline, senza avere
+ il bisogno di essere connessi ad Internet.
+ Tutti i dati memorizzati dall'applicazione risiedono e vengono mantenuti all'interno del dispositivo
+ che la utilizza, e quindi non vengono inviati ad un server esterno, con l'esclusione di apposite
+ procedure per l'esportazione dei dati che ne permettono il backup.
+ Può essere utilizzato qualsiasi browser moderno.</p>
+ <p>&Egrave; possibile usare l'applicazione su PC (Windows, Linux o Mac) o su tablet (iPad od Android):
+ si potrebbe usarla anche su smartphone, ma le dimensioni limitate degli schermi ne ostacolerebbero
+ il corretto utilizzo.</p>
+ <p>Termini legali: l'app è liberamente utilizzabile da chiunque. Al suo interno vengono usate librerie
+ di terzi (Bootstrap, FastClick, JQuery, localForage) per le cui licenze si rimanda ai rispettivi produttori.
+ Non vengono usati cookies, ma tecnologie di memorizzazione dati nel browser,
+ che quindi non implicano l'invio dei dati ad un server esterno.</p>
+ <h3>Database</h3>
+ <p>Il database è suddiviso in tabelle che vanno impostate prima di poter rilevare una partita:</p>
+ <dl>
+  <dt>Società</dt>
+  <dd>Nomi delle società cui appartengono le squadre</dd>
+  <dt>Squadre</dt>
+  <dd>Squadre che disputano i vari campionati</dd>
+  <dt>Campionati</dt>
+  <dd>Nomi dei campionati o delle fasi di campionato che vengono disputati dalle squadre</dd>
+  <dt>Campionati-Squadre</dt>
+  <dd>Tabella di relazione per collegare le squadre ad uno o più campionati che disputano</dd>
+  <dt>Giocatori</dt>
+  <dd>Dati degli atleti</dd>
+  <dt>Squadre-Giocatori</dt>
+  <dd>Tabella di relazione per collegare un giocatore ad una o più squadre di appartenenza.
+  Per poter assegnare un giocatore a più squadre contemporaneamente, occorre che le categorie
+  delle squadre siano diverse (es.: Senior, Under 19). Se si vuole assegnare un giocatore ad
+  un'altra squadra della stessa categoria di quella cui già appartiene, bisogna rimuoverlo
+  dalla prima squadra</dd>
+  <dt>Partite</dt>
+  <dd>Elenco delle partite di un campionato. &Egrave; sufficiente immettere solo gli incontri
+  di cui si vogliono rilevare le statistiche</dd>
+ </dl>
+ <p>Tutte le assegnazioni di squadre, campionati, giocatori e partite sono relative ad un anno
+ sportivo, questo per poter suddividere i dati tra le varie annate.</p>
+ <p>&Egrave; possibile resettare, importare ed esportare il database. I files di importazione ed
+ esportazione sono in formato di testo SQL compatibile con SQLite. Nel caso in cui si utilizzi
+ l'app a tutto schermo sui dispositivi mobili, si potrebbero verificare problemi relativi
+ alle procedure di importazione ed esportazione del database (così come nel caso di upload del
+ referto della partita), dovuti al fatto che i sistemi operativi dei dispositivi possono bloccare
+ le operazioni sui files: in tali situazioni è possibile bypassare i problemi applicando
+ dei semplici "copia-incolla" sulle apposite aree di testo.</p>
+ <h3>Generali</h3>
+ <p>I dati generali sono la somma dei valori ricavati da tutte le partite giocate da una
+ squadra, in uno o più campionati disputati.</p>
+ <h3>Partita</h3>
+ <p>La procedura della partita inizia con la scelta della gara su cui si vuole lavorare.</p>
+ <p>Le impostazioni di rilevazione consentono di scegliere l'opzione "punto" (indispensabile
+ quando si rilevano entrambe le squadre), l'opzione per rilevare i tiri indicando la posizione
+ sul campo, e, in caso di scelta di questa, l'opzione per indicare i tiri da sotto come
+ quelli entro i tre metri dal canestro oppure quelli dentro l'area dei tre secondi.</p>
+ <p>Se è la prima volta che si elabora la partita aperta, vengono richieste le intestazioni
+ (utilizzate in seguito nelle varie stampe) ed i numeri di maglia da assegnare ai giocatori.
+ Riguardo ai numeri di maglia, si può utilizzare qualsiasi numero formato da una o due
+ cifre. Se non viene indicato un numero, vuol dire che il giocatore non è stato iscritto
+ a referto, e che quindi non partecipa all'incontro.</p>
+ <p>Nelle intestazioni ci sono due campi per risultato e parziali dei tempi di gioco: questi
+ vengono aggiornati automaticamente dall'app solo se la rilevazione viene fatta su entrambe
+ le squadre, mentre vanno aggiornati manualmente se viene rilevata solo una squadra.</p>
+ <p>La pagina della partita presenta, nella barra del menù, due bottoni per zoomare la
+ finestra: questi funzionano, modificando il "viewport", solo su dispositivi mobili e non su PC;
+ usandoli danno la possibilità di far rientrare tutti gli elementi della pagina nello
+ schermo anche su quei dispositivi Android che presentano lo schermo più stretto rispetto
+ agli iPad.</p>
+ <p>Il riquadro della partita presenta un campo per immissione di testo: qui verranno immessi,
+ tramite i vari bottoni presenti oppure anche direttamente con la tastiera (metodo
+ sconsigliato!), le sigle di giocatori ed azioni che avvengono durante la gara; le sigle
+ immesse verranno poi elaborate quando verrà premuto il grande bottone blu a destra del
+ campo di immissione. Il bottone con freccia destra, posto a sinistra del campo, consente di
+ cancellare l'ultima sigla immessa, mentre il bottone SP consente di aggiungere uno spazio per
+ separare l'ultima sigla immessa da quella che verrà (utile solo in caso di opzione "punto"
+ selezionata per evitare di assegnare un'azione corrispondente).</p>
+ <h4>Sigle</h4>
+ <p>Le sigle utilizzate per l'immissione sono le seguenti:</p>
+ <dl>
+  <dt>PP</dt><dd>palla persa</dd>
+  <dt>PR</dt><dd>palla rubata (o azione recuperata se assegnata alla squadra)</dd>
+  <dt>SD</dt><dd>stoppata data</dd>
+  <dt>SS</dt><dd>stoppata subita</dd>
+  <dt>FF</dt><dd>fallo fatto</dd>
+  <dt>FS</dt><dd>fallo subito</dd>
+  <dt>FFP</dt><dd>fallo fatto in attacco con palla persa (se è iniziato, conclude anche il contropiede):
+  sfondamento o tecnico</dd>
+  <dt>FFA</dt><dd>fallo fatto con azione persa: con libero aggiuntivo, tecnico in difesa, antisportivo,
+  squalificante</dd>
+  <dt>FSP, FSA</dt><dd>fallo subito con azione recuperata: in difesa, con libero aggiuntivo, tecnico,
+  antisportivo, squalificante; sono identiche, ma cambia il loro dato corrispondente (FFP o FFA) in caso
+  di immissione dati con l'<a href="#opzpunto">opzione "punto"</a></dd>
+  <dt>AS</dt><dd>assist</dd>
+  <dt>CP</dt><dd>azione in contropiede (il contropiede viene concluso in automatico da un tiro
+  o una palla persa, ma ricomincia se il tiro sbagliato è seguito da rimbalzo offensivo; reinserendo
+  la sigla, lo stato di contropiede viene chiuso)</dd>
+  <dt>RO</dt><dd>rimbalzo offensivo</dd>
+  <dt>RD</dt><dd>rimbalzo difensivo</dd>
+  <dt>PRI</dt><dd>palla recuperata iniziale (da usare per la palla a due di inizio partita o per impostare
+  il possesso alternato in caso di falli negli intervalli)</dd>
+  <dt>RFT</dt><dd>rimbalzo difensivo di fine tempo (da assegnare dopo un tiro sbagliato allo
+  scadere, oppure dopo un tiro libero sbagliato seguito da rimessa laterale, causato da fallo tecnico,
+  antisportivo o squalificante, in inglese <i>dead ball rebound</i>)</dd>
+  <dt>AP</dt><dd>azione persa: il dato corrispondente è un'azione recuperata (SQ PR)</dd>
+  <dt>SC1</dt><dd>schiacciata realizzata</dd>
+  <dt>TS1</dt><dd>tiro da sotto realizzato</dd>
+  <dt>TS0</dt><dd>tiro da sotto sbagliato</dd>
+  <dt>TF1</dt><dd>tiro da fuori realizzato</dd>
+  <dt>TF0</dt><dd>tiro da fuori sbagliato</dd>
+  <dt>T31</dt><dd>tiro da tre realizzato</dd>
+  <dt>T30</dt><dd>tiro da tre sbagliato</dd>
+  <dt>TX...</dt><dd>tiro eseguito nella metà campo dove attacca la squadra A (viene poi trasformato
+  in TS, TF o T3)</dd>
+  <dt>TY...</dt><dd>tiro eseguito nella metà campo dove attacca la squadra B (viene poi trasformato
+  in TS, TF o T3)</dd>
+  <dt>TL1,TL0,TL00,TL01,TL10,TL11,TL000,TL111,ecc.</dt><dd>tiri liberi</dd>
+  <dt>'</dt><dd>commento (da non visualizzare nel referto leggibile)</dd>
+  <dt>NOTE</dt><dd>commento (da visualizzare nel referto leggibile)</dd>
+  <dt>TMP</dt><dd>tempo rimasto da giocare (usato solo per compatibilità col programma per PC)</dd>
+  <dt>AA</dt><dd>attacco squadra A</dd>
+  <dt>AB</dt><dd>attacco squadra B</dd>
+  <dt>DA</dt><dd>difesa squadra A</dd>
+  <dt>DB</dt><dd>difesa squadra B</dd>
+  <dt>ENT</dt><dd>entrate (all'inizio dei tempi di gioco)</dd>
+  <dt>S</dt><dd>sostituzione</dd>
+  <dt>A4,A5,A12,A00,A33,ecc.</dt><dd>giocatori della squadra A</dd>
+  <dt>B4,B5,B12,B00,B33,ecc.</dt><dd>giocatori della squadra B</dd>
+  <dt>ASQ</dt><dd>squadra A (per assegnarle falli, rimbalzi e palle)</dd>
+  <dt>BSQ</dt><dd>squadra B (per assegnarle falli, rimbalzi e palle)</dd>
+ </dl>
+ <h4>Immissione tiri</h4>
+ <p>Se si è optato per la rilevazione dei tiri sul campo di gioco:</p>
+ <ul>
+  <li>l'orientamento del campo varia col variare di quello del tablet, verticale
+  od orizzontale</li>
+  <li>la scelta del canestro in cui tirano le due squadre si ottiene tramite i due piccoli
+  bottoni A e B posti dietro i canestri</li>
+  <li>il tiro viene registrato cliccando la posizione sul campo da gioco, indicata da un
+  pallino rosso; continuando la pressione del click o del tap per più di mezzo secondo,
+  il pallino cambia colore diventando verde. Al momento del rilascio, in caso di pallino rosso,
+  il tiro verrà registrato come sbagliato, mentre se il pallino è verde il tiro verrà indicato
+  come realizzato. In caso di schiacciata realizzata, premere il bottone SC1: se questo risulta
+  essere l'ultima sigla nella riga d'immissione, a questo punto, cliccando la posizione sul
+  campo (senza bisogno di pressione "lunga"), la posizione della schiacciata verrà inserita
+  nella riga d'immissione.</li>
+ </ul>
+ <p>Il tiro verrà poi elaborato dall'app in automatico come tiro da sotto, da fuori o da tre
+ a seconda della posizione indicata e dell'opzione "3 metri/area" selezionata.</p>
+ <p>In caso di errore dovuto alla mancata sistemazione dei bottoni A e B, per cui, ad esempio,
+ un tiro da sotto venisse trasformato in un tiro da 3 da oltre metà campo, basterà modificare
+ il referto sostituendo il <i>T3</i> con un <i>TY</i> se il tiro era della squadra A, altrimenti
+ con un <i>TX</i> in caso di squadra B.</p>
+ <p>In caso di tiri liberi immessi tramite l'apposita finestra di dialogo, se nessun
+ libero è realizzato, verrà cancellato l'eventuale assist presente nella riga d'immisione.</p>
+ <a id="opzpunto" style="display: block; position: relative; top: -50px; visibility: hidden;"></a>
+ <h4>Opzione "punto"</h4>
+ <p>Quando si rilevano due squadre contemporaneamente, l'uso del punto è praticamente
+ indispensabile perché riduce il numero dei click necessari durante l'immissione dei dati.
+ Il concetto da capire è questo: per ogni azione ne esiste una corrispondente, per cui,
+ se dopo l'azione mettiamo un punto e la sigla di un giocatore, a questo verrà assegnata
+ l'azione corrispondente. Qualche esempio:</p>
+ <dl>
+  <dt>A5 TS0.A7</dt><dd>tiro sbagliato del 5 e rimbalzo offensivo del 7 della squadra A</dd>
+  <dt>A5 TS0.B7</dt><dd>tiro sbagliato del 5 della squadra A e rimbalzo difensivo del 7 della squadra B</dd>
+  <dt>A5 TS1.A7</dt><dd>assist del 7 e tiro da sotto realizzato dal 5 della squadra A</dd>
+  <dt>A5 FF.B7</dt><dd>fallo fatto del 5 della squadra A e fallo subito del 7 della squadra B</dd>
+ </dl>
+ <p>Negli ultimi due casi, usando la tastiera per l'immissione, volendo si potrebbe omettere
+ l'inserimento della lettera tra il punto ed il numero del giocatore perché è implicito che l'assist
+ lo dia un giocatore della stessa squadra o che il fallo sia subito da uno dell'altra.</p>
+ <h4>Parentesi []</h4>
+ <p>Molti dati vengono racchiusi tra parentesi quadre poste dopo una sigla: posizioni dei tiri,
+ tempo di gioco e numeri dei giocatori per entrate e sostituzioni, ecc. Se si vogliono
+ rilevare attacchi e difese, dentro le parentesi va immesso il nome dell'attacco o della difesa.</p>
+ <h4>Dati comparativi</h4>
+ <p>Al di sotto dei bottoni con le sigle dei giocatori, c'è una tabella contenente i dati
+ che servono per controllare e verificare il lavoro che si sta facendo comparandoli tra le due squadre:
+ ci sono i punti (da verificare sul tabellone elettronico), la situazione del bonus, falli fatti e subiti,
+ rimbalzi difensivi e difensivi degli avversari (trovati usando la formula <i>tiri sbagliati - rimbalzi
+ offensivi</i>), stoppate date e subite, palle perse e recuperate, chi ha il possesso del pallone
+ (indicato dal numero 1); ci sono inoltre i quozienti di tiro. Se qualche valore non combina col
+ corrispondente della squadra avversaria, viene segnalato cambiandogli il colore di sfondo.</p>
+ <h4>La tabella Referto</h4>
+ <p>La tabella del referto, posta in basso a destra, presenta tre colonne:</p>
+ <ol>
+  <li>il referto vero e proprio, con le sigle normalizzate nella forma "giocatore azione[]" oppure
+  "sigla[]", con le parentesi quadre che per molte sigle sono opzionali oppure non servono. Ogni riga
+  di questa colonna è cliccabile per poterla modificare</li>
+  <li>punteggio progressivo e differenze tra le squadre: le sigle qui utilizzate consentono di
+  scovare eventuali errori di rilevazione:
+  <dl>
+   <dt>1fa</dt><dd>c'è un fallo fatto in più per A</dd>
+   <dt>1pa</dt><dd>c'è una palla persa in più per A</dd>
+   <dt>1sa</dt><dd>c'è una stoppata data in più per A</dd>
+   <dt>-1ra</dt><dd>c'è un rimbalzo in meno, difensivo per A, offensivo per B</dd>
+   <dt>1fb</dt><dd>c'è un fallo fatto in più per B</dd>
+   <dt>1pb</dt><dd>c'è una palla persa in più per B</dd>
+   <dt>1sb</dt><dd>c'è una stoppata data in più per B</dd>
+   <dt>-1rb</dt><dd>c'è un rimbalzo in meno, difensivo per B, offensivo per A</dd>
+   <dt>1az</dt><dd>l'azione fa sì che la differenza tra possesso A e possesso B sia maggiore di 1,
+   e quindi viene snaturata la normale alternanza dei possessi</dd>
+   <dt>cp1</dt><dd>inizio contropiede</dd>
+   <dt>cp0</dt><dd>fine contropiede</dd>
+  </dl>
+  Quando compaiono queste sigle, nelle righe successive di solito vengono annullate: se questo
+  non avviene, ci deve essere un errore.</li>
+  <li>informazioni: se l'azione è un fallo fatto, vengono riportati i falli del giocatore, se è
+  un tiro realizzato, i punti individuali ed il quoziente di tiro, ecc.</li>
+ </ol>
+</div>
+
+<script src="js/jquery-1.11.2.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/localforage.min.js"></script>
+<script src="js/bp.js"></script>
+<script src="swload.js"></script>
+</body>
+</html>
