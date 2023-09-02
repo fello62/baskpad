@@ -198,23 +198,23 @@ La tabella del referto, posta in basso a destra, presenta tre colonne:
    c'è una palla persa in più per A
    ##### 1sa
    c'è una stoppata data in più per A
-##### -1ra
-c'è un rimbalzo in meno, difensivo per A, offensivo per B
-##### 1fb
-c'è un fallo fatto in più per B
-##### 1pb
-c'è una palla persa in più per B
-##### 1sb
-c'è una stoppata data in più per B
-##### -1rb
-c'è un rimbalzo in meno, difensivo per B, offensivo per A
-##### 1az
-l'azione fa sì che la differenza tra possesso A e possesso B sia maggiore di 1, e quindi viene snaturata la normale alternanza dei possessi
-##### cp1
-inizio contropiede
-##### cp0
-fine contropiede
+   ##### -1ra
+   c'è un rimbalzo in meno, difensivo per A, offensivo per B
+   ##### 1fb
+   c'è un fallo fatto in più per B
+   ##### 1pb
+   c'è una palla persa in più per B
+   ##### 1sb
+   c'è una stoppata data in più per B
+   ##### -1rb
+   c'è un rimbalzo in meno, difensivo per B, offensivo per A
+   ##### 1az
+   l'azione fa sì che la differenza tra possesso A e possesso B sia maggiore di 1, e quindi viene snaturata la normale alternanza dei possessi
+   ##### cp1
+   inizio contropiede
+   ##### cp0
+   fine contropiede
 
-Quando compaiono queste sigle, nelle righe successive di solito vengono annullate: se questo non avviene, ci deve essere un errore.
+   Quando compaiono queste sigle, nelle righe successive di solito vengono annullate: se questo non avviene, ci deve essere un errore.
 
-3) informazioni: se l'azione è un fallo fatto, vengono riportati i falli del giocatore, se è un tiro realizzato, i punti individuali ed il quoziente di tiro, ecc.
+3. informazioni: se l'azione è un fallo fatto, vengono riportati i falli del giocatore, se è un tiro realizzato, i punti individuali ed il quoziente di tiro, ecc.
