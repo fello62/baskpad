@@ -190,12 +190,12 @@ Al di sotto dei bottoni con le sigle dei giocatori, c'è una tabella contenente 
 ### La tabella Referto
 
 La tabella del referto, posta in basso a destra, presenta tre colonne:
-1) il referto vero e proprio, con le sigle normalizzate nella forma "giocatore azione[]" oppure "sigla[]", con le parentesi quadre che per molte sigle sono opzionali oppure non servono. Ogni riga di questa colonna è cliccabile per poterla modificare
-2) punteggio progressivo e differenze tra le squadre: le sigle qui utilizzate consentono di scovare eventuali errori di rilevazione:
-##### 1fa
-c'è un fallo fatto in più per A
-##### 1pa
-c'è una palla persa in più per A
+1. il referto vero e proprio, con le sigle normalizzate nella forma "giocatore azione[]" oppure "sigla[]", con le parentesi quadre che per molte sigle sono opzionali oppure non servono. Ogni riga di questa colonna è cliccabile per poterla modificare
+2. punteggio progressivo e differenze tra le squadre: le sigle qui utilizzate consentono di scovare eventuali errori di rilevazione:
+   .##### 1fa
+   .c'è un fallo fatto in più per A
+   .##### 1pa
+   .c'è una palla persa in più per A
 ##### 1sa
 c'è una stoppata data in più per A
 ##### -1ra
