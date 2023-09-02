@@ -88,28 +88,31 @@
 
 <script src="js/jquery-1.11.2.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
-<script src="js/localforage.min.js"></script>
 <script src="js/ctrldata.js"></script>
 <script src="js/bp.js"></script>
 <script>
 <!--
-var rg;
-var ansp='';
-var codcamp;
-leggioptas();
+var ansp='',codcamp,rg;
+
+aspettaDB(leggioptas);
 
 function moverclick(event){
- var i,ar;
+ var ar,button,f,i;
  // trova il Button che ha aperto il Modal
- var button=$(this);
+ button=$(this);
  // trova la riga del Button
  rg=button.data('riga');
  button.parents('tr').remove();
- ar={codcamp:codcamp,codsq:rg};
- i=newrec('campsq');
- updaterec('campsq',i,ar);
- savedb();
- leggirighesc();
+ fdb.idNewRec('campsq',saveRec);
+
+ function saveRec(id){
+  ar={codcampsq:id,codcamp:codcamp,codsq:rg};
+  fdb.updateRec('campsq',ar,saveRec2);
+ }
+
+ function saveRec2(){
+  leggirighe(2);//squadre campionato
+ }
 }
 
 function movelclick(event){
@@ -118,11 +121,13 @@ function movelclick(event){
  // trova la riga del Button
  rg=button.data('riga');
  button.parents('tr').remove();
- deleterec('campsq',function(x,y){
-  return adb.campsq[x][0]==y;
- },rg);
- savedb();
- leggirighets();
+ fdb.deleteRec('campsq',function(x,y){
+  return x.codcampsq==y;
+ },rg,deleRec);
+
+ function deleRec(){
+  leggirighe(1);//tutte le squadre
+ }
 }
 
 $('#righets').on('click','button.mover',moverclick);
@@ -135,135 +140,102 @@ $(document.a.annosport).on('change',function(event){
 
 $(document.a.codcamp).on('change',function(event){
  codcamp=$(this).val();
- leggirighets();
- leggirighesc();
+ leggirighe(3);//entrambe
 });
 
 function leggioptas(){
- var t,h,i,d,r,v1,sel;
- if (leggendo){
-  setTimeout(function(){leggioptas();},100);
-  return;
+ var h,i,sel,t,v1;
+ fdb.tabAs('camp',leggioptascb);
+
+ function leggioptascb(mappa){
+  h=v1='';
+  for(i=0;i<mappa.length;i++){
+   t=mappa[i];
+   if (i==0) v1=t;
+   if ((ansp.length>0)&&(ansp==t)) v1=t;
+   h+='<option>'+t+'</option>';
+  }
+  ansp=v1;
+  sel=$(document.a.annosport);
+  sel.html(h);
+  if (ansp.length>0) sel.val(ansp);
+  leggioptcc();
  }
- r={};
- d=adf.camp.annosport;
- for(i=0;i<adb.camp.length;i++)
-  r[adb.camp[i][d]]=i;
- r=Object.keys(r);
- r.sort(function(a,b){
-  return ((a==b)?0:((a>b)?-1:1));
- });
- h=v1='';
- for(i=0;i<r.length;i++){
-  t=r[i];
-  if (i==0)
-   v1=t;
-  if ((ansp.length>0)&&(ansp==t))
-   v1=t;
-  h+='<option>'+t+'</option>';
- }
- ansp=v1;
- sel=$(document.a.annosport);
- sel.html(h);
- if (ansp.length>0)
-  sel.val(ansp);
- leggioptcc();
 }
 
 function leggioptcc(){
- var c,d,h,i,r,mappa,sel,v1;
- c=adf.camp.annosport;
- mappa=[];
- for(i=0;i<adb.camp.length;i++)
-  if (adb.camp[i][c]==ansp){
-   h={codcamp:adb.camp[i][adf.camp.codcamp],nomecamp:adb.camp[i][adf.camp.nomecamp],girone:adb.camp[i][adf.camp.girone],fase:adb.camp[i][adf.camp.fase]};
-   mappa.push(h);
+ var h,i,r,sel;
+ fdb.tabRecAs('camp',ansp,leggioptcccb);
+
+ function leggioptcccb(mappa){
+  if (mappa.length>0){
+   h=adf.camp.nomi;
+   for(i=adf.camp.fase;i>=adf.camp.nomecamp;i--)
+    mappa.sort(function(a,b){
+     return ((a[h[i]]==b[h[i]])?0:((a[h[i]]>b[h[i]])?1:-1));
+    });
   }
- if (mappa.length>0){
-  h=Object.keys(mappa[0]);
-  for(i=3;i>=1;i--)
-   mappa.sort(function(a,b){
-    return ((a[h[i]]==b[h[i]])?0:((a[h[i]]>b[h[i]])?1:-1));
-   });
+  h='';
+  for(i=0;i<mappa.length;i++){
+   r=mappa[i];
+   h+='<option value="'+r.codcamp+'">'+r.nomecamp+', '+r.girone+', '+r.fase+'</option>';
+  }
+  codcamp=''+(mappa[0].codcamp);
+  sel=$(document.a.codcamp);
+  sel.html(h);
+  if (codcamp.length>0) sel.val(codcamp);
+  leggirighe(3);//entrambe
  }
- h=v1='';
- for(i=0;i<mappa.length;i++){
-  r=mappa[i];
-  c=r.codcamp;
-  if (i==0)
-   v1=c;
-  h+='<option value="'+c+'">'+r.nomecamp+', '+r.girone+', '+r.fase+'</option>';
- }
- codcamp=v1;
- sel=$(document.a.codcamp);
- sel.html(h);
- if (codcamp.length>0)
-  sel.val(codcamp);
- leggirighets();
- leggirighesc();
 }
 
-function leggirighets(){
- var c,d,h,i,mappa,mappacampsq;
+function leggirighe(lrmodo){
+ var h,i,mappa=[[],[]],mappacampsq,r;
  if (codcamp.length==0){
   $('#righets').html('');
-  return;
- }
- c=adf.campsq.codcamp;
- d=adf.campsq.codsq;
- mappacampsq=[];
- for(i=0;i<adb.campsq.length;i++)
-  if (adb.campsq[i][c]==codcamp)
-   mappacampsq[adb.campsq[i][d]]=adb.campsq[i][0];
- d=adf.sq.annosport;
- c=adf.sq.codsq;
- mappa=[];
- for(i=0;i<adb.sq.length;i++)
-  if ((adb.sq[i][d]==ansp)&&(!mappacampsq[adb.sq[i][c]])){
-   h={codsq:adb.sq[i][c],codcampsq:0,nomesq:adb.sq[i][adf.sq.nomesq],cat:adb.sq[i][adf.sq.cat],sesso:adb.sq[i][adf.sq.sesso]};
-   mappa.push(h);
-  }
- if (mappa.length>0){
-  h=Object.keys(mappa[0]);
-  for(i=4;i>=2;i--)
-   mappa.sort(function(a,b){
-    return ((a[h[i]]==b[h[i]])?0:((a[h[i]]>b[h[i]])?1:-1));
-   });
- }
- $('#righets').html(scrivirighe(mappa,'codsq'));
-}
-
-function leggirighesc(){
- var c,d,h,i,mappa,mappacampsq;
- if (codcamp.length==0){
   $('#righesc').html('');
   return;
  }
- c=adf.campsq.codcamp;
- d=adf.campsq.codsq;
- mappacampsq=[];
- for(i=0;i<adb.campsq.length;i++)
-  if (adb.campsq[i][c]==codcamp)
-   mappacampsq[adb.campsq[i][d]]=adb.campsq[i][0];
- mappa=[];
- for(i=0;i<adb.sq.length;i++)
-  if (mappacampsq[adb.sq[i][0]]){
-   h={codsq:adb.sq[i][c],codcampsq:mappacampsq[adb.sq[i][0]],nomesq:adb.sq[i][adf.sq.nomesq],cat:adb.sq[i][adf.sq.cat],sesso:adb.sq[i][adf.sq.sesso]};
-   mappa.push(h);
-  }
- if (mappa.length>0){
-  h=Object.keys(mappa[0]);
-  for(i=4;i>=2;i--)
-   mappa.sort(function(a,b){
-    return ((a[h[i]]==b[h[i]])?0:((a[h[i]]>b[h[i]])?1:-1));
-   });
+ fdb.tabRecFilter(
+  'campsq',
+  function(x,y,z){if (x.codcamp==y) z[x.codsq]=x.codcampsq;},
+  codcamp,
+  leggirighecb1);//trova le squadre di un campionato
+
+ function leggirighecb1(mappacs){
+  mappacampsq=mappacs;
+  fdb.tabRecAs('sq',ansp,leggirighecb2);
  }
- $('#righesc').html(scrivirighe(mappa,'codcampsq'));
+
+ function leggirighecb2(mappasq){
+  for(i=0;i<mappasq.length;i++){
+   r=mappasq[i];
+   h={codsq:r.codsq,nomesq:r.nomesq,cat:r.cat,sesso:r.sesso};
+   if (mappacampsq[r.codsq]){
+    if ((lrmodo&2)==2){
+     h.codcampsq=mappacampsq[r.codsq];
+     mappa[1].push(h);
+    }
+   } else {
+    if ((lrmodo&1)==1){
+     h.codcampsq=0;
+     mappa[0].push(h);
+    }
+   }
+  }
+  h=adf.sq.nomi;
+  for(r=0;r<2;r++)
+   if (mappa[r].length>0)
+    for(i=adf.sq.sesso;i>=adf.sq.nomesq;i--)
+     mappa[r].sort(function(a,b){
+      return ((a[h[i]]==b[h[i]])?0:((a[h[i]]>b[h[i]])?1:-1));
+     });
+  if ((lrmodo&1)==1) $('#righets').html(scrivirighe(mappa[0],'codsq'));
+  if ((lrmodo&2)==2) $('#righesc').html(scrivirighe(mappa[1],'codcampsq'));
+ }
 }
 
 function scrivirighe(mappa,cod){
- var h,i,j,r,c,v,ar;
- h='';
+ var h='',i,j,r,c,v,ar;
  v=(cod=='codcampsq')?'left':'right';
  for(i=0;i<mappa.length;i++){
   r=mappa[i];

@@ -58,18 +58,13 @@
    </div>
   </div>
  </form>
- <div class="row" id="progresso" style="display: none;">
-  <div class="col-xs-12">
-   <div class="alert alert-danger">
-    Elaborazione in corso...
-   </div>
-  </div>
- </div>
- <div class="row" id="concluso" style="display: none;">
-  <div class="col-xs-12">
-   <div class="alert alert-success">
-    <!--<button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>-->
-    Elaborazione conclusa!
+</div>
+
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="attesa" tabindex="-1">
+ <div class="modal-dialog modal-sm">
+  <div class="modal-content">
+   <div class="modal-header">
+    <h4 class="modal-title">Attendere...</h4>
    </div>
   </div>
  </div>
@@ -77,7 +72,6 @@
 
 <script src="js/jquery-1.11.2.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
-<script src="js/localforage.min.js"></script>
 <script src="js/ctrldata.js"></script>
 <script src="js/bp.js"></script>
 <script>
@@ -94,68 +88,18 @@ $('#dlurl').click(function(event){
 });
 
 $('#dosql').click(function(event){
- $('#concluso').hide();
- $('#progresso').show();
- setTimeout(function(){elabora();},100);
+ $('#attesa').modal('show');
+ aspettaDB(elabora);
 });
 
 function elabora(){
- var i,t,ar,tbl,s,j,linee;
- if (leggendo){
-  setTimeout(function(){elabora();},100);
-  return;
+ fdb.importaDB(document.a.sql,elaboracb);
+
+ function elaboracb(t){
+  document.a.sql.value=t;
+  $('#attesa').modal('hide');
+  alert('Elaborazione conclusa.');
  }
- t=document.a.sql.value;
- linee=t.split(';\n');
- ar=[];
- for(i=0;i<linee.length;i++){
-  t=trim(linee[i]);
-  if (t.substr(0,6).toUpperCase()=='INSERT')
-   ar.push(t);
- }
- linee=[];
- tbl='';
- for(i=0;i<ar.length;i++){
-  t=ar[i].split(' ');
-  t[2]=t[2].replace(/['"]+/g,'');
-  if (tbl!=t[2]) {
-   tbl=t[2];
-   linee.push('delete from '+tbl);
-  }
-  linee.push(t.join(' '));
- }
- document.a.sql.value=linee.join(';\n')+';\n';
- for (i=0;i<linee.length;i++){
-  t=linee[i].split(' ');
-  tbl=t[2];
-  if (t[0].toUpperCase()=='INSERT'){
-   ar=[];
-   s=trim(linee[i].slice(linee[i].indexOf('(')+1,linee[i].lastIndexOf(')')))+',';
-   j=0;
-   while(s.length>0){
-    if (s.charAt(0)=="'"){
-     j=1;
-     while(j=s.indexOf("'",j)){
-      if (s.charAt(j+1)!="'")
-       break;
-      else
-       j+=2;
-     }
-     ar.push(s.slice(1,j).replace(/''/g,"'"));
-     s=ltrim(s.substr(s.indexOf(',',j)+1));
-    } else {
-     j=s.indexOf(',');
-     ar.push(Number(rtrim(s.substr(0,j))));
-     s=ltrim(s.substr(j+1));
-    }
-   }
-   adb[tbl].push(ar);
-  } else if (t[0].toUpperCase()=='DELETE')
-   adb[tbl]=[];
- }
- savedb();
- $('#progresso').hide();
- $('#concluso').show();
 }
 -->
 </script>

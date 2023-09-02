@@ -143,18 +143,14 @@
 
 <script src="js/jquery-1.11.2.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
-<script src="js/localforage.min.js"></script>
 <script src="js/ctrldata.js"></script>
 <script src="js/bp.js"></script>
 <script>
 <!--
-var rg;
-var ansp='';
-var codcamp;
-var codsq;
-var ordine='codprt';
-var verso='asc';
-leggioptas();
+var ansp='',codcamp,codsq,nuovid,ordine='codprt',verso='asc',rg;
+nuovid={codsq:0,gara:0,gior:0,data:''};
+
+aspettaDB(leggioptas);
 
 $('#intest > th[data-ord]')
 .css('cursor','pointer')
@@ -173,16 +169,13 @@ $('#intest > th[data-ord]')
 });
 
 $('#modModal').on('show.bs.modal', function(event){
+ var bt,button,dd,hid,m,mm,modal,oggi,titolo,vis,yy;
  // trova il Button che ha aperto il Modal
- var button=$(event.relatedTarget);
+ button=$(event.relatedTarget);
  // trova la riga del Button
  rg=button.data('riga');
  act=button.hasClass('eli');
- var modal=$(this);
- var titolo;
- var bt;
- var hid;
- var vis;
+ modal=$(this);
  if (act){
   titolo='Eliminazione';
   vis='.eli';
@@ -199,15 +192,38 @@ $('#modModal').on('show.bs.modal', function(event){
   if (rg=="0"){
    titolo='Nuova';
    codsq=['0','0'];
-   document.f.ngara.value='';
-   document.f.giornata.value='';
-   document.f.data.value='';
-   document.f.ora.value='';
    document.f.luogo.value='';
-   legginuova();
+   $(document.f.codsqa).val(nuovid.codsq);
+   $(document.f.codsqb).val(nuovid.codsq);
+   if (nuovid.gara){
+    document.f.ngara.value=1+1*nuovid.gara;
+    document.f.giornata.value=nuovid.gior;
+    s=sql2dataora(nuovid.data);
+    document.f.data.value=s[0];
+    document.f.ora.value=s[1];
+   } else {
+    document.f.ngara.value='1';
+    document.f.giornata.value='1';
+    oggi=new Date();
+    dd=oggi.getDate();
+    mm=oggi.getMonth()+1;
+    yy=oggi.getFullYear();
+    m=[];
+    m[0]=('0'+dd).slice(-2);
+    m[1]=('0'+mm).slice(-2);
+    m[2]=('000'+yy).slice(-4);
+    document.f.data.value=m[0]+'/'+m[1]+'/'+m[2];
+    dd=oggi.getHours();
+    mm=oggi.getMinutes();
+    m[0]=('0'+dd).slice(-2);;
+    m[1]=('0'+mm).slice(-2);
+    document.f.ora.value=m[0]+':'+m[1];
+   }
   } else {
    titolo='Modifica';
    codsq=button.data('codsq').split(',');
+   $(document.f.codsqa).val(codsq[0]);
+   $(document.f.codsqb).val(codsq[1]);
    document.f.ngara.value=$('#rg'+rg+'a').text();
    document.f.giornata.value=$('#rg'+rg+'b').text();
    document.f.data.value=$('#rg'+rg+'c').text();
@@ -215,11 +231,12 @@ $('#modModal').on('show.bs.modal', function(event){
    document.f.codsqa.value=$('#rg'+rg+'e').text();
    document.f.codsqb.value=$('#rg'+rg+'f').text();
    document.f.luogo.value=$('#rg'+rg+'g').text();
+   $(document.f.codsqa).val(codsq[0]);
+   $(document.f.codsqb).val(codsq[1]);
   }
   vis='.mod';
   hid='.eli';
   bt='Salva';
-  leggioptsq();
  }
  modal.find(vis).css({'visible':'true','display':'block'});
  modal.find(hid).css({'visible':'false','display':'none'});
@@ -228,10 +245,11 @@ $('#modModal').on('show.bs.modal', function(event){
 });
 
 $('#modModal').on('shown.bs.modal',function(event){
+ var o;
  if (act){
   $(this).find('button[type=submit]').focus();
  } else {
-  var o=document.f.ngara;
+  o=document.f.ngara;
   o.focus();
   o.setSelectionRange(0,o.value.length);
  }
@@ -244,6 +262,7 @@ $(document.a.annosport).on('change',function(event){
 
 $(document.a.codcamp).on('change',function(event){
  codcamp=$(this).val();
+ leggioptsq();
  leggirighe();
 });
 
@@ -264,231 +283,190 @@ $(document.f.ora).on('blur',function(event){
 });
 
 $(document.f.luogo).on('blur',function(event){
+ novirgole(this);
  return maiusc(this);
 });
 
 $(document.f).on('submit',function(event){
  var ar;
  if (act){
-  deleterec('prt',function(x,y){
-   return adb.prt[x][0]==y;
-  },rg);
+  fdb.deleteRec('prt',function(x,y){
+   return x.codprt==y;
+  },rg,leggirighe);
  } else {
   ctrlnumero(document.f.ngara,1,999999);
   ctrlnumero(document.f.giornata,1,999);
   ctrldata(document.f.data);
   ctrltime(document.f.ora);
+  novirgole(document.f.luogo);
   maiusc(document.f.luogo);
-  ar={codcamp:codcamp,codsqa:document.f.codsqa.value,codsqb:document.f.codsqb.value,dataora:dataora2sql(document.f.data.value,document.f.ora.value),luogo:document.f.luogo.value,giornata:document.f.giornata.value,ngara:document.f.ngara.value};
-  if (rg==0)
-   rg=newrec('prt');
-  updaterec('prt',rg,ar);
+  if (rg==0) fdb.idNewRec('prt',saveRecPrt2);
+  else saveReccb(rg);
+
+  function saveRecPrt2(id){
+   rg=id;
+   ar=newRec('prt2',id);
+   fdb.updateRec('prt2',ar,saveRec);
+  }
+
+  function saveRec(){
+   saveReccb(rg);
+  }
+
+  function saveReccb(rg){
+   ar={codprt:rg,codcamp:codcamp,codsqa:document.f.codsqa.value,codsqb:document.f.codsqb.value,dataora:dataora2sql(document.f.data.value,document.f.ora.value),luogo:document.f.luogo.value,giornata:document.f.giornata.value,ngara:document.f.ngara.value};
+   fdb.updateRec('prt',ar,leggirighe);
+  }
  }
  $('#modModal').modal('hide');
- savedb();
- leggirighe();
  return false;
 });
 
 function leggioptas(){
- var t,h,i,d,r,v1,sel;
- if (leggendo){
-  setTimeout(function(){leggioptas();},100);
-  return;
+ var cursor,h,i,r,sel,t,tx,v1;
+ fdb.tabAs('camp',leggioptascb);
+
+ function leggioptascb(mappa){
+  h=v1='';
+  for(i=0;i<mappa.length;i++){
+   t=mappa[i];
+   if (i==0) v1=t;
+   if ((ansp.length>0)&&(ansp==t)) v1=t;
+   h+='<option>'+t+'</option>';
+  }
+  ansp=v1;
+  sel=$(document.a.annosport);
+  sel.html(h);
+  if (ansp.length>0) sel.val(ansp);
+  leggioptcc();
  }
- r={};
- d=adf.camp.annosport;
- for(i=0;i<adb.camp.length;i++)
-  r[adb.camp[i][d]]=i;
- r=Object.keys(r);
- r.sort(function(a,b){
-  return ((a==b)?0:((a>b)?-1:1));
- });
- h=v1='';
- for(i=0;i<r.length;i++){
-  t=r[i];
-  if (i==0)
-   v1=t;
-  if ((ansp.length>0)&&(ansp==t))
-   v1=t;
-  h+='<option>'+t+'</option>';
- }
- ansp=v1;
- sel=$(document.a.annosport);
- sel.html(h);
- if (ansp.length>0)
-  sel.val(ansp);
- leggioptcc();
 }
 
 function leggioptcc(){
- var c,d,h,i,r,mappa,sel,v1;
- c=adf.camp.annosport;
- mappa=[];
- for(i=0;i<adb.camp.length;i++)
-  if (adb.camp[i][c]==ansp){
-   h={codcamp:adb.camp[i][adf.camp.codcamp],nomecamp:adb.camp[i][adf.camp.nomecamp],girone:adb.camp[i][adf.camp.girone],fase:adb.camp[i][adf.camp.fase]};
-   mappa.push(h);
+ var h,i,r,sel;
+ fdb.tabRecAs('camp',ansp,leggioptcccb);
+
+ function leggioptcccb(mappa){
+  if (mappa.length>0){
+   h=adf.camp.nomi;
+   for(i=adf.camp.fase;i>=adf.camp.nomecamp;i--)
+    mappa.sort(function(a,b){
+     return ((a[h[i]]==b[h[i]])?0:((a[h[i]]>b[h[i]])?1:-1));
+    });
   }
- if (mappa.length>0){
-  h=Object.keys(mappa[0]);
-  for(i=3;i>=1;i--)
-   mappa.sort(function(a,b){
-    return ((a[h[i]]==b[h[i]])?0:((a[h[i]]>b[h[i]])?1:-1));
-   });
+  h='';
+  for(i=0;i<mappa.length;i++){
+   r=mappa[i];
+   h+='<option value="'+r.codcamp+'">'+r.nomecamp+', '+r.girone+', '+r.fase+'</option>';
+  }
+  codcamp=''+mappa[0].codcamp;
+  sel=$(document.a.codcamp);
+  sel.html(h);
+  if (codcamp.length>0) sel.val(codcamp);
+  leggioptsq();
+  leggirighe();
  }
- h=v1='';
- for(i=0;i<mappa.length;i++){
-  r=mappa[i];
-  c=r.codcamp;
-  if (i==0)
-   v1=c;
-  h+='<option value="'+c+'">'+r.nomecamp+', '+r.girone+', '+r.fase+'</option>';
- }
- codcamp=v1;
- sel=$(document.a.codcamp);
- sel.html(h);
- if (codcamp.length>0)
-  sel.val(codcamp);
- leggirighe();
 }
 
 function leggirighe(){
- var c,d,h,i,j,r,ar,chiavi,csa,csb,mappa,mappacodsq;
+ var ar,h,i,j,mappacodsq,r;
  if (codcamp.length==0){
   $('#righe').html('');
   return;
  }
- d=adf.sq.nomesq;
- mappacodsq=[];
- for(i=0;i<adb.sq.length;i++)
-  mappacodsq[adb.sq[i][0]]=adb.sq[i][d];
- chiavi=Object.keys(adf.sq);
- d=chiavi.indexOf('nomesq');
- mappa=[];
- chiavi=Object.keys(adf.prt);
- chiavi.pop();
- c=adf.prt.codcamp;
- csa=adf.prt.codsqa;
- csb=adf.prt.codsqb;
- for(i=0;i<adb.prt.length;i++)
-  if (adb.prt[i][c]==codcamp){
-   h={};
-   for(j=0;j<chiavi.length;j++)
-    h[chiavi[j]]=adb.prt[i][j];
-   h.nomesqa=mappacodsq[h.codsqa];
-   h.nomesqb=mappacodsq[h.codsqb];
-   mappa.push(h);
+ fdb.tabRecAs('sq',ansp,leggirighecb1);
+
+ function leggirighecb1(mappa){
+  mappacodsq=[];
+  for(i=0;i<mappa.length;i++){
+   r=mappa[i];
+   mappacodsq[r.codsq]=r.nomesq;
   }
- d=chiavi.indexOf(ordine);
- if (d<adf.sq.tipo.length)
-  h=adf.sq.tipo[d];
- else
-  h='s';
- if (h=='n')
-  mappa.sort(function(a,b){
-   return (a[ordine]-b[ordine])*(verso=='asc'?1:-1);
-  });
- else
-  mappa.sort(function(a,b){
-   return ((a[ordine]==b[ordine])?0:((a[ordine]>b[ordine])?1:-1))*(verso=='asc'?1:-1);
-  });
- h='';
- for(i=0;i<mappa.length;i++){
-  r=mappa[i];
-  c=r.codprt;
-  csa=r.codsqa;
-  csb=r.codsqb;
-  ar=[];
-  ar.push(r.ngara);
-  ar.push(r.giornata);
-  d=sql2dataora(r.dataora);
-  ar.push(d[0]);
-  ar.push(d[1]);
-  ar.push(r.nomesqa);
-  ar.push(r.nomesqb);
-  ar.push(r.luogo);
-  ar.push(c);
-  h+='<tr><td><button type="button" class="btn btn-default" data-toggle="modal" data-target="#modModal" data-riga="'+c+'" data-codsq="'+csa+','+csb+'"><span class="glyphicon glyphicon-pencil"></span></button></td>';
-  h+='<td><button type="button" class="btn btn-default eli" data-toggle="modal" data-target="#modModal" data-riga="'+c+'"><span class="glyphicon glyphicon-remove"></span></button></td>';
-  for (j=0;j<ar.length;j++) {
-   h+='<td id="rg'+c+String.fromCharCode(97+j)+'">'+htmlentities(ar[j])+'</td>';
-  }
-  h+='</tr>';
+  fdb.tabRecFilter(
+   'prt',
+   function(x,y,z){if (x.codcamp==y) z.push(x);},
+   codcamp,
+   leggirighecb2);//trova le partite di un campionato
  }
- $('#righe').html(h);
+
+ function leggirighecb2(mappa){
+  nuovid.gara=nuovid.gior=0;
+  nuovid.data='';
+  for(i=0;i<mappa.length;i++){
+   mappa[i].nomesqa=mappacodsq[mappa[i].codsqa];
+   mappa[i].nomesqb=mappacodsq[mappa[i].codsqb];
+   if ((j=mappa[i].ngara)>nuovid.gara) nuovid.gara=j;
+   if ((j=mappa[i].giornata)>nuovid.gior) nuovid.gior=j;
+   if ((j=mappa[i].dataora)>nuovid.data) nuovid.data=j;
+  }
+  if (mappa.length>0){
+   i=adf.prt.nomi.indexOf(ordine);
+   if (i>=0) h=adf.prt.tipo[i];
+   else h='s';
+   if (h=='n')
+    mappa.sort(function(a,b){
+     return (a[ordine]-b[ordine])*(verso=='asc'?1:-1);
+    });
+   else
+    mappa.sort(function(a,b){
+     return ((a[ordine]==b[ordine])?0:((a[ordine]>b[ordine])?1:-1))*(verso=='asc'?1:-1);
+    });
+  }
+  h='';
+  for(i=0;i<mappa.length;i++){
+   r=mappa[i];
+   ar=[];
+   ar.push(r.ngara);
+   ar.push(r.giornata);
+   j=sql2dataora(r.dataora);
+   ar.push(j[0]);
+   ar.push(j[1]);
+   ar.push(r.nomesqa);
+   ar.push(r.nomesqb);
+   ar.push(r.luogo);
+   ar.push(r.codprt);
+   h+='<tr><td><button type="button" class="btn btn-default" data-toggle="modal" data-target="#modModal" data-riga="'+r.codprt+'" data-codsq="'+r.codsqa+','+r.codsqb+'"><span class="glyphicon glyphicon-pencil"></span></button></td>';
+   h+='<td><button type="button" class="btn btn-default eli" data-toggle="modal" data-target="#modModal" data-riga="'+r.codprt+'"><span class="glyphicon glyphicon-remove"></span></button></td>';
+   for(j=0;j<ar.length;j++) {
+    h+='<td id="rg'+r.codprt+String.fromCharCode(97+j)+'">'+htmlentities(ar[j])+'</td>';
+   }
+   h+='</tr>';
+  }
+  $('#righe').html(h);
+ }
 }
 
 function leggioptsq(){
- var c,d,h,i,p,r,mappacodsq,mappa;
- r=adf.sq.nomesq;
- mappacodsq=[];
- for(i=0;i<adb.sq.length;i++)
-  mappacodsq[adb.sq[i][0]]=adb.sq[i][r];
- d=adf.campsq.codsq;
- c=adf.campsq.codcamp;
- mappa=[];
- for(i=0;i<adb.campsq.length;i++)
-  if ((adb.campsq[i][c]==codcamp)&&(mappacodsq[adb.campsq[i][d]])){
-   p=adb.campsq[i][d];
-   mappa.push({nomesq:mappacodsq[p],codsq:p});
-  }
- mappa.sort(function(a,b){
-  return ((a.nomesq==b.nomesq)?0:((a.nomesq>b.nomesq)?1:-1));
- });
- h=p='';
- for(i=0;i<mappa.length;i++){
-  r=mappa[i];
-  c=r.codsq;
-  if (i==0)
-   p=c;
-  h+='<option value="'+c+'">'+htmlentities(r.nomesq)+'</option>';
- }
- $(document.f.codsqa)
-  .html(h)
-  .val(codsq[0]=='0'?p:codsq[0]);
- $(document.f.codsqb)
-  .html(h)
-  .val(codsq[1]=='0'?p:codsq[1]);
-}
+ var i,r,mappa,mappacampsq;
+ fdb.tabRecFilter(
+  'campsq',
+  function(x,y,z){if (x.codcamp==y) z[x.codsq]=x.codcampsq;},
+  codcamp,
+  leggioptsqcb1);//trova le squadre di un campionato
 
-function legginuova(){
- var i,r,s,mappa,gara,gior,data;
- mappa=[];
- gara=gior=1;
- data='';
- for(i=0;i<adb.prt.length;i++)
-  if (adb.prt[i][adf.prt.codcamp]==codcamp){
-   if ((s=1+adb.prt[i][adf.prt.ngara])>gara)
-    gara=s;
-   if ((s=adb.prt[i][adf.prt.giornata])>gior)
-    gior=s;
-   if ((s=adb.prt[i][adf.prt.dataora])>data)
-    data=s;
+ function leggioptsqcb1(mappacs){
+  mappacampsq=mappacs;
+  fdb.tabRecAs('sq',ansp,leggioptsqcb2);
+ }
+
+ function leggioptsqcb2(mappasq){
+  mappa=[];
+  for(i=0;i<mappasq.length;i++){
+   r=mappasq[i];
+   if (mappacampsq[r.codsq]) mappa.push(r);
   }
- if (gara){
-  document.f.ngara.value=gara;
-  document.f.giornata.value=gior;
-  s=sql2dataora(data);
-  document.f.data.value=s[0];
-  document.f.ora.value=s[1];
- } else {
-  document.f.ngara.value='1';
-  document.f.giornata.value='1';
-  var oggi=new Date();
-  var dd=oggi.getDate();
-  var mm=oggi.getMonth()+1;
-  var yy=oggi.getFullYear();
-  var m=[];
-  m[0]=('0'+String(dd)).slice(-2);
-  m[1]=("0"+String(mm)).slice(-2);
-  m[2]=("000"+String(yy)).slice(-4);
-  document.f.data.value=m[0]+'/'+m[1]+'/'+m[2];
-  dd=oggi.getHours();
-  mm=oggi.getMinutes();
-  m[0]=("0"+String(dd)).slice(-2);;
-  m[1]=("0"+String(mm)).slice(-2);
-  document.f.ora.value=m[0]+':'+m[1];
+  if (mappa.length>0)
+   mappa.sort(function(a,b){
+    return ((a.nomesq==b.nomesq)?0:((a.nomesq>b.nomesq)?1:-1));
+   });
+  h='';
+  for(i=0;i<mappa.length;i++){
+   r=mappa[i];
+   c=r.codsq;
+   if (i==0) nuovid.codsq=c;
+   h+='<option value="'+c+'">'+htmlentities(r.nomesq)+'</option>';
+  }
+  $([document.f.codsqa,document.f.codsqb]).html(h);
  }
 }
 -->

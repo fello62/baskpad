@@ -1,5 +1,5 @@
 CACHE MANIFEST
-#Versione 20220101.1
+#Versione 20230902.1
 ./
 index.htm
 apple-touch-icon.png
@@ -38,7 +38,6 @@ js/bp.js
 js/ctrldata.js
 js/fastclick.min.js
 js/jquery-1.11.2.min.js
-js/localforage.min.js
 
 NETWORK:
 *

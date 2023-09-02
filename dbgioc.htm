@@ -126,16 +126,13 @@
 
 <script src="js/jquery-1.11.2.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
-<script src="js/localforage.min.js"></script>
 <script src="js/ctrldata.js"></script>
 <script src="js/bp.js"></script>
 <script>
 <!--
-var rg;
-var act;
-var ordine='cognome';
-var verso='asc';
-leggirighe();
+var act,ordine='cognome',rg,verso='asc';
+
+aspettaDB(leggirighe);
 
 $('#intest > th[data-ord]')
 .css('cursor','pointer')
@@ -154,16 +151,13 @@ $('#intest > th[data-ord]')
 });
 
 $('#modModal').on('show.bs.modal',function(event){
+ var bt,button,hid,modal,titolo,vis;
  // trova il Button che ha aperto il Modal
- var button=$(event.relatedTarget);
+ button=$(event.relatedTarget);
  // trova la riga del Button
  rg=button.data('riga');
  act=button.hasClass('eli');
- var modal=$(this);
- var titolo;
- var bt;
- var hid;
- var vis;
+ modal=$(this);
  if (act){
   titolo='Eliminazione';
   $('#elicognome').text($('#rg'+rg+'a').text());
@@ -201,10 +195,11 @@ $('#modModal').on('show.bs.modal',function(event){
 });
 
 $('#modModal').on('shown.bs.modal',function(event){
+ var o;
  if (act){
   $(this).find('button[type=submit]').focus();
  } else {
-  var o=document.f.cognome;
+  o=document.f.cognome;
   o.focus();
   o.setSelectionRange(0,o.value.length);
  }
@@ -235,9 +230,9 @@ $(document.f.altezza).on('blur',function(event){
 $(document.f).on('submit',function(event){
  var ar;
  if (act) {
-  deleterec('gioc',function(x,y){
-   return adb.gioc[x][0]==y;
-  },rg);
+  fdb.deleteRec('gioc',function(x,y){
+   return x.codgioc==y;
+  },rg,leggirighe);
  } else {
   novirgole(document.f.cognome);
   maiusc(document.f.cognome);
@@ -247,59 +242,50 @@ $(document.f).on('submit',function(event){
    ctrlanno(document.f.anno);
   if (document.f.altezza.value!='')
    ctrlnumero(document.f.altezza,1,300);
-  ar={cognome:document.f.cognome.value,nome:document.f.nome.value,anno:document.f.anno.value,altezza:document.f.altezza.value,ruolo:document.f.ruolo.value};
-  if (rg==0)
-   rg=newrec('gioc');
-  updaterec('gioc',rg,ar);
+  if (rg==0) fdb.idNewRec('gioc',saveRec);
+  else saveRec(rg);
+
+  function saveRec(rg){
+   ar={codgioc:rg,cognome:document.f.cognome.value,nome:document.f.nome.value,anno:document.f.anno.value,altezza:document.f.altezza.value,ruolo:document.f.ruolo.value};
+   fdb.updateRec('gioc',ar,leggirighe);
+  }
  }
  $('#modModal').modal('hide');
- savedb();
- leggirighe();
  return false;
 });
 
-function novirgole(o){
- var v=o.value;
- o.value=v.replace(/,/g,'');
-}
-
 function leggirighe(){
- var c,d,h,i,j,r,ar,mappa;
- if (leggendo){
-  setTimeout(function(){leggirighe();},100);
-  return;
- }
- d=adf.gioc[ordine];
- mappa=adb.gioc.map(function(el,i){
-  return {indice:i,valore:el[d]};
- });
- if (adf.gioc.tipo[d]=='n')
-  mappa.sort(function(a,b){
-   return (a.valore-b.valore)*(verso=='asc'?1:-1);
-  });
- else
-  mappa.sort(function(a,b){
-   return ((a.valore==b.valore)?0:((a.valore>b.valore)?1:-1))*(verso=='asc'?1:-1);
-  });
- h='';
- for(i=0;i<mappa.length;i++){
-  r=adb.gioc[mappa[i].indice];
-  c=r[adf.gioc.codgioc];
-  ar=[];
-  ar.push(r[adf.gioc.cognome]);
-  ar.push(r[adf.gioc.nome]);
-  ar.push(r[adf.gioc.anno]);
-  ar.push(r[adf.gioc.altezza]);
-  ar.push(r[adf.gioc.ruolo]);
-  ar.push(c);
-  h+='<tr><td><button type="button" class="btn btn-default" data-toggle="modal" data-target="#modModal" data-riga="'+c+'"><span class="glyphicon glyphicon-pencil"></span></button></td>';
-  h+='<td><button type="button" class="btn btn-default eli" data-toggle="modal" data-target="#modModal" data-riga="'+c+'"><span class="glyphicon glyphicon-remove"></span></button></td>';
-  for(j=0;j<ar.length;j++){
-   h+='<td id="rg'+c+String.fromCharCode(97+j)+'">'+htmlentities(ar[j])+'</td>';
+ var ar,h,i,j,r;
+ fdb.tabRec('gioc',leggirighecb);
+
+ function leggirighecb(mappa){
+  if (adf.gioc.tipo[adf.gioc[ordine]]=='n')
+   mappa.sort(function(a,b){
+    return (a[ordine]-b[ordine])*(verso=='asc'?1:-1);
+   });
+  else
+   mappa.sort(function(a,b){
+    return ((a[ordine]==b[ordine])?0:((a[ordine]>b[ordine])?1:-1))*(verso=='asc'?1:-1);
+   });
+  h='';
+  for(i=0;i<mappa.length;i++){
+   r=mappa[i];
+   ar=[];
+   ar.push(r.cognome);
+   ar.push(r.nome);
+   ar.push(r.anno);
+   ar.push(r.altezza);
+   ar.push(r.ruolo);
+   ar.push(r.codgioc);
+   h+='<tr><td><button type="button" class="btn btn-default" data-toggle="modal" data-target="#modModal" data-riga="'+r.codgioc+'"><span class="glyphicon glyphicon-pencil"></span></button></td>';
+   h+='<td><button type="button" class="btn btn-default eli" data-toggle="modal" data-target="#modModal" data-riga="'+r.codgioc+'"><span class="glyphicon glyphicon-remove"></span></button></td>';
+   for(j=0;j<ar.length;j++){
+    h+='<td id="rg'+r.codgioc+String.fromCharCode(97+j)+'">'+htmlentities(ar[j])+'</td>';
+   }
+   h+='</tr>';
   }
-  h+='</tr>';
- }
- $('#righe').html(h);
+  $('#righe').html(h);
+ };
 }
 -->
 </script>

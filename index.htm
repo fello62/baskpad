@@ -55,24 +55,62 @@
   <p>Web App per la rilevazione delle statistiche nel basket</p>
   <small>
    Autore: Fabrizio Fellini<br>
-   <span id="versione">Versione</span> - <span id="offlinestate">OFFLINE non disponibile</span><br>
+   <span id="versione">Versione</span> - <span id="offlinestate">OFFLINE non disponibile</span> - <span id="typedb">Nessun archivio</span><br>
   </small>
-  <a class="btn btn-sm btn-default" id="manualUpdate" href="javascript:void(0);">Controllo aggiornamenti<br><span class="badge" id="cacheProgress">Caricamento pagina</span></a>
+  <a class="btn btn-primary hidden" id="manualUpdate" href="javascript:void(0);">Controllo aggiornamenti online</a>
+  <a class="btn btn-primary hidden" id="olInstall" href="javascript:void(0);">Installazione offline</a>
+  <a class="btn btn-primary hidden" id="dbInstall" href="javascript:void(0);">Installazione archivio</a><br>
+  <div class="badge" id="cacheProgress">Caricamento pagina<br></div>
  </div>
  <p>BaskPad è una "web app", cioè un'applicazione in grado di girare con il supporto di un navigatore web;
  grazie alle caratteristiche dei browser moderni, è in grado di lavorare anche offline, senza avere
  il bisogno di essere connessi ad Internet.
  Tutti i dati memorizzati dall'applicazione risiedono e vengono mantenuti all'interno del dispositivo
  che la utilizza, e quindi non vengono inviati ad un server esterno, con l'esclusione di apposite
- procedure per l'esportazione dei dati che ne permettono il backup.
- Può essere utilizzato qualsiasi browser moderno.</p>
- <p>&Egrave; possibile usare l'applicazione su PC (Windows, Linux o Mac) o su tablet (iPad od Android):
+ procedure per l'esportazione dei dati che ne permettono il backup.</p
+ <p>Può essere utilizzato qualsiasi browser moderno. Il codice Javascript usato è stato volutamente
+ mantenuto compatibile il più possibile con le vecchie specifiche ECMA5, anche con librerie esterne
+ non aggiornate all'ultima versione; questo per fare in modo che anche vecchi dispositivi possano
+ utilizzare l'app. L'unica eccezione al riguardo è l'installazione offline con service worker, dove,
+ per forza di cose, si devono usare le <i>Promise</i> di ECMA6.</p>
+ <p>&Egrave; possibile usare l'applicazione su PC (Windows, Linux o Mac) o su tablet (iPad oppure Android):
  si potrebbe usarla anche su smartphone, ma le dimensioni limitate degli schermi ne ostacolerebbero
  il corretto utilizzo.</p>
  <p>Termini legali: l'app è liberamente utilizzabile da chiunque. Al suo interno vengono usate librerie
- di terzi (Bootstrap, FastClick, JQuery, localForage) per le cui licenze si rimanda ai rispettivi produttori.
+ di terzi (Bootstrap, FastClick, JQuery) per le cui licenze si rimanda ai rispettivi produttori.
  Non vengono usati cookies, ma tecnologie di memorizzazione dati nel browser,
  che quindi non implicano l'invio dei dati ad un server esterno.</p>
+ <h3>Installazione offline</h3>
+ <p>Esistono due tecnologie per l'installazione offline dell'app; la prima è basata sull'
+ <i>application cache</i>, la seconda sul <i>service worker</i>. Si consiglia di usare l'application
+ cache su browsers obsoleti, mentre il service worker va usato su quelli più recenti. Tenere anche
+ in conto che l'Application Cache viene considerata deprecata, per cui, andando avanti col tempo,
+ i browsers tenderanno a rimuoverne il supporto.</p>
+ <p>In caso di mancato funzionamento di queste due tecnologie, questo può dipendere dal tipo
+ di connessione col server: i browsers più recenti esigono per sicurezza solo connessioni
+ <i>https</i>, cioè criptate, cosa questa poi assolutamente obbligatoria per l'uso di un
+ service worker. In caso di malfunzionamento, modificare l'URL di questa pagina da <i>http</i> a
+ <i>https</i>.</p>
+ <h3>Installazione database</h3>
+ <p>Sono disponibili tre diverse tecnologie per la memorizzazione sul proprio dispositivo dei dati
+ necessari al funzionamento dell'app:</p>
+ <dl>
+  <dt>Array di dati su localStorage</dd>
+  <dd>Tutto l'archivio viene completamente contenuto in memoria, e salvato in modo permanente usando
+  la tecnologia <i>localStorage</i>; si consiglia l'uso per archivi di piccole dimensioni, visto che
+  i browsers limitano la capienza di localStorage a 5/10 Mb. Può funzionare su praticamente qualsiasi
+  navigatore, vecchio o nuovo che sia.</dd>
+  <dt>WebSql</dt>
+  <dd>Tecnologia consigliata su vecchi browsers, consente la memorizzazione di ampie moli di dati.
+  I problemi sono che non viene più aggiornata, alcuni navigatori non l'hanno mai adottata, ed
+  altri l'hanno rimossa o lo faranno in futuro. &Egrave; basata sulla libreria SQLite, che veniva
+  usata anche quando questa app era un programma in Pascal per PC sotto Linux o Windows, per cui
+  l'esportazione dei dati è stata comunque mantenuta con un linguaggio SQL compatibile con
+  questa libreria.</dd>
+  <dt>IndexedDb</dt>
+  <dd>Tecnologia consigliata su browsers recenti, consente anche lei la memorizzazione di ampie moli
+  di dati. Il problema è che sui dispositivi più vecchi non funziona oppure è <i>buggata</i>.</dd>
+ </dl>
  <h3>Database</h3>
  <p>Il database è suddiviso in tabelle che vanno impostate prima di poter rilevare una partita:</p>
  <dl>
@@ -96,8 +134,8 @@
   <dd>Elenco delle partite di un campionato. &Egrave; sufficiente immettere solo gli incontri
   di cui si vogliono rilevare le statistiche</dd>
  </dl>
- <p>Tutte le assegnazioni di squadre, campionati, giocatori e partite sono relative ad un anno
- sportivo, questo per poter suddividere i dati tra le varie annate.</p>
+ <p>Tutte le assegnazioni di squadre e campionati sono relative ad un anno sportivo, questo per
+ poter suddividere i dati tra le varie annate.</p>
  <p>&Egrave; possibile resettare, importare ed esportare il database. I files di importazione ed
  esportazione sono in formato di testo SQL compatibile con SQLite. Nel caso in cui si utilizzi
  l'app a tutto schermo sui dispositivi mobili, si potrebbero verificare problemi relativi
@@ -270,10 +308,368 @@
  </ol>
 </div>
 
+<form name="impoffline" class="form-horizontal">
+ <div class="modal fade" id="modImpOffline" tabindex="-1">
+  <div class="modal-dialog">
+   <div class="modal-content">
+    <div class="modal-header">
+     <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+     <h4 class="modal-title">Installazione offline</h4>
+    </div>
+    <div class="modal-body">
+     <div class="form-group">
+      <label class="col-xs-4 control-label">Tecnologia da usare</label>
+      <div class="col-xs-8">
+       <div class="mod">
+        <label class="radio-inline">
+         <input type="radio" name="offlinetype" value="1"> Service Worker (consigliata)
+        </label>
+        <label class="radio-inline">
+         <input type="radio" name="offlinetype" value="2"> Application Cache
+        </label>
+       </div>
+      </div>
+     </div>
+    </div>
+    <div class="modal-footer">
+     <button type="button" class="btn btn-lg btn-default" data-dismiss="modal">Annulla</button>
+     <button type="submit" class="btn btn-lg btn-primary">OK</button>
+    </div>
+   </div>
+  </div>
+ </div>
+</form>
+
+<form name="impdb" class="form-horizontal">
+ <div class="modal fade" id="modImpDb" tabindex="-1">
+  <div class="modal-dialog">
+   <div class="modal-content">
+    <div class="modal-header">
+     <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+     <h4 class="modal-title">Installazione archivio</h4>
+    </div>
+    <div class="modal-body">
+     <div class="form-group">
+      <label class="col-xs-4 control-label">Tecnologia da usare</label>
+      <div class="col-xs-8">
+       <div class="mod">
+        <label class="radio-inline">
+         <input type="radio" name="dbtype" value="4"> IndexedDb (consigliata)
+        </label>
+        <label class="radio-inline">
+         <input type="radio" name="dbtype" value="8"> ArrayDb
+        </label>
+        <label class="radio-inline">
+         <input type="radio" name="dbtype" value="16"> WebSqlDb
+        </label>
+       </div>
+      </div>
+     </div>
+    </div>
+    <div class="modal-footer">
+     <button type="button" class="btn btn-lg btn-default" data-dismiss="modal">Annulla</button>
+     <button type="submit" class="btn btn-lg btn-primary">OK</button>
+    </div>
+   </div>
+  </div>
+ </div>
+</form>
+
 <script src="js/jquery-1.11.2.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
-<script src="js/localforage.min.js"></script>
 <script src="js/bp.js"></script>
-<script src="swload.js"></script>
+<script>
+const
+ pronto='OFFLINE pronta',
+ nonpronto='OFFLINE non disponibile';
+
+var acOK,cacheProgress,cacheProperties,firstrun,mu,nomeCache,offlineState,swOK,tipoCache,version,versionBP;
+
+$(function(){
+ cacheProgress=$('#cacheProgress');
+ cacheProperties={
+  filesDownloaded:0,
+  totalFiles:0,
+  fileNames:[]
+ };
+ version=$('#versione');
+ offlineState=$('#offlinestate');
+ firstrun=true;
+ swOK=('serviceWorker' in navigator);
+ acOK=('applicationCache' in window);
+ tipoCache=['',' SW',' AC'][(bpStatus&3)];
+ mu=$('#manualUpdate');
+ mu.click(function(event){
+  event.preventDefault();
+  getTotalFiles();
+ });
+ getTotalFiles();
+
+ checkOL();
+
+ checkDB();
+});
+
+$(document.impoffline).on('submit',function(){
+ var i,v='';
+ for(i=0;i<document.impoffline.offlinetype.length;i++) if (document.impoffline.offlinetype[i].checked) v=document.impoffline.offlinetype[i].value;
+ if (v=='') alert('Selezionare una scelta.');
+ else {
+  $('#modImpOffline').modal('hide');
+  bpStatus=(bpStatus|v);
+  localStorage.bpstatus=bpStatus;
+  getTotalFiles();
+ }
+ return false;
+});
+
+$(document.impdb).on('submit',function(){
+ var i,v='';
+ for(i=0;i<document.impdb.dbtype.length;i++)
+  if (document.impdb.dbtype[i].checked) v=document.impdb.dbtype[i].value;
+ if (v=='') alert('Selezionare una scelta.');
+ else {
+  $('#modImpDb').modal('hide');
+  bpStatus=(bpStatus|v);
+  localStorage.bpstatus=bpStatus;
+  DBInit();
+  $('#dbInstall').addClass('hidden');
+  checkDB();
+ }
+ return false;
+});
+
+function displayProgress(str){
+ if (str) {
+  cacheProgress.append(str+'<br>');
+  console.log(str);
+  return;
+ }
+ cacheProperties.filesDownloaded++;
+ if (cacheProperties.totalFiles){//conosco i files totali
+  str='Progresso: '+cacheProperties.filesDownloaded+' di '+cacheProperties.totalFiles+' files caricati';
+  cacheProgress.append(str+'<br>');
+  console.log(str);
+ } else {//non conosco i files totali
+  str=cacheProperties.filesDownloaded+' files caricati';
+  cacheProgress.append(str+'<br>');
+  console.log(str);
+ }
+}
+
+function getTotalFiles(){
+ cacheProgress.text('');
+ displayProgress('Caricamento versione corrente');
+ offlineReady(false);
+ cacheProperties.filesDownloaded=0;
+ cacheProperties.totalFiles=0;
+ $.ajax({
+  type:"get",
+  url:"./baskpad2.manifest",
+  dataType:"text",
+  success:function(content){
+   //cerco la versione
+   var p,r;
+   p=content.indexOf('#Versione');
+   r=content.indexOf('\n',p);
+   versionBP=content.substring(p+10,r);
+   nomeCache='baskpad_v'+versionBP;
+   version.text('Versione '+versionBP+tipoCache);
+   if ((bpStatus&3)!=0) getTotalFilesCB();
+  }
+ });
+
+ function getTotalFilesCB(){
+  if ((firstrun)&&((bpStatus&3)!=0)) displayProgress('Acquisizione lista files');
+  else displayProgress('Ricerca nuova versione');
+  offlineReady(false);
+  $.ajax({
+   type:"get",
+   url:"./baskpad.manifest",
+   dataType:"text",
+   cache:false,
+   success:function(content){
+    //cerco la versione
+    var p,r;
+    p=content.indexOf('#Versione');
+    r=content.indexOf('\n',p);
+    versionBP=content.substring(p+10,r);
+    nomeCache='baskpad_v'+versionBP;
+    //elimina le righe non di cache
+    content=content.replace(new RegExp('(NETWORK|FALLBACK):'+'((?!(NETWORK|FALLBACK|CACHE):)[\\w\\W]*)','gi'),'');
+    //elimina i commenti
+    content=content.replace(new RegExp('#[^\\r\\n]*(\\r\\n?|\\n)','g'),'');
+    //elimina la testata e le righe che finiscono con /
+    content=content.replace(new RegExp('CACHE MANIFEST\\s*|\\s*$','g'),'');
+    //sostituisce i ritorni a capo con #
+    content=content.replace(new RegExp('[\\r\\n]+','g'),'#');
+    //trova il numero di files
+    cacheProperties.fileNames=content.split("#");
+    cacheProperties.totalFiles=cacheProperties.fileNames.length+1;
+    //lancio swInstall
+    if (firstrun){
+     firstrun=false;
+     if ((bpStatus&3)==1) swLoad();
+     else acLoad();
+    } else if ((bpStatus&3)==1) swInizia();
+   },
+   error:function(){
+    displayProgress('Errore nel controllo');
+    offlineReady((bpStatus&3)!=0);
+   }
+  });
+ }
+}
+
+function checkDB(){
+ switch(bpStatus&28){
+  case 4:
+   $('#typedb').text('Archivio IndexedDb');
+   break;
+  case 8:
+   $('#typedb').text('Archivio ArrayDb');
+   break;
+  case 16:
+   $('#typedb').text('Archivio WebSqlDb');
+   break;
+  default:
+   $('#dbInstall')
+   .click(function(event){
+    event.preventDefault();
+    document.impdb.dbtype[0].disabled=!('indexedDB' in window);
+    document.impdb.dbtype[1].disabled=!('localStorage' in window);
+    document.impdb.dbtype[2].disabled=!('openDatabase' in window);
+    $('#modImpDb').modal('show');
+   })
+   .removeClass('hidden');
+ }
+}
+
+function checkOL(){
+ switch(bpStatus&3){
+  case 1://SW
+   mu.removeClass('hidden');
+   $('#olInstall').addClass('hidden');
+   break;
+  case 2://AC
+   mu.removeClass('hidden');
+   $('#olInstall').addClass('hidden');
+   break;
+  default:
+   $('#olInstall')
+   .click(function(event){
+    event.preventDefault();
+    document.impoffline.offlinetype[0].disabled=!swOK;
+    document.impoffline.offlinetype[1].disabled=!acOK;
+    $('#modImpOffline').modal('show');
+   })
+   .removeClass('hidden');
+ }
+}
+
+function offlineReady(state,ac){
+ console.log('offlineReady',state);
+ offlineState.text(state?pronto:nonpronto);
+ if (ac){
+  if (ac.status==0){
+   alert("L'Application Cache sembra non funzionare.\nProvare il Service Worker!");
+   bpStatus=(bpStatus|3)-3;
+   localStorage.bpstatus=bpStatus;
+   window.location.reload();
+  }
+ }
+}
+
+function acLoad(){
+ var iframe=document.createElement('iframe');
+ $('#manualUpdate').off('click');
+ console.log('Test ApplicationCache');
+ iframe.setAttribute('style','width:0px;height:0px;visibility:hidden;position:absolute;border:none');
+ iframe.src='manifest.htm';
+ iframe.id='appcacheloader';
+ document.body.appendChild(iframe);
+}
+
+function swLoad(){
+ console.log('Test Service Worker');
+ navigator.serviceWorker.register('sw.js')
+ .then(function(registration){
+  console.log("Registrazione service worker riuscita, l'ambito è:", registration.scope);
+  navigator.serviceWorker.ready.then(function(reg){
+   console.log('navigator.serviceWorker.ready concluso, e navigator.serviceWorker.controller è',navigator.serviceWorker.controller);
+   if (navigator.serviceWorker.controller){
+    swInizia();
+   } else {
+    navigator.serviceWorker.addEventListener('controllerchange',function(event){
+     console.log('OK, ora navigator.serviceWorker.controller è',navigator.serviceWorker.controller);
+     swInizia();
+    });
+   }
+  });
+ });
+}
+
+function swInizia(){
+ var aggiornati,eliminati;
+ aggiornati=eliminati=false;
+ caches.keys()
+ .then(function(keyList){
+  return Promise.all(keyList.map(function(key){
+   if (nomeCache!=key){
+    eliminati=true;
+    displayProgress('Elimino i vecchi files');
+    console.log('Cancello',key);
+    return caches.delete(key)
+    .then(function(bool){
+     if (bool) console.log('Cancellata',key);
+     else console.log('Non cancellata',key);
+     return Promise.resolve();
+    });
+   } else return Promise.resolve();
+  }));
+ })
+ .then(function(){
+  return caches.has(nomeCache)
+  .then(function(bool){
+   console.log('Check se',nomeCache,'esiste',bool);
+   if (!bool){
+    aggiornati=true;
+    return caches.open(nomeCache)
+    .then(function(cache){
+     cacheProperties.totalFiles=cacheProperties.fileNames.length;
+     return Promise.all(cacheProperties.fileNames.map(function(fileName){
+      return fetch(fileName)
+      .then(function(response){
+       console.log('Aggiungo',response.url);
+       return cache.put(response.url,response)
+       .then(function(){
+        displayProgress();
+        console.log('Aggiunto',response.url);
+        return Promise.resolve();
+       });
+      });
+     }));
+    });
+   } else return Promise.resolve();
+  });
+ })
+ .then(function(){
+  if (aggiornati){
+   offlineReady(true);
+   if (eliminati){
+    displayProgress('Nuovi files disponibili');
+    displayProgress('Pagina in ricaricamento...');
+    setTimeout(function(){
+     window.location.reload();
+    },5000);
+   } else displayProgress('Caricati tutti i files');
+  } else if (!eliminati){
+   displayProgress('Nessun aggiornamento');
+   offlineReady(true);
+  }
+  checkOL();
+ });
+}
+</script>
 </body>
 </html>

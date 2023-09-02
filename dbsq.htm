@@ -131,18 +131,13 @@
 
 <script src="js/jquery-1.11.2.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
-<script src="js/localforage.min.js"></script>
 <script src="js/ctrldata.js"></script>
 <script src="js/bp.js"></script>
 <script>
 <!--
-var rg;
-var act;
-var ansp='';
-var cs;
-var ordine='nomesq';
-var verso='asc';
-leggioptas();
+var act,ansp='',mappasoc=[],ordine='nomesq',rg,verso='asc';
+
+aspettaDB(leggioptsoc);
 
 $('#intest > th[data-ord]')
 .css('cursor','pointer')
@@ -161,18 +156,14 @@ $('#intest > th[data-ord]')
 });
 
 $('#modModal').on('show.bs.modal',function(event){
+ var bt,button,cs,d,hid,modal,titolo,vis,y;
  // trova il Button che ha aperto il Modal
- var button=$(event.relatedTarget);
+ button=$(event.relatedTarget);
+ modal=$(this),titolo;
  // trova la riga del Button
  rg=button.data('riga');
  act=button.hasClass('eli');
  cs=button.data('codsoc');
- var modal=$(this);
- var titolo;
- leggioptsoc();
- var bt;
- var hid;
- var vis;
  if (act){
   titolo='Eliminazione';
   vis='.eli';
@@ -184,17 +175,18 @@ $('#modModal').on('show.bs.modal',function(event){
   $('#elicat').text($('#rg'+rg+'c').text());
   $('#elisesso').text($('#rg'+rg+'d').text());
  } else {
+  $(document.f.codsoc).val(cs);
   if (rg=="0"){
    titolo='Nuova';
-   var d=new Date();
-   var y=d.getFullYear();
-   if (d.getMonth()<7)
-    y--;
-   document.f.annosport.value=''+y+'-'+String(1+y).substr(String(1+y).length-2,2);
+   d=new Date();
+   y=d.getFullYear();
+   if (d.getMonth()<6) y--;
+   document.f.annosport.value=''+y+'-'+String(1+y).slice(-2);
    document.f.nomesq.value='';
    document.f.cat.value='';
    document.f.sesso[0].checked=true;
    document.f.sesso[1].checked=false;
+   $(document.f.codsoc).val(cs);
   } else {
    titolo='Modifica';
    document.f.annosport.value=ansp;
@@ -214,10 +206,11 @@ $('#modModal').on('show.bs.modal',function(event){
 });
 
 $('#modModal').on('shown.bs.modal',function(event){
+ var o;
  if (act){
   $(this).find('button[type=submit]').focus();
  } else {
-  var o=document.f.annosport;
+  o=document.f.annosport;
   o.focus();
   o.setSelectionRange(0,o.value.length);
  }
@@ -229,156 +222,125 @@ $(document.a.annosport).on('change',function(event){
 });
 
 $(document.f.nomesq).on('blur',function(event){
+ novirgole(this);
  return maiusc(this);
 });
 
 $(document.f.cat).on('blur',function(event){
+ novirgole(this);
  return maiusc(this);
 });
 
 $(document.f).on('submit',function(event){
- var s;
- var ar=new Array();
+ var ar,cs;
  if (act){
-  deleterec('sq',function(x,y){
-   return adb.sq[x][0]==y;
-  },rg);
+  fdb.deleteRec('sq',function(x,y){
+   return x.codsq==y;
+  },rg,leggioptas);
  } else {
+  novirgole(document.f.nomesq);
   maiusc(document.f.nomesq);
+  novirgole(document.f.cat);
   maiusc(document.f.cat);
   cs=document.f.codsoc.value;
   ansp=document.f.annosport.value;
-  ar={codsoc:cs,annosport:ansp,nomesq:document.f.nomesq.value,cat:document.f.cat.value,sesso:(document.f.sesso[0].checked?'M':'F')};
-  if (rg==0)
-   rg=newrec('sq');
-  updaterec('sq',rg,ar);
+  if (rg==0) fdb.idNewRec('sq',saveRec);
+  else saveRec(rg);
+
+  function saveRec(rg){
+   ar={codsq:rg,codsoc:cs,annosport:ansp,nomesq:document.f.nomesq.value,cat:document.f.cat.value,sesso:(document.f.sesso[0].checked?'M':'F')};
+   fdb.updateRec('sq',ar,leggioptas);
+  }
  }
  $('#modModal').modal('hide');
- savedb();
- leggioptas();
  return false;
 });
 
 function leggioptas(){
- var d,h,i,r,t,sel,v1;
- if (leggendo){
-  setTimeout(function(){leggioptas();},100);
-  return;
+ var h,i,sel,t,v1;
+ fdb.tabAs('sq',leggioptascb);
+
+ function leggioptascb(mappa){
+  h=v1='';
+  for(i=0;i<mappa.length;i++){
+   t=mappa[i];
+   if (i==0) v1=t;
+   if ((ansp.length>0)&&(ansp==t)) v1=t;
+   h+='<option>'+t+'</option>';
+  }
+  ansp=v1;
+  sel=$(document.a.annosport);
+  sel.html(h);
+  if (ansp.length>0) sel.val(ansp);
+  leggirighe();
  }
- r={};
- d=adf.sq.annosport;
- for(i=0;i<adb.sq.length;i++)
-  r[adb.sq[i][d]]=i;
- r=Object.keys(r);
- r.sort(function(a,b){
-  return ((a==b)?0:((a>b)?-1:1));
- });
- h=v1='';
- for(i=0;i<r.length;i++){
-  t=r[i];
-  if (i==0)
-   v1=t;
-  if ((ansp.length>0)&&(ansp==t))
-   v1=t;
-  h+='<option>'+t+'</option>';
- }
- ansp=v1;
- sel=$(document.a.annosport);
- sel.html(h);
- if (ansp.length>0)
-  sel.val(ansp);
- leggirighe();
 }
 
 function leggirighe(){
- var c,d,h,i,j,r,ar,ccodsoc,chiavi,mappa,mappasoc;
+ var h,i,j,r;
  if (ansp.length==0){
   $('#righe').html('');
   return;
  }
- d=adf.soc.societa;
- mappasoc=[];
- for(i=0;i<adb.soc.length;i++)
-  mappasoc[adb.soc[i][0]]=adb.soc[i][d];
- chiavi=Object.keys(adf.sq);
- chiavi.pop();
- r=chiavi.length;
- chiavi.push('societa');
- c=adf.sq.codsoc;
- d=adf.sq.annosport;
- mappa=[];
- for(i=0;i<adb.sq.length;i++)
-  if (adb.sq[i][d]==ansp){
-   h={};
-   for(j=0;j<r;j++)
-    h[chiavi[j]]=adb.sq[i][j];
-   h.societa=mappasoc[adb.sq[i][c]];
-   mappa.push(h);
+ fdb.tabRecAs('sq',ansp,leggirighecb);
+
+ function leggirighecb(mappa){
+  for(i=0;i<mappa.length;i++)
+   mappa[i].societa=mappasoc[mappa[i].codsoc];
+  i=adf.sq.nomi.indexOf(ordine);
+  if ((i>=0)&&(i<adf.sq.tipo.length)) h=adf.sq.tipo[i];
+  else h='s';
+  if (h=='n')
+   mappa.sort(function(a,b){
+    return (a[ordine]-b[ordine])*(verso=='asc'?1:-1);
+   });
+  else
+   mappa.sort(function(a,b){
+    return ((a[ordine]==b[ordine])?0:((a[ordine]>b[ordine])?1:-1))*(verso=='asc'?1:-1);
+   });
+
+  for(i=0;i<mappa.length;i++){
+   r=mappa[i];
+   ar=[];
+   ar.push(r.nomesq);
+   ar.push(r.societa);
+   ar.push(r.cat);
+   ar.push(r.sesso);
+   ar.push(r.codsq);
+   h+='<tr><td><button type="button" class="btn btn-default" data-toggle="modal" data-target="#modModal" data-riga="'+r.codsq+'" data-codsoc="'+r.codsoc+'"><span class="glyphicon glyphicon-pencil"></span></button></td>';
+   h+='<td><button type="button" class="btn btn-default eli" data-toggle="modal" data-target="#modModal" data-riga="'+r.codsq+'"><span class="glyphicon glyphicon-remove"></span></button></td>';
+   for(j=0; j<ar.length; j++) {
+    h+='<td id="rg'+r.codsq+String.fromCharCode(97+j)+'">'+htmlentities(ar[j])+'</td>';
+   }
+   h+='</tr>';
   }
- d=chiavi.indexOf(ordine);
- if (d<adf.sq.tipo.length)
-  h=adf.sq.tipo[d];
- else
-  h='s';
- if (h=='n')
-  mappa.sort(function(a,b){
-   return (a[ordine]-b[ordine])*(verso=='asc'?1:-1);
-  });
- else
-  mappa.sort(function(a,b){
-   return ((a[ordine]==b[ordine])?0:((a[ordine]>b[ordine])?1:-1))*(verso=='asc'?1:-1);
-  });
- h='';
- for(i=0;i<mappa.length;i++){
-  r=mappa[i];
-  c=r.codsq;
-  ccodsoc=r.codsoc;
-  ar=[];
-  ar.push(r.nomesq);
-  ar.push(r.societa);
-  ar.push(r.cat);
-  ar.push(r.sesso);
-  ar.push(c);
-  h+='<tr><td><button type="button" class="btn btn-default" data-toggle="modal" data-target="#modModal" data-riga="'+c+'" data-codsoc="'+ccodsoc+'"><span class="glyphicon glyphicon-pencil"></span></button></td>';
-  h+='<td><button type="button" class="btn btn-default eli" data-toggle="modal" data-target="#modModal" data-riga="'+c+'"><span class="glyphicon glyphicon-remove"></span></button></td>';
-  for (var j=0; j<ar.length; j++) {
-   h+='<td id="rg'+c+String.fromCharCode(97+j)+'">'+htmlentities(ar[j])+'</td>';
-  }
-  h+='</tr>';
+  $('#righe').html(h);
  }
- $('#righe').html(h);
 }
 
 function leggioptsoc(){
- var c,d,h,i,r,s,chiavi,mappa;
- chiavi=Object.keys(adf.soc);
- chiavi.pop();
- mappa=adb.soc.map(function(el){
-  h={};
-  for(i=0;i<chiavi.length;i++)
-   h[chiavi[i]]=el[i];
-  return h;
- });
- mappa.sort(function(a,b){
-  return ((a.societa==b.societa)?0:((a.societa>b.societa)?1:-1));
- });
- h='';
- for(i=0;i<mappa.length;i++){
-  r=mappa[i];
-  c=r.codsoc;
-  s=r.societa;
-  h+='<option value="'+c+'">'+htmlentities(s)+'</option>';
- }
- $(document.f.codsoc).html(h);
- if (typeof cs=='undefined'){
-  if (adb.soc.length)
-   cs=mappa[0].codsoc;
+ var h,i,r;
+ fdb.tabRec('soc',leggioptsoccb);
+
+ function leggioptsoccb(mappa){
+  if (mappa.length>0)
+   mappa.sort(function(a,b){
+    return ((a.societa==b.societa)?0:((a.societa>b.societa)?1:-1));
+   });
   else {
-   alert('ATTENZIONE!\nImmettere prima almeno una società.');
-   vai('index.htm');
+    alert('ATTENZIONE!\nImmettere prima almeno una società.');
+    vai('index.htm');
   }
+  h='';
+  for(i=0;i<mappa.length;i++){
+   r=mappa[i];
+   mappasoc[r.codsoc]=r.societa;
+   h+='<option value="'+r.codsoc+'">'+htmlentities(r.societa)+'</option>';
+  }
+  $(document.f.codsoc).html(h);
+  $('button[data-riga="0"]').data('codsoc',mappa[0].codsoc);
+  leggioptas();
  }
- $(document.f.codsoc).val(cs);
 }
 -->
 </script>

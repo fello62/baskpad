@@ -34,7 +34,7 @@
    <h4>Esportazione database</h4>
   </div>
  </div>
- <form name="a" class="form-horizontal" method="post" target="_blank">
+ <form name="a" class="form-horizontal" method="post">
   <input type="hidden" name="nomefile" value="sql.txt">
   <div class="form-group">
    <label class="col-xs-2 col-xs-offset-1 control-label">Testo SQL</label>
@@ -51,22 +51,35 @@
   <div class="form-group">
    <div class="col-xs-10 col-xs-offset-1" style="text-align: right;">
     <button id="indicizza" class="btn btn-lg btn-default">Compatta indici</button>
-    <a href="#" id="intsave" target="_blank" class="btn btn-lg btn-default">Salvataggio interno</a>
+    <a href="#" download="sql.txt" id="intsave" class="btn btn-lg btn-default">Salvataggio interno</a>
     <button type="submit" class="btn btn-lg btn-primary">Salva</button>
    </div>
   </div>
  </form>
 </div>
 
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="attesa" tabindex="-1">
+ <div class="modal-dialog modal-sm">
+  <div class="modal-content">
+   <div class="modal-header">
+    <h4 class="modal-title">Attendere...</h4>
+   </div>
+  </div>
+ </div>
+</div>
+
 <script src="js/jquery-1.11.2.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
-<script src="js/localforage.min.js"></script>
 <script src="js/ctrldata.js"></script>
 <script src="js/bp.js"></script>
 <script>
 <!--
+
+aspettaDB(elabora);
+
 $('#indicizza').click(function(){
- return reindex();
+ reindex();
+ return false;
 });
 
 $(document.a).on('submit', function (event) {
@@ -74,159 +87,25 @@ $(document.a).on('submit', function (event) {
  return true;
 });
 
-elabora();
+function elabora(){
+ $('#attesa').modal('show');
+ fdb.esportaDB(document.a.txt,eleboracb);
 
-function reindex(){
- var ar={
-  camp:[],
-  soc:[],
-  sq:[],
-  gioc:[],
-  sqgioc:[],
-  campsq:[],
-  prt:[],
-  dati:[]
- };
- var i,j,m,n,p,q,v,x,referto;
- alert('Attendere...');
- for(i=0;i<adb.camp.length;i++){
-  v=i+1;
-  ar.camp[adb.camp[i][0]]=v;
-  adb.camp[i][0]=v;
+ function eleboracb(){
+  $("#intsave").attr('href','data:application/octet-stream,'+encodeURIComponent(document.a.txt.value));
+  $('#attesa').modal('hide');
  }
- for(i=0;i<adb.soc.length;i++){
-  v=i+1;
-  ar.soc[adb.soc[i][0]]=v;
-  adb.soc[i][0]=v;
- }
- for(i=0;i<adb.sq.length;i++){
-  v=i+1;
-  ar.sq[adb.sq[i][0]]=v;
-  adb.sq[i][0]=v;
-  adb.sq[i][adf.sq.codsoc]=ar.soc[adb.sq[i][adf.sq.codsoc]];
- }
- for(i=0;i<adb.gioc.length;i++){
-  v=i+1;
-  ar.gioc[adb.gioc[i][0]]=v;
-  adb.gioc[i][0]=v;
- }
- for(i=0;i<adb.sqgioc.length;i++){
-  v=i+1;
-  ar.sqgioc[adb.sqgioc[i][0]]=v;
-  adb.sqgioc[i][0]=v;
-  adb.sqgioc[i][adf.sqgioc.codsq]=ar.sq[adb.sqgioc[i][adf.sqgioc.codsq]];
-  adb.sqgioc[i][adf.sqgioc.codgioc]=ar.gioc[adb.sqgioc[i][adf.sqgioc.codgioc]];
- }
- for(i=0;i<adb.campsq.length;i++){
-  v=i+1;
-  ar.campsq[adb.campsq[i][0]]=v;
-  adb.campsq[i][0]=v;
-  adb.campsq[i][adf.campsq.codcamp]=ar.camp[adb.campsq[i][adf.campsq.codcamp]];
-  adb.campsq[i][adf.campsq.codsq]=ar.sq[adb.campsq[i][adf.campsq.codsq]];
- }
- for(i=0;i<adb.prt.length;i++){
-  v=i+1;
-  ar.prt[adb.prt[i][0]]=v;
-  adb.prt[i][0]=v;
-  adb.prt[i][adf.prt.codcamp]=ar.camp[adb.prt[i][adf.prt.codcamp]];
-  adb.prt[i][adf.prt.codsqa]=ar.sq[adb.prt[i][adf.prt.codsqa]];
-  adb.prt[i][adf.prt.codsqb]=ar.sq[adb.prt[i][adf.prt.codsqb]];
-  adb.prt2[i][0]=v;
-  referto=adb.prt2[i][adf.prt2.referto];
-  p=referto.indexOf('codprt=')+7;
-  q=referto.indexOf('\n',p);
-  x=parseInt(referto.substring(p,q),10);
-  referto=referto.substr(0,p)+ar.prt[x]+referto.substr(q);
-  p=referto.indexOf('codcamp=')+8;
-  q=referto.indexOf('\n',p);
-  x=parseInt(referto.substring(p,q),10);
-  referto=referto.substr(0,p)+ar.camp[x]+referto.substr(q);
-  p=referto.indexOf('codsqa=')+7;
-  q=referto.indexOf('\n',p);
-  x=parseInt(referto.substring(p,q),10);
-  referto=referto.substr(0,p)+ar.sq[x]+referto.substr(q);
-  p=referto.indexOf('codsqb=')+7;
-  q=referto.indexOf('\n',p);
-  x=parseInt(referto.substring(p,q),10);
-  referto=referto.substr(0,p)+ar.sq[x]+referto.substr(q);
-  p=referto.indexOf('<num>\n')+6;
-  q=referto.indexOf('\n</num>\n');
-  if (q>p){
-   m=referto.substring(p,q).split('\n');
-   for(j=0;j<m.length;j++){
-    n=m[j].split(',');
-    x=parseInt(n[1],10);
-    n[1]=ar.gioc[x];
-    m[j]=n.join(',');
-   }
-   referto=referto.substr(0,p)+m.join('\n')+referto.substr(q);
-  }
-  adb.prt2[i][adf.prt2.referto]=referto;
- }
- for(i=0;i<adb.dati.length;i++){
-  v=i+1;
-  ar.dati[adb.dati[i][0]]=v;
-  adb.dati[i][0]=v;
-  adb.dati[i][adf.dati.codprt]=ar.prt[adb.dati[i][adf.dati.codprt]];
-  v=adb.dati[i][adf.dati.codgioc];
-  if (v>0)
-   adb.dati[i][adf.dati.codgioc]=ar.gioc[v];
-  adb.dati[i][adf.dati.codsq]=ar.sq[adb.dati[i][adf.dati.codsq]];
- }
- document.a.txt.value='';
- savedb();
- alert('Indicizzazione conclusa!');
- elabora();
- return false;
 }
 
-function elabora(){
- var k,v,r,i,s,tbli,tbls;
- if (leggendo){
-  setTimeout(function(){elabora();},100);
-  return;
+function reindex(){
+ $('#attesa').modal('show');
+ fdb.reindexDB(reindexcb);
+
+ function reindexcb(){
+  document.a.txt.value='';
+  elabora();
+  $('#attesa').modal('hide');
  }
- s='BEGIN TRANSACTION;\n';
- s+='CREATE TABLE IF NOT EXISTS camp (codcamp integer primary key, annosport varchar, nomecamp varchar, girone varchar, fase varchar, tempi integer, durata integer, suppl integer, maxfalli integer);\n';
- s+='CREATE TABLE IF NOT EXISTS soc (codsoc integer primary key, societa varchar);\n';
- s+='CREATE TABLE IF NOT EXISTS sq (codsq integer primary key, codsoc integer, annosport varchar, nomesq varchar, cat varchar, sesso varchar);\n';
- s+='CREATE TABLE IF NOT EXISTS gioc (codgioc integer primary key, cognome varchar, nome varchar, anno integer, altezza integer, ruolo varchar);\n';
- s+='CREATE TABLE IF NOT EXISTS sqgioc (codsqgioc integer primary key, codsq integer, codgioc integer, nmaglia varchar);\n';
- s+='CREATE TABLE IF NOT EXISTS campsq (codcampsq integer primary key, codcamp integer, codsq integer);\n';
- s+='CREATE TABLE IF NOT EXISTS prt (codprt integer primary key, codcamp integer, codsqa integer, codsqb integer, dataora varchar, luogo varchar, giornata word, ngara integer);\n';
- s+='CREATE TABLE IF NOT EXISTS prt2 (codprt integer primary key, referto text, nomesqa varchar, nomesqb varchar, coacha varchar, coachb varchar, ris varchar, parz varchar, arbitri varchar, rilevatori varchar, note text);\n';
- s+='CREATE TABLE IF NOT EXISTS dati (coddati integer primary key, codprt integer, codgioc integer, codsq integer, nmaglia varchar, prt integer, dq integer, st integer, min integer, sec integer, ff integer, fs integer, ts1 integer, ts0 integer, tf1 integer, tf0 integer, t31 integer, t30 integer, tl1 integer, tl0 integer, ro integer, rd integer, sd integer, ss integer, pp integer, pr integer, ass integer, sc integer, pm integer, stl1 integer, stl6 integer, seqtl varchar, tiri varchar);\n';
- s+='CREATE TRIGGER IF NOT EXISTS camp_campsq_prt before delete on camp for each row begin delete from campsq where campsq.codcamp = old.codcamp; delete from prt where prt.codcamp = old.codcamp; end;\n';
- s+='CREATE TRIGGER IF NOT EXISTS soc_sq before delete on soc for each row begin delete from sq where sq.codsoc = old.codsoc; end;\n';
- s+='CREATE TRIGGER IF NOT EXISTS sq_sqgioc_prt before delete on sq for each row begin delete from campsq where campsq.codsq = old.codsq; delete from sqgioc where sqgioc.codsq = old.codsq; delete from prt where prt.codsqa = old.codsq or prt.codsqb = old.codsq; end;\n';
- s+='CREATE TRIGGER IF NOT EXISTS prt_prt2_dati before delete on prt for each row begin delete from prt2 where prt2.codprt = old.codprt; delete from dati where dati.codprt = old.codprt; end;\n';
- s+='CREATE TRIGGER IF NOT EXISTS gioc_sqgioc_dati before delete on gioc for each row begin delete from sqgioc where sqgioc.codgioc = old.codgioc; delete from dati where dati.codgioc = old.codgioc; end;\n';
- tbls=Object.keys(adb);
- document.a.txt.value=s;
- for (tbli=0;tbli<tbls.length;tbli++){
-  if (adb[tbls[tbli]].length>0){
-   s='delete from "'+tbls[tbli]+'";\n';
-   for(i=0;i<adb[tbls[tbli]].length;i++){
-    s+='INSERT INTO "'+tbls[tbli]+'" VALUES (';
-    r=adb[tbls[tbli]][i];
-    v=false;
-    for(k=0;k<r.length;k++){
-     if (v)
-      s+=',';
-     else
-      v=true;
-     if (typeof r[k]=='string')
-      s+=quotedstr(r[k]);
-     else
-      s+=r[k];
-    }
-    s+=');\n';
-   }
-   document.a.txt.value+=s;
-  }
- }
- document.a.txt.value+='COMMIT;\n';
- $("#intsave").attr('href','data:application/octet-stream,'+encodeURIComponent(document.a.txt.value));
 }
 -->
 </script>

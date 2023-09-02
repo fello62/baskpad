@@ -623,7 +623,6 @@ a.nero {
 
 <script src="js/jquery-1.11.2.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
-<script src="js/localforage.min.js"></script>
 <script src="js/fastclick.min.js"></script>
 <script src="js/ctrldata.js"></script>
 <script src="js/bp.js"></script>
@@ -724,16 +723,16 @@ $(document.nm).on('submit',function(event){
  return false;
 });
 $('#modNumMag').on('click','button.nmag',function(event){
- var button=$(this);
- var cg='#nm'+button.data('codgioc');
+ var button,cg;
+ button=$(this);
+ cg='#'+button.data('codgioc');
  $(cg).val(('  '+button.text()).slice(-2));
  return false;
 });
 $('#modNumMag').on('blur','input.nmag',function(event){
  solonumeri(this);
  var q=('  '+this.value).slice(-2);
- if (q!='  ')
-  this.value=q;
+ if (q!='  ') this.value=q;
 });
 
 $(document.ref).on('submit',function(event){
@@ -901,7 +900,7 @@ $('#modSost button.btn-primary').click(function(event){
  entrate=($('#entrateflag').val()=='1')?true:false;
  b=$('button[data-sost]');
  r='';
- for (i=0;i<b.length;i++){
+ for(i=0;i<b.length;i++){
   prima=(b.eq(i).data('sost')=='1')?true:false;
   gioc=b.eq(i).text();
   dopo=b.eq(i).hasClass('btn-success');
@@ -929,14 +928,14 @@ $('button.sost').click(function(event){
   $('#modSost h4').text('Sostituzioni');
  }
  $('#entrateprimotasto').val('1');
- for (s=0;s<=1;s++){
+ for(s=0;s<=1;s++){
   secondi[s]=60*datirec[s][tot].dati[vcmin]+datirec[s][tot].dati[vcsec];
   var mm=Math.floor(secondi[s]/60);
   var ss=secondi[s]%60;
   $('#time'+('ab'.charAt(s))).text(mm+"'"+('0'+ss).slice(-2)+'"');
   ic=fc='<div class="btn-group">';
   bnum=numeri[s].length/4;
-  for (i=0;i<bnum-1;i++){
+  for(i=0;i<bnum-1;i++){
    if ((! entrate)&&(datirec[s][i+1].dati[vconc]!=0))
     ic+='<button type="button" class="btn btn-success" data-sost="1">'+trim(numeri[s].substr(i*4,4))+'</button>';
    else
@@ -1011,7 +1010,7 @@ dispunto();
 apriprt(0);
 
 function apriprt(stato){
- if (leggendo){
+ if (!dbready){
   setTimeout(function(){apriprt(stato);},100);
   return;
  }
@@ -1068,14 +1067,15 @@ function apriprt(stato){
 }
 
 function cercaref(){
- var t=prompt('Ricerca referto',cerca.txt);
+ var r,t,x;
+ t=prompt('Ricerca referto',cerca.txt);
  if (t==null)
   return;
  if (t!=''){
   cerca.txt=String(t).toUpperCase();
-  var r=(getrigheref()).split('\n');
+  r=(getrigheref()).split('\n');
   cerca.arr=[];
-  for (var x=0;x<r.length-1;x++){
+  for(x=0;x<r.length-1;x++){
   if (r[x].indexOf(cerca.txt)>=0)
    cerca.arr.push(x);
   }
@@ -1149,21 +1149,19 @@ function chiudiprt(){
  if (confirm('CONFERMA\nChiudo la partita?')){
   //sharingoff();
   if (modificato){
-   saveprt();
+   saveprt(esciprt,true);
   } else {
-   localStorage.removeItem('refertotxt');
-   sessionStorage.removeItem('refertoold');
-   localStorage.removeItem('abflag');
-   vai('index.htm');
+   esciprt(false);
   }
  }
 }
 
 function dispunto(){
- for (var i=0;i<=1;i++){
-  var canvas=document.getElementById("pun"+i);
+ var canvas,ctx,i;
+ for(i=0;i<=1;i++){
+  canvas=document.getElementById("pun"+i);
   if (canvas.getContext){
-   var ctx=canvas.getContext("2d");
+   ctx=canvas.getContext("2d");
    ctx.lineWidth=1;
    ctx.fillStyle=(i==0)?"red":"lime";
    ctx.beginPath();
@@ -1171,6 +1169,14 @@ function dispunto(){
    ctx.fill();
   }
  }
+}
+
+function esciprt(msg){
+ if (msg) alert('INFORMAZIONE\nSalvataggio dati eseguito!');
+ localStorage.removeItem('refertotxt');
+ sessionStorage.removeItem('refertoold');
+ localStorage.removeItem('abflag');
+ vai('index.htm');
 }
 
 function impinthide(){
@@ -1222,84 +1228,64 @@ function impnmhide(){
 }
 
 function impnmsave(){
- var numerimaglia=JSON.parse(document.nm.dati.value);
+ var e,er,flag,i,inp,lnum,numerimaglia,r,ref,s,start;
+ numerimaglia=JSON.parse(document.nm.dati.value);
  //cerco i numeri già esistenti
- var ng=numerimaglia.ng;
- var n=-1;
- var ap=[];
- var inp=$('#modNumMag').find('input.nmag');
- for (var s=0;s<=1;s++){
-  var lnum='';
-  for (var i=0;i<ng[s];i++){
-   n++;
-   ap[n]=n;
-   var e=inp.get(n);
-   if (e.value.length==0)
-    continue;
-   if (lnum.indexOf(' '+e.value)>=0){
+ for(s=0;s<=1;s++){
+  lnum='';
+  for(i=0;i<numerimaglia[s].length;i++){
+   r=numerimaglia[s][i];
+   inp=$('#'+s+'nm'+r.codgioc);
+   e=inp.val();
+   numerimaglia[s][i].nmaglianew=e;
+   if (e.length==0) continue;
+   if (lnum.indexOf(' '+e)>=0){
     alert('ATTENZIONE\nNumero di maglia esistente!');
-    e.focus();
+    inp.focus();
     return false;
    }
-   lnum+=' '+e.value;
+   lnum+=' '+e;
   }
  }
  document.nm.dati.value='';
  //ordina i numeri di maglia
- for (s=0;s<=1;s++){
-  var flag,start;
-  var ucmb=s*ng[0]-1;
-  do {
-   start=ucmb+1;
-   flag=false;
-   for (i=ng[0]-2+s*ng[1];i>=start;i--){
-    if (inp.get(ap[i]).value>inp.get(ap[i+1]).value){
-     n=ap[i];
-     ap[i]=ap[i+1];
-     ap[i+1]=n;
-     ucmb=i;
-     flag=true;
-    }
-   }
-  } while (flag);
- }
+ for(s=0;s<=1;s++)
+  numerimaglia[s].sort(function(a,b){
+   return ((a.nmaglianew==b.nmaglianew)?0:((a.nmaglianew>b.nmaglianew)?1:-1));
+  });
  //inserisce i numeri di maglia nel referto
- var ref=getrigheref().replace(/\n/g,' ');
+ ref=getrigheref().replace(/\n/g,' ').replace(/]/g,' ]');
  flag=(ref.length>0);
  start=false;
  e='<num>\n';
- n=0;
- for (s=0;s<=1;s++){
-  for (i=0;i<ng[s];i++){
-   lnum=trim(inp.get(ap[n]).value);
+ for(s=0;s<=1;s++){
+  for(i=0;i<numerimaglia[s].length;i++){
+   r=numerimaglia[s][i];
+   lnum=trim(r.nmaglianew);
    if (lnum.length>0){
     e+='AB'.charAt(s)+lnum+',';
-    e+=numerimaglia.codgioc[ap[n]]+',';
-    e+=numerimaglia.cognome[ap[n]]+',';
-    e+=numerimaglia.nome[ap[n]]+',';
-    e+=numerimaglia.anno[ap[n]]+',';
-    e+=numerimaglia.altezza[ap[n]]+',';
-    e+=numerimaglia.ruolo[ap[n]]+'\n';
-    if ((flag)&&(numerimaglia.nmagliap[ap[n]].length>0)&&(lnum!=numerimaglia.nmagliap[ap[n]])){
-     ucmb=new RegExp(('AB'.charAt(s)+numerimaglia.nmagliap[ap[n]]+' '),'g');
-     ref=ref.replace(ucmb,('ab'.charAt(s)+lnum)+' ');
-     ucmb=new RegExp(('AB'.charAt(s)+numerimaglia.nmagliap[ap[n]]+']'),'g');
-     ref=ref.replace(ucmb,('ab'.charAt(s)+lnum)+']');
+    e+=r.codgioc+',';
+    e+=r.cognome+',';
+    e+=r.nome+',';
+    e+=r.anno+',';
+    e+=r.altezza+',';
+    e+=r.ruolo+'\n';
+    if ((flag)&&(r.nmagliaold.length>0)&&(r.nmaglianew!=r.nmagliaold)){
+     er=new RegExp(('AB'.charAt(s)+trim(r.nmagliaold)+' '),'g');
+     ref=ref.replace(er,('ab'.charAt(s)+lnum)+' ');
      start=true;
     }
    }
-   n++;
   }
  }
  i=prt2rec.referto.indexOf('<num>\n');
- n=prt2rec.referto.indexOf('</num>\n');
- if ((flag)&&(start))
-  sessionStorage.refertoold=prt2rec.referto;
- prt2rec.referto=prt2rec.referto.substr(0,i)+e+prt2rec.referto.substr(n);
+ s=prt2rec.referto.indexOf('</num>\n');
+ if (start) sessionStorage.refertoold=prt2rec.referto;
+ prt2rec.referto=prt2rec.referto.substr(0,i)+e+prt2rec.referto.substr(s);
  modificato=true;
  resetdati(true);
  caricanummag();
- if ((flag)&&(start)){
+ if (start){
   s=sintassi(ref,2);
   setrigheref(s+'\n');
  }
@@ -1310,76 +1296,70 @@ function impnmsave(){
  return false;
 }
 
-function impnmshow(cb){
- var numerimaglia={
-  ng:[0,0],
-  sq:[],
-  codgioc:[],
-  cognome:[],
-  nome:[],
-  nmaglia:[],
-  anno:[],
-  altezza:[],
-  ruolo:[],
-  nmagliap:[]
- };
- var mappacodgioc=[];
- mappacodgioc[0]=[];
- mappacodgioc[1]=[];
- for (var i=0;i<adb.sqgioc.length;i++){
-  if (adb.sqgioc[i][adf.sqgioc.codsq]==prtrec.codsq[0])
-   mappacodgioc[0][adb.sqgioc[i][adf.sqgioc.codgioc]]=i;
-  if (adb.sqgioc[i][adf.sqgioc.codsq]==prtrec.codsq[1])
-   mappacodgioc[1][adb.sqgioc[i][adf.sqgioc.codgioc]]=i;
+function impnmshow(){
+ var h,i,k,mappacodgioc,numerimaglia,r,s,q,v;
+ numerimaglia=[[],[]];
+ fdb.tabRecFilter(
+  'sqgioc',
+  function(x,y,z){if ((x.codsq==y[0])||(x.codsq==y[1])) z.push(x);},
+  prtrec.codsq,
+  impnmshowcb1
+ );
+
+ function impnmshowcb1(mappa){
+  mappacodgioc=mappa.reduce(function(arr,elem){
+   if (prtrec.codsq[0]==elem.codsq) arr[0][elem.codgioc]={nmaglia:elem.nmaglia,idxdati:-1};
+   if (prtrec.codsq[1]==elem.codsq) arr[1][elem.codgioc]={nmaglia:elem.nmaglia,idxdati:-1};
+   return arr;
+  },[[],[]]);
+  fdb.tabRecFilter(
+   'gioc',
+   function(x,y,z){if ((y[0][x.codgioc])||(y[1][x.codgioc])) z.push(x);},
+   mappacodgioc,
+   impnmshowcb2
+  );
  }
- var mappa=[];
- mappa[0]=[];
- mappa[1]=[];
- for(i=0;i<adb.gioc.length;i++){
-  for(var sq=0;sq<=1;sq++){
-   if (mappacodgioc[sq][adb.gioc[i][0]]>-1){
-    var s={codgioc:adb.gioc[i][0],cognome:adb.gioc[i][adf.gioc.cognome],nome:adb.gioc[i][adf.gioc.nome],nmaglia:adb.sqgioc[mappacodgioc[sq][adb.gioc[i][0]]][adf.sqgioc.nmaglia],anno:adb.gioc[i][adf.gioc.anno],altezza:adb.gioc[i][adf.gioc.altezza],ruolo:adb.gioc[i][adf.gioc.ruolo]};
-    mappa[sq].push(s);
-   }
+
+ function impnmshowcb2(mappag){
+  numerimaglia=[[],[]];
+  for(i=0;i<mappag.length;i++){
+   r=mappag[i];
+   for(q=0;q<=1;q++)
+    if (mappacodgioc[q][r.codgioc]){
+     s={codgioc:r.codgioc,cognome:r.cognome,nome:r.nome,nmaglia:mappacodgioc[q][r.codgioc].nmaglia,anno:r.anno,altezza:r.altezza,ruolo:r.ruolo,nmagliaold:'',disabled:false};
+     mappacodgioc[q][r.codgioc].idxdati=-1+numerimaglia[q].push(s);
+    }
   }
- }
- var r;
- for (sq=0;sq<=1;sq++){
-  mappa[sq].sort(function(a,b){
-   return ((a.nmaglia==b.nmaglia)?0:((a.nmaglia>b.nmaglia)?1:-1));
-  });
-  var h='';
-  for (i=0;i<mappa[sq].length;i++){
-   r=mappa[sq][i];
-   numerimaglia.ng[sq]++;
-   numerimaglia.sq.push(sq);
-   numerimaglia.codgioc.push(r.codgioc);
-   numerimaglia.cognome.push(r.cognome);
-   numerimaglia.nome.push(r.nome);
-   numerimaglia.nmaglia.push(r.nmaglia);
-   numerimaglia.anno.push(r.anno);
-   numerimaglia.altezza.push(r.altezza);
-   numerimaglia.ruolo.push(r.ruolo);
-   h+='<tr><td>'+r.cognome+' '+r.nome+'</td>';
-   //trovamaglia
-   var v='';
-   for (var k=1;k<=datirec[sq][tot].dati[vcprt];k++){
-    if (datirec[sq][k].codgioc==parseInt(r.codgioc,10)){
-     v=datirec[sq][k].nmaglia;
-     break;
+  //cerca i vecchi numerimaglia
+  for(q=0;q<=1;q++){
+   for(k=1;k<=datirec[q][tot].dati[vcprt];k++){
+    v=datirec[q][k].nmaglia;
+    if (v.length>0) v=('  '+v).slice(-2);
+    if (mappacodgioc[q][datirec[q][k].codgioc]){
+     r=mappacodgioc[q][datirec[q][k].codgioc].idxdati;
+     numerimaglia[q][r].nmagliaold=v;
+    } else {//inserisce i giocatori eliminati da sqgioc
+     r=datirec[q][k];
+     s={codgioc:r.codgioc,cognome:r.cognome,nome:r.nome,nmaglia:v,anno:r.anno,altezza:r.altezza,ruolo:r.ruolo,nmagliaold:v,disabled:true};
+     numerimaglia[q].push(s);
     }
    }
-   numerimaglia.nmagliap.push(v);
-   if (v.length>0)
-    v=('  '+v).slice(-2);
-   h+='<td><input type="text" class="form-control input-sm nmag" size="3" maxlength="2" name="nmag[]" value="'+v+'" id="nm'+r.codgioc+'"></td>';
-   h+='<td><button type="button" class="btn btn-default nmag" data-codgioc="'+r.codgioc+'">'+r.nmaglia+'</button></td></tr>';
+   numerimaglia[q].sort(function(a,b){
+    return ((a.nmaglia==b.nmaglia)?0:((a.nmaglia>b.nmaglia)?1:-1));
+   });
+   h=numerimaglia[q].reduce(function(str,elem){
+    str+='<tr><td>'+elem.cognome+' '+elem.nome+'</td>';
+    str+='<td><input type="text" class="form-control input-sm nmag" size="3" maxlength="2" name="nmag[]" value="'+elem.nmagliaold+'" id="'+q+'nm'+elem.codgioc+'"'+(elem.disabled?' disabled':'')+'></td><td>';
+    if (!elem.disabled) str+='<button type="button" class="btn btn-info btn-block nmag" data-codgioc="'+q+'nm'+elem.codgioc+'">'+elem.nmaglia+'</button>';
+    str+='</td></tr>';
+    return str;
+   },'');
+   $('#righe'+('ab'.charAt(q))).html(h);
   }
-  $('#righe'+('ab'.charAt(sq))).html(h);
+  document.nm.dati.value=JSON.stringify(numerimaglia);
+  $('#princ').hide();
+  $('#modNumMag').show();
  }
- document.nm.dati.value=JSON.stringify(numerimaglia);
- $('#princ').hide();
- $('#modNumMag').show();
 }
 
 function imprilhide(){
@@ -1504,8 +1484,8 @@ function modrigaref(riga){
 function mostradaticmp(){
  var s,d,i,o,f;
  var celle=$('#datcmp').find('td');
- for (s=0;s<=1;s++){
-  for (d=dcpunti;d<=dcmp;d++){
+ for(s=0;s<=1;s++){
+  for(d=dcpunti;d<=dcmp;d++){
    i=s*dcmp+4*s+d-dcpunti;
    celle.eq(i).text(daticmp[s][d]);
    if ((s==0)&&(d>=dcff)){
@@ -1539,14 +1519,14 @@ function mostradaticmp(){
 
 function mostragioc(){
  var s,i,h,bnum,c,ic,fc;
- for (s=0;s<=1;s++){
+ for(s=0;s<=1;s++){
   if (datirec[s][tot].dati[vcprt]==0){
    ic=fc='';
   } else {
    ic='<div id="giocsqic'+'ab'.charAt(s)+'" class="btn-group'+((cellulare||!nmagliagiu)?'':'-vertical marginev')+'">';
    fc='<div id="giocsqfc'+'ab'.charAt(s)+'" class="btn-group'+((cellulare||!nmagliagiu)?'':'-vertical marginev')+'">';
    bnum=numeri[s].length/4;
-   for (i=0;i<bnum;i++){
+   for(i=0;i<bnum;i++){
     c=((s==selsq)&&(i==selgiocidx-1));
     if ((i<bnum-1)&&(datirec[s][i+1].dati[vconc]==0))
      fc+='<button type="button" class="btn btn-'+(nmagliagiu?'xs':'sm')+' btn-'+(c?'info':'danger')+'" data-onc="btn-danger">'+trim(numeri[s].substr(i*4,4))+'</button>';
@@ -1607,7 +1587,7 @@ function mostrainfo(o,f,t){
  if (r.hasClass('popover'))
   return;
  mostrainfopop(false,o,f,t);
- $(document).one('click',function(){
+ $(document).one('click focus focusout focusin',function(){
   mostrainfopop(true,o,f,t);
  });
 }
@@ -1625,9 +1605,9 @@ function mostrainfopop(elim,o,f,t){
    content: function(){
     var a,g,i,s,v,w;
     a=new Array();
-    for (s=0;s<=1;s++){
+    for(s=0;s<=1;s++){
      i=0;
-     for (g=1;g<=sq;g++){
+     for(g=1;g<=sq;g++){
       if ((g<=datirec[s][tot].dati[vcprt])||(g==sq)){
        v=f(s,g);
        if ((typeof v=='string')||(v>0)){
@@ -1641,9 +1621,9 @@ function mostrainfopop(elim,o,f,t){
      }
     }
     w='<table class="table table-bordered tableinfo">';
-    for (g=0;g<a.length;g++){
+    for(g=0;g<a.length;g++){
      w+='<tr>';
-     for (s=0;s<=1;s++){
+     for(s=0;s<=1;s++){
       if (s==1)
        w+='<td style="background-color: #dddddd"></td>';
       if (a[g][s*2])
@@ -1675,11 +1655,12 @@ function mostrainfotiri(s,g,tipo){
 }
 
 function mostraref(riga){
- var r=(getrigheref()).split('\n');
- var d=diff.split('\n');
- var i=info.split('\n');
- var h='';
- for (var x=0;x<r.length-1;x++){
+ var d,h,i,r,x;
+ r=(getrigheref()).split('\n');
+ d=diff.split('\n');
+ i=info.split('\n');
+ h='';
+ for(x=0;x<r.length-1;x++){
   h+='<tr>';
   h+='<td><a href="javascript:modrigaref('+x+');">'+r[x]+'</a></td>';
   h+='<td>'+d[x]+'</td>';
@@ -1880,7 +1861,7 @@ function zoom(diff){
 
 function attaccocerca(s,d){
  var g,result;
- for (g=1;g<attaccorec.length;g++)
+ for(g=1;g<attaccorec.length;g++)
   if ((attaccorec[g].nome==d)&&(attaccorec[g].dati[vcprt]==s)){
    result=g;
    return result;
@@ -1893,38 +1874,37 @@ function attaccocerca(s,d){
  };
  attaccorec[result].dati=new Array(voci+1);
  attaccorec[result].nome=d;
- for (g=1;g<=voci;g++)
+ for(g=1;g<=voci;g++)
   attaccorec[result].dati[g]=0;
  attaccorec[result].dati[vcprt]=s;
  return result;
 }
 
 function caricanummag(){
- var p=prt2rec.referto.indexOf('<num>\n');
- var r=prt2rec.referto.indexOf('</num>\n');
- if (p<0)
-  return;
- var x=[0,0];
+ var altezza,anno,codgioc,cognome,i,nmaglia,nome,num,p,r,ruolo,s,x;
+ p=prt2rec.referto.indexOf('<num>\n');
+ r=prt2rec.referto.indexOf('</num>\n');
+ if (p<0) return;
+ x=[0,0];
  numeri=['',''];
- var num=prt2rec.referto.substring(p,r).split('\n');
- for (var i=1;i<num.length;i++){
-  if (num[i].length==0)
-   continue;
+ num=prt2rec.referto.substring(p,r).split('\n');
+ for(i=1;i<num.length;i++){
+  if (num[i].length==0) continue;
   p=num[i].indexOf(',');
-  var nmaglia=num[i].substring(0,p);
-  var s=nmaglia.charCodeAt(0)-65;
+  nmaglia=num[i].substring(0,p);
+  s=nmaglia.charCodeAt(0)-65;
   x[s]++;
   r=num[i].indexOf(',',p+1);
-  var codgioc=parseInt(num[i].substring(p+1,r),10);
+  codgioc=parseInt(num[i].substring(p+1,r),10);
   p=num[i].indexOf(',',r+1);
-  var cognome=num[i].substring(r+1,p);
+  cognome=num[i].substring(r+1,p);
   r=num[i].indexOf(',',p+1);
-  var nome=num[i].substring(p+1,r);
+  nome=num[i].substring(p+1,r);
   p=num[i].indexOf(',',r+1);
-  var anno=num[i].substring(r+1,p);
+  anno=num[i].substring(r+1,p);
   r=num[i].indexOf(',',p+1);
-  var altezza=num[i].substring(p+1,r);
-  var ruolo=num[i].substring(r+1);
+  altezza=num[i].substring(p+1,r);
+  ruolo=num[i].substring(r+1);
   datirec[s][x[s]].nmaglia=nmaglia.substr(1);
   numeri[s]+=(nmaglia+'  ').substr(0,4);
   datirec[s][x[s]].codgioc=codgioc;
@@ -1935,7 +1915,7 @@ function caricanummag(){
   datirec[s][x[s]].ruolo=ruolo;
   datirec[s][x[s]].dati[vcprt]=1;
  }
- for (s=0;s<=1;s++){
+ for(s=0;s<=1;s++){
   datirec[s][tot].dati[vcprt]=x[s];
   datirec[s][tot].codgioc=-1;
   datirec[s][tot].cognome='TOTALI';
@@ -1948,58 +1928,68 @@ function caricanummag(){
 }
 
 function caricaprtdadb(){
+ var r,s;
  resetdati(false);
- prtrec.codprt=sessionStorage.codprt;
- var s=findrec('prt',prtrec.codprt);
- var r=adb.prt[s];
- prtrec.codcamp=r[adf.prt.codcamp];
- prtrec.codsq[0]=r[adf.prt.codsqa]
- prtrec.codsq[1]=r[adf.prt.codsqb];
- prtrec.dataora=r[adf.prt.dataora];
- prtrec.luogo=r[adf.prt.luogo];
- prtrec.giornata=r[adf.prt.giornata];
- prtrec.ngara=r[adf.prt.ngara];
- s=findrec('camp',prtrec.codcamp);
- r=adb.camp[s];
- camprec.annosport=r[adf.camp.annosport];
- camprec.nomecamp=r[adf.camp.nomecamp];
- camprec.girone=r[adf.camp.girone];
- camprec.fase=r[adf.camp.fase];
- camprec.tempi=parseInt(r[adf.camp.tempi],10);
- camprec.durata=parseInt(r[adf.camp.durata],10);
- camprec.suppl=parseInt(r[adf.camp.suppl],10);
- camprec.maxfalli=parseInt(r[adf.camp.maxfalli],10);
- s=findrec('sq',prtrec.codsq[0]);
- r=adb.sq[s];
- prt2rec.nomesq[0]=r[adf.sq.nomesq];
- prtrec.sesso[0]=r[adf.sq.sesso];
- s=findrec('sq',prtrec.codsq[1]);
- r=adb.sq[s];
- prt2rec.nomesq[1]=r[adf.sq.nomesq];
- prtrec.sesso[1]=r[adf.sq.sesso];
- s=findrec('prt2',prtrec.codprt);
- r=adb.prt2[s];
- if (r[adf.prt2.referto].length==0)
-  modificato=true;
- else {
-  prt2rec.referto=r[adf.prt2.referto];
-  prt2rec.nomesq[0]=r[adf.prt2.nomesqa];
-  prt2rec.nomesq[1]=r[adf.prt2.nomesqb];
-  prt2rec.coach[0]=r[adf.prt2.coacha];
-  prt2rec.coach[1]=r[adf.prt2.coachb];
-  prt2rec.arbitri=r[adf.prt2.arbitri];
-  prt2rec.rilevatori=r[adf.prt2.rilevatori];
-  prt2rec.note=r[adf.prt2.note];
-  prt2rec.ris=r[adf.prt2.ris];
-  prt2rec.parz=r[adf.prt2.parz];
-  prt2rec.nomecortosq[0]=cercarefdb('nomecortosqa');
-  prt2rec.nomecortosq[1]=cercarefdb('nomecortosqb');
-  modificato=false;
+ prtrec.codprt=1*(sessionStorage.codprt);
+ fdb.tabGet('prt',prtrec.codprt,caricaprtdadbcb1);
+
+ function caricaprtdadbcb1(r){
+  prtrec.codcamp=r.codcamp;
+  prtrec.codsq[0]=r.codsqa;
+  prtrec.codsq[1]=r.codsqb;
+  prtrec.dataora=r.dataora;
+  prtrec.luogo=r.luogo;
+  prtrec.giornata=r.giornata;
+  prtrec.ngara=r.ngara;
+  fdb.tabGet('camp',prtrec.codcamp,caricaprtdadbcb2);
  }
- refiniz();
- saveallref();
- caricanummag();
- stackpop();
+
+ function caricaprtdadbcb2(r){
+  camprec.annosport=r.annosport;
+  camprec.nomecamp=r.nomecamp;
+  camprec.girone=r.girone;
+  camprec.fase=r.fase;
+  camprec.tempi=r.tempi;
+  camprec.durata=r.durata;
+  camprec.suppl=r.suppl;
+  camprec.maxfalli=r.maxfalli;
+  fdb.tabGet('sq',prtrec.codsq[0],caricaprtdadbcb3);
+ }
+
+ function caricaprtdadbcb3(r){
+  prt2rec.nomesq[0]=r.nomesq;
+  prtrec.sesso[0]=r.sesso;
+  fdb.tabGet('sq',prtrec.codsq[1],caricaprtdadbcb4);
+ }
+
+ function caricaprtdadbcb4(r){
+  prt2rec.nomesq[1]=r.nomesq;
+  prtrec.sesso[1]=r.sesso;
+  fdb.tabGet('prt2',prtrec.codprt,caricaprtdadbcb5);
+ }
+
+ function caricaprtdadbcb5(r){
+  if (r.referto.length==0) modificato=true;
+  else {
+   prt2rec.referto=r.referto;
+   prt2rec.nomesq[0]=r.nomesqa;
+   prt2rec.nomesq[1]=r.nomesqb;
+   prt2rec.coach[0]=r.coacha;
+   prt2rec.coach[1]=r.coachb;
+   prt2rec.arbitri=r.arbitri;
+   prt2rec.rilevatori=r.rilevatori;
+   prt2rec.note=r.note;
+   prt2rec.ris=r.ris;
+   prt2rec.parz=r.parz;
+   prt2rec.nomecortosq[0]=cercarefdb('nomecortosqa');
+   prt2rec.nomecortosq[1]=cercarefdb('nomecortosqb');
+   modificato=false;
+  }
+  refiniz();
+  saveallref();
+  caricanummag();
+  stackpop();
+ }
 }
 
 function caricaprtdaref(){
@@ -2054,7 +2044,7 @@ function cercarefdb(voce){
 
 function difesacerca(s,d){
  var g,result;
- for (g=1;g<difesarec.length;g++)
+ for(g=1;g<difesarec.length;g++)
   if ((difesarec[g].nome==d)&&(difesarec[g].dati[vcprt]==s)){
    result=g;
    return result;
@@ -2067,7 +2057,7 @@ function difesacerca(s,d){
  };
  difesarec[result].dati=new Array(voci+1);
  difesarec[result].nome=d;
- for (g=1;g<=voci;g++)
+ for(g=1;g<=voci;g++)
   difesarec[result].dati[g]=0;
  difesarec[result].dati[vcprt]=s;
  return result;
@@ -2080,61 +2070,56 @@ function eseguidiff(testo1,testo2){
  t2=testo2.split('\n');
  i1=i2=0;
  while ((i1<t1.length)&&(i2<t2.length)){
-  //linee diverse
-  if (t1[i1]!=t2[i2]){
-   //cerca la prima linea uguale
+  if (t1[i1]!=t2[i2]){//linee diverse
    trovato=false;
    m1=s1=i1;
    m2=s2=i2;
-   do{
+   do{//cerca la prima linea uguale avanzando in t1
     m1++;
     if (m1<t1.length){
      c1=m1;
-     c2=s2;
+     c2=s2;//controlla t2 partendo dalla prima diversa
      do{
-      if (t1[c1]==t2[c2]){
-       //trovato linee uguali
+      if (t1[c1]==t2[c2]){//trovato linee uguali
        trovato=true;
        break;
       }
-      c2++;
-     } while((c2<=m2)&&(c2<t2.length));
+      c2++;//va avanti in t2 se le successive le aveva controllate
+     } while((c2<=m2)&&(c2<t2.length));//altrimenti esce
     }
     if (trovato) break;
-    m2++;
+    m2++;//cerca la prima linea uguale avanzando in t2
     if (m2<t2.length){
-     c1=s1;
+     c1=s1;//controlla t1 partendo dalla prima diversa
      c2=m2;
      do{
-      if (t1[c1]==t2[c2]){
-       //trovato linee uguali
+      if (t1[c1]==t2[c2]){//trovato linee uguali
        trovato=true;
        break;
       }
-      c1++;
-     } while((c1<=m1)&&(c1<t1.length));
+      c1++;//va avanti in t1 se le successive le aveva controllate
+     } while((c1<=m1)&&(c1<t1.length));//altrimenti esce
     }
     if (trovato) break;
-   } while((m1<t1.length)||(m2<t2.length));
-   if (!trovato){
+   } while((m1<t1.length)||(m2<t2.length));//esce se arrivato in fondo ad uno dei due
+   if (!trovato){//le differenze sono fino in fondo
     c1=t1.length;
     c2=t2.length;
    }
    r.push(i1+','+i2);
-   for (s1=i1;s1<c1;s1++) r.push('-'+t1[s1]);
-   for (s2=i2;s2<c2;s2++) r.push('+'+t2[s2]);
+   for(s1=i1;s1<c1;s1++) r.push('-'+t1[s1]);
+   for(s2=i2;s2<c2;s2++) r.push('+'+t2[s2]);
    i1=c1;
    i2=c2;
-  } else {
-   //linee uguali
+  } else {//linee uguali
    i1++;
    i2++;
   }
  }
- if ((i1<t1.length)||(i2<t2.length)){
+ if ((i1<t1.length)||(i2<t2.length)){//se uno dei due ha altre linee
   r.push(i1+','+i2);
-  for (s1=i1;s1<t1.length;s1++) r.push('-'+t1[s1]);
-  for (s2=i2;s2<t2.length;s2++) r.push('+'+t2[s2]);
+  for(s1=i1;s1<t1.length;s1++) r.push('-'+t1[s1]);
+  for(s2=i2;s2<t2.length;s2++) r.push('+'+t2[s2]);
  }
  return r.join('\n');
 }
@@ -2144,7 +2129,7 @@ function eseguipatch(testo1,testo3){
  t1=testo1.split('\n');
  t3=testo3.split('\n');
  p=r=0;
- for (i=0;i<t3.length;i++){
+ for(i=0;i<t3.length;i++){
   c=t3[i].charAt(0);
   if ((c>='0')&&(c<='9')){
    r=t3[i].indexOf(',');
@@ -2167,7 +2152,7 @@ function eseguipatchctrl(testo1,testo3){
  t3=testo3.split('\n');
  r=0;
  f=true;
- for (i=0;i<t3.length;i++){
+ for(i=0;i<t3.length;i++){
   c=t3[i].charAt(0);
   if ((c>='0')&&(c<='9')){
    r=parseInt(t3[i],10)||0;
@@ -2196,7 +2181,7 @@ function getdiff(){
   result='';
  i=dcff;
  while (i<dcpr){
-  for (s=0;s<=1;s++){
+  for(s=0;s<=1;s++){
    r=daticmp[s][i]-daticmp[1-s][i+1];
    if (r!=0){
     if (result.length>0)
@@ -2246,7 +2231,7 @@ function gioccerca(s,t){
    result=Math.floor(c/4)+1;
   }
  } else {
-  for (i=0;i<=1;i++){
+  for(i=0;i<=1;i++){
    c=numeri[i].indexOf((t+'    ').substr(0,4));
    if ((c%4)==0){
     s=i;
@@ -2262,10 +2247,9 @@ function gioccerca(s,t){
 }
 
 function incampo(){
- var x,y;
- var result='In campo:';
- for (x=0;x<=1;x++)
-  for (y=1;y<=maxgioc;y++)
+ var result='In campo:',x,y;
+ for(x=0;x<=1;x++)
+  for(y=1;y<=maxgioc;y++)
    if (datirec[x][y].dati[vconc]==1)
     result+=' '+('AB'.charAt(x))+datirec[x][y].nmaglia;
  return result;
@@ -2292,6 +2276,10 @@ stati contropiede:
 1 contropiede attivato
 2 contropiede squadra A
 4 contropiede squadra B
+8 contropiede sospeso tl-
+stati rimbalzooff:
+1 rimbalzooff attivato
+8 rimbalzooff sospeso tl-
 stati mostra:
 1 mostra dati comparativi
 2 mostra gioc in campo
@@ -2309,7 +2297,7 @@ stati mostra:
  }
  if ((intflag&64)!=0){
   tmp='';
-  for (n=0;n<=2;n++){
+  for(n=0;n<=2;n++){
    rl[n]='';
   }
  }
@@ -2366,8 +2354,8 @@ stati mostra:
      sint=0;
      switch (dato){
 
-      case (vcffp):
-      case (vcffa):
+      case vcffp:
+      case vcffa:
        if (giocsel<sq)
         daticmp[sqsel][dcbonus]++;
        incdato(sqsel,giocsel,vcff);
@@ -2399,11 +2387,11 @@ stati mostra:
        }
        if ((intflag&64)!=0){
         rl[sqsel]=getgiocperref(sqsel,giocsel);
-        rl[sqsel]=rl[sqsel]+': fallo fatto ('+datirec[sqsel][giocsel].dati[vcff]+')';
+        rl[sqsel]+=': fallo fatto ('+datirec[sqsel][giocsel].dati[vcff]+')';
         if (dato==vcffp){
-         rl[sqsel]=rl[sqsel]+' con palla persa';
-         if ((contropiede&1)!=0) rl[sqsel]=rl[sqsel]+' in contropiede';
-        } else rl[sqsel]=rl[sqsel]+' con azione persa';
+         rl[sqsel]+=' con palla persa';
+         if ((contropiede&1)!=0) rl[sqsel]+=' in contropiede';
+        } else rl[sqsel]+=' con azione persa';
         refleggadd(rl);
        }
        if (((contropiede&1)!=0)&&(dato==vcffp)){//solo lo sfondamento ffp ferma il contropiede
@@ -2412,8 +2400,7 @@ stati mostra:
         adrec[sqsel].cpnum++;
         adrec[sqsel].cppp++;
        }
-       if (rimbalzooff)
-        rimbalzooff=false;
+       if ((rimbalzooff&1)!=0) rimbalzooff=0;
        break;
 
       case vcff:
@@ -2434,13 +2421,13 @@ stati mostra:
         attaccorec[attaccoidx[sqsel]].dati[vcff]++;
        if ((intflag&64)!=0){
         rl[sqsel]=getgiocperref(sqsel,giocsel);
-        rl[sqsel]=rl[sqsel]+': fallo fatto ('+datirec[sqsel][giocsel].dati[vcff]+')';
+        rl[sqsel]+=': fallo fatto ('+datirec[sqsel][giocsel].dati[vcff]+')';
         refleggadd(rl);
        }
        break;
 
-      case (vcfsp):
-      case (vcfsa):
+      case vcfsp:
+      case vcfsa:
        if (giocsel<sq){
         incdato(sqsel,giocsel,vcfs);
         rinfo=datirec[sqsel][giocsel].dati[vcfs]+'fs';
@@ -2462,7 +2449,7 @@ stati mostra:
         }
         if ((intflag&64)!=0){
          rl[sqsel]=getgiocperref(sqsel,giocsel);
-         rl[sqsel]=rl[sqsel]+': fallo subito';
+         rl[sqsel]+=': fallo subito';
          refleggadd(rl);
         }
        }
@@ -2485,14 +2472,14 @@ stati mostra:
          attaccorec[attaccoidx[sqsel]].dati[vcfs]++;
         if ((intflag&64)!=0){
          rl[sqsel]=getgiocperref(sqsel,giocsel);
-         rl[sqsel]=rl[sqsel]+': fallo subito';
+         rl[sqsel]+=': fallo subito';
          refleggadd(rl);
         }
        }
        break;
 
       case vcro:
-       rimbalzooff=true;
+       rimbalzooff=1;
        //se il tiro sbagliato era in contropiede, lo riabilita
        m=(contropiede&6);
        if (m!=0){
@@ -2517,7 +2504,7 @@ stati mostra:
         attaccorec[attaccoidx[sqsel]].dati[vcro]++;
        if ((intflag&64)!=0){
         rl[sqsel]=getgiocperref(sqsel,giocsel);
-        rl[sqsel]=rl[sqsel]+': rimbalzo offensivo';
+        rl[sqsel]+=': rimbalzo offensivo';
         refleggadd(rl);
        }
        break;
@@ -2537,11 +2524,10 @@ stati mostra:
         attaccorec[attaccoidx[sqsel]].dati[vcrd]++;
        if ((intflag&64)!=0){
         rl[sqsel]=getgiocperref(sqsel,giocsel);
-        rl[sqsel]=rl[sqsel]+': rimbalzo difensivo';
+        rl[sqsel]+=': rimbalzo difensivo';
         refleggadd(rl);
        }
-       if ((contropiede&6)!=0)
-        contropiede=0;
+       if ((contropiede&6)!=0) contropiede=0;
        break;
 
       case vcsd:
@@ -2558,7 +2544,7 @@ stati mostra:
         attaccorec[attaccoidx[sqsel]].dati[dato]++;
        if ((intflag&64)!=0){
         rl[sqsel]=getgiocperref(sqsel,giocsel);
-        rl[sqsel]=rl[sqsel]+': stoppata data';
+        rl[sqsel]+=': stoppata data';
         refleggadd(rl);
        }
        break;
@@ -2577,7 +2563,7 @@ stati mostra:
         attaccorec[attaccoidx[sqsel]].dati[dato]++;
        if ((intflag&64)!=0){
         rl[sqsel]=getgiocperref(sqsel,giocsel);
-        rl[sqsel]=rl[sqsel]+': stoppata subita';
+        rl[sqsel]+=': stoppata subita';
         refleggadd(rl);
        }
        break;
@@ -2597,9 +2583,8 @@ stati mostra:
         attaccorec[attaccoidx[sqsel]].dati[vcpp]++;
        if ((intflag&64)!=0){
         rl[sqsel]=getgiocperref(sqsel,giocsel);
-        rl[sqsel]=rl[sqsel]+': palla persa';
-        if ((contropiede&1)!=0)
-         rl[sqsel]=rl[sqsel]+' in contropiede';
+        rl[sqsel]+=': palla persa';
+        if ((contropiede&1)!=0) rl[sqsel]+=' in contropiede';
         refleggadd(rl);
        }
        if ((contropiede&1)!=0){
@@ -2608,8 +2593,7 @@ stati mostra:
         adrec[sqsel].cpnum++;
         adrec[sqsel].cppp++;
        }
-       if (rimbalzooff)
-        rimbalzooff=false;
+       if ((rimbalzooff&1)!=0) rimbalzooff=0;
        break;
 
       case vcpr:
@@ -2630,7 +2614,7 @@ stati mostra:
          attaccorec[attaccoidx[sqsel]].dati[vcpr]++;
         if ((intflag&64)!=0){
          rl[sqsel]=getgiocperref(sqsel,giocsel);
-         rl[sqsel]=rl[sqsel]+': palla recuperata';
+         rl[sqsel]+=': palla recuperata';
          refleggadd(rl);
         }
        }
@@ -2649,12 +2633,12 @@ stati mostra:
         attaccorec[attaccoidx[sqsel]].dati[vcas]++;
        if ((intflag&64)!=0){
         rl[sqsel]=getgiocperref(sqsel,giocsel);
-        rl[sqsel]=rl[sqsel]+': assist';
+        rl[sqsel]+=': assist';
         refleggadd(rl);
        }
        break;
 
-      case (vcpri):
+      case vcpri:
        if (adrec[0].pri+adrec[1].pri==0){
         m=true;
         adrec[sqsel].pri++;
@@ -2670,18 +2654,18 @@ stati mostra:
        daticmp[1-sqsel][dcposs]=0;
        if ((m)&&((intflag&64)!=0)){
         rl[sqsel]=getgiocperref(sqsel,giocsel);
-        rl[sqsel]=rl[sqsel]+': palla recuperata iniziale';
+        rl[sqsel]+=': palla recuperata iniziale';
         refleggadd(rl);
        }
        break;
 
-      case (vcap):
+      case vcap:
        adrec[sqsel].azp++;
        setdatocmp(sqsel,dcpp);
        setposs(sqsel,-1);
        break;
 
-      case (vcrft):
+      case vcrft:
        adrec[sqsel].rft++;
        setdatocmp(sqsel,dcrd);
        setposs(sqsel,1);
@@ -2709,8 +2693,8 @@ stati mostra:
        } else {
         m=dato;
        }
-       if (giocsel==sq){
-        if (dato>vctf1) dato=vctf1;
+       if ((giocsel==sq)&&([vcts1,vctf1,vct31,vcsc1].indexOf(dato)>=0)){
+        if (dato==vct31) dato=vctf1;
         rinfo+='autocanestro';
        }
        incdato(sqsel,giocsel,dato);
@@ -2750,15 +2734,14 @@ stati mostra:
          adrec[sqsel].cpnum++;
          adrec[sqsel].cppun+=m;
         }
-        if (rimbalzooff)
-         adrec[sqsel].ropun+=m;
+        if ((rimbalzooff&1)!=0) adrec[sqsel].ropun+=m;
         if (datirec[1-sqsel][tot].dati[vcprt]>0){
-         for (i=1;i<=datirec[sqsel][tot].dati[vcprt];i++)
+         for(i=1;i<=datirec[sqsel][tot].dati[vcprt];i++)
           if (datirec[sqsel][i].dati[vconc]==1){
            datirec[sqsel][i].dati[vcpm]+=m;
            datirec[sqsel][tot].dati[vcpm]+=m;
           }
-         for (i=1;i<=datirec[1-sqsel][tot].dati[vcprt];i++)
+         for(i=1;i<=datirec[1-sqsel][tot].dati[vcprt];i++)
           if (datirec[1-sqsel][i].dati[vconc]==1){
            datirec[1-sqsel][i].dati[vcpm]-=m;
            datirec[1 - sqsel][tot].dati[vcpm]-=m;
@@ -2786,8 +2769,7 @@ stati mostra:
         m=(dato==vcsc1)?vcts1:dato;
        } else {
        //canestro sbagliato
-        if ((contropiede&1)!=0)
-         adrec[sqsel].cpnum++;
+        if ((contropiede&1)!=0) adrec[sqsel].cpnum++;
         m=dato-1;
         setdatocmp(sqsel,dcrdavv);
        }
@@ -2806,15 +2788,14 @@ stati mostra:
           case vcsc1: rl[sqsel]+='schiacciata'; break;
          }
         }
-        if ((contropiede&1)!=0)
-         rl[sqsel]+=' in contropiede';
+        if ((contropiede&1)!=0) rl[sqsel]+=' in contropiede';
         if ([vcts1,vctf1,vct31,vcsc1].indexOf(dato)>=0){
          rl[2]=daticmp[0][dcpunti]+'-'+daticmp[1][dcpunti];
          i=punti(sqsel,giocsel);
          rl[sqsel]+=' ('+i+' punti)';
         }
         if (qua>0)
-         rl[sqsel]+='<div class="mappa"><canvas width="150" height="100" data-tiro="'+t+'"></canvas></div>';
+         rl[sqsel]+='<div '+classmappa+'><canvas width="150" height="100" data-tiro="'+t+'"></canvas></div>';
         refleggadd(rl);
        }
        if ((contropiede&1)!=0){
@@ -2822,31 +2803,29 @@ stati mostra:
         if ([vcts1,vctf1,vct31,vcsc1].indexOf(dato)>=0) contropiede=0;
         else contropiede=(sqsel==0)?2:4;
        }
-       if (rimbalzooff) rimbalzooff=false;
+       if ((rimbalzooff&1)!=0) rimbalzooff=0;
        break;
 
       case vctl1:
       case vctl0:
-      case (vctlm):
+      case vctlm:
        //inizia nuova serie di tl
+       d=new Array();
        if (dato==vctlm){
-        u=datirec[sqsel][tot].seqtl.lastIndexOf('/');
+        if ((contropiede&8)!=0) contropiede=1;
+        if ((rimbalzooff&8)!=0) rimbalzooff=1;
+        //cerca l'ultima serie che finisce con -
+        u=d[0]=(datirec[sqsel][tot].seqtl+'/').lastIndexOf('-/');
         if (u<0){
          if ((intflag&2)!=0){
-          t='ATT['+tdc+': non accettabile per assenza serie tl precedenti]';
+          t='ATT['+tdc+': non accettabile per assenza serie tl con - precedenti]';
           righe.splice(r+1,0,t);
          }
          break;
         }
-        //trova l'ultima serie che deve finire per -
-        u=datirec[sqsel][tot].seqtl.substr(u);
-        if (u.charAt(u.length-1)!='-'){
-         if ((intflag&2)!=0){
-          t='ATT['+tdc+': non accettabile per assenza - precedenti]';
-          righe.splice(r+1,0,t);
-         }
-         break;
-        }
+        //esamina la serie cercata
+        t=datirec[sqsel][tot].seqtl.lastIndexOf('/',u);
+        u=datirec[sqsel][tot].seqtl.substring(t,u+1);
         if (u.length!=tdc.length-1){
          if ((intflag&2)!=0){
           t='ATT['+tdc+': non accettabile per lunghezza serie precedente diversa]';
@@ -2854,10 +2833,10 @@ stati mostra:
          }
          break
         }
-        //incrocia le due serie
+        //incrocia le due serie per vedere se - e 01 coincidono
         m=new Array();
         m[0]=0;
-        for (i=1;i<tdc.length-1;i++){
+        for(i=1;i<tdc.length-1;i++){
          m[i]=(u.charAt(i)=='-')?0:1;
          m[i]+=(tdc.charAt(i+1)=='-')?0:1;
          if (m[0]<m[i])
@@ -2872,13 +2851,15 @@ stati mostra:
          }
          break
         }
+        // cerco la serie nel giocatore
         m=1;
-        t=datirec[sqsel][giocsel].seqtl.lastIndexOf('/');
+        t=d[1]=(datirec[sqsel][giocsel].seqtl+'/').lastIndexOf('-/');
         if (t>=0)
-         if (u==datirec[sqsel][giocsel].seqtl.substr(t))
+         if (u==datirec[sqsel][giocsel].seqtl.substring(datirec[sqsel][giocsel].seqtl.lastIndexOf('/',t),t+1))
           m=3;
         u=m;
        } else u=0;
+       //se u==0 crea nuove serie
        if ((u&1)==0)
         datirec[sqsel][tot].seqtl+='/';
        if ((u&2)==0)
@@ -2889,19 +2870,19 @@ stati mostra:
         rl[sqsel]=getgiocperref(sqsel,giocsel);
        //per ogni tl...
        m=0;
-       for (i=2;i<tdc.length;i++){
+       for(i=2;i<tdc.length;i++){
         t=tdc.charAt(i);
         //sostituisce 0 o 1 nella seqtl di squadra
         if ((u&1)!=0){
          if (t!='-')
-          datirec[sqsel][tot].seqtl=datirec[sqsel][tot].seqtl.substr(0,datirec[sqsel][tot].seqtl.length-tdc.length+i)+t+datirec[sqsel][tot].seqtl.substr(datirec[sqsel][tot].seqtl.length-tdc.length+i+1);
+          datirec[sqsel][tot].seqtl=datirec[sqsel][tot].seqtl.substring(0,d[0]-tdc.length+1+i)+t+datirec[sqsel][tot].seqtl.substr(d[0]-tdc.length+2+i);
         } else {
          //allunga la seqtl di squadra
          datirec[sqsel][tot].seqtl+=t;
         }
         if ((u&2)!=0){
          if (t!='-')
-          datirec[sqsel][giocsel].seqtl=datirec[sqsel][giocsel].seqtl.substr(0,datirec[sqsel][giocsel].seqtl.length-tdc.length+i)+t+datirec[sqsel][giocsel].seqtl.substr(datirec[sqsel][giocsel].seqtl.length-tdc.length+i+1);
+          datirec[sqsel][giocsel].seqtl=datirec[sqsel][giocsel].seqtl.substring(0,d[1]-tdc.length+1+i)+t+datirec[sqsel][giocsel].seqtl.substr(d[1]-tdc.length+2+i);
         } else {
          //allunga la seqtl del giocatore
          datirec[sqsel][giocsel].seqtl+=t;
@@ -2909,7 +2890,7 @@ stati mostra:
         //incrementa rtl
         if (tdc.charAt(i-1)=='0')
          adrec[sqsel].rtl++;
-        //incremente dato e stl6, e poi conta i punti
+        //incrementa dato e stl6, e poi conta i punti
         if ('01'.indexOf(t)>=0){
          incdato(sqsel,giocsel,vctl1+1-parseInt(t,10));
          datirec[sqsel][tot].dati[vcstl6]+=s;
@@ -2930,31 +2911,29 @@ stati mostra:
          }
          if (t=='1')
           m++;
-         if ((intflag&64)!=0){
-          if (tdc.length==3){
+        }
+        if ((intflag&64)!=0){
+         if (tdc.length==3){
+          if (t=='1')
+           rl[sqsel]+=': tiro libero realizzato';
+          else
+           rl[sqsel]+=': tiro libero sbagliato';
+          if ((contropiede&1)!=0) rl[sqsel]+=' dopo contropiede';
+         } else {
+          if (i==2){
+           rl[sqsel]+=': tiri liberi';
+           if ((contropiede&1)!=0) rl[sqsel]+=' dopo contropiede';
+          }
+          if (t!='-'){
+           switch (i){
+            case 2: rl[sqsel]+=', primo'; break;
+            case 3: rl[sqsel]+=', secondo'; break;
+            case 4: rl[sqsel]+=', terzo'; break;
+           }
            if (t=='1')
-            rl[sqsel]+=': tiro libero realizzato';
+            rl[sqsel]+=' realizzato';
            else
-            rl[sqsel]+=': tiro libero sbagliato';
-           if ((contropiede&1)!=0)
-            rl[sqsel]+=' dopo contropiede';
-          } else {
-           if (i==2){
-            rl[sqsel]+=': tiri liberi';
-            if ((contropiede&1)!=0)
-             rl[sqsel]+=' dopo contropiede';
-           }
-           if (t!='-'){
-            switch (i){
-             case 2: rl[sqsel]+=', primo'; break;
-             case 3: rl[sqsel]+=', secondo'; break;
-             case 4: rl[sqsel]+=', terzo'; break;
-            }
-            if (t=='1')
-             rl[sqsel]+=' realizzato';
-            else
-             rl[sqsel]+=' sbagliato';
-           }
+            rl[sqsel]+=' sbagliato';
           }
          }
         }
@@ -2975,20 +2954,18 @@ stati mostra:
        }
        rinfo=datirec[sqsel][giocsel].dati[vctl1]+'/'+(datirec[sqsel][giocsel].dati[vctl1]+datirec[sqsel][giocsel].dati[vctl0])+'tl';
        if (m>0){
-        if ((contropiede&1)!=0)
-         adrec[sqsel].cppun+=m;
-        if (rimbalzooff)
-         adrec[sqsel].ropun+=m;
+        if ((contropiede&1)!=0) adrec[sqsel].cppun+=m;
+        if ((rimbalzooff&1)!=0) adrec[sqsel].ropun+=m;
         rinfo+=' '+punti(sqsel,giocsel)+'p';
         //rileva la differenza punti per il plus/minus
         cambioris=true;
         if (datirec[1-sqsel][tot].dati[vcprt]>0){
-         for (i=1;i<=datirec[sqsel][tot].dati[vcprt];i++)
+         for(i=1;i<=datirec[sqsel][tot].dati[vcprt];i++)
           if (datirec[sqsel][i].dati[vconc]==1){
            datirec[sqsel][i].dati[vcpm]+=m;
            datirec[sqsel][tot].dati[vcpm]+=m;
           }
-         for (i=1;i<=datirec[1-sqsel][tot].dati[vcprt];i++)
+         for(i=1;i<=datirec[1-sqsel][tot].dati[vcprt];i++)
           if (datirec[1-sqsel][i].dati[vconc]==1){
            datirec[1-sqsel][i].dati[vcpm]-=m;
            datirec[1-sqsel][tot].dati[vcpm]-=m;
@@ -3027,10 +3004,12 @@ stati mostra:
          contropiedecmb=true;
          adrec[sqsel].cpnum++;
         }
-        if (rimbalzooff)
-         rimbalzooff=false;
+        if ((rimbalzooff&1)!=0) rimbalzooff=0;
         setdatocmp(sqsel,dcrdavv);
         setposs(sqsel,-1);
+       } else {
+        if ((contropiede&1)!=0) contropiede=8;
+        if ((rimbalzooff&1)!=0) rimbalzooff=8;
        }
        break;
 
@@ -3100,7 +3079,7 @@ stati mostra:
             periodocopiatot(ent[p]-1,p);
            if (tempodigioco<=camprec.tempi)
             daticmp[p][dcbonus]=0;
-           for (n=1;n<=tot;n++){
+           for(n=1;n<=tot;n++){
             //sequenze tiri
             if (((n<=datirec[p][tot].dati[vcprt])||(n>sq))&&(d[p]==0)){
              datirec[p][n].seqtl+=';';
@@ -3128,7 +3107,7 @@ stati mostra:
         }
        }
        if ((intflag&32)!=0)
-        for (p=0;p<=1;p++)
+        for(p=0;p<=1;p++)
          if (ent[p]>0){
           //cerca il quintetto
           quintidx[p]=quintcerca(p);
@@ -3143,8 +3122,8 @@ stati mostra:
          rl[2]=(tempodigioco-parseInt(camprec.tempi,10))+'º suppl. ';
         tmp=m+':'+('0'+s).slice(-2);
         rl[2]+=tmp;
-        for (p=0;p<=1;p++){
-         for (n=1;n<=datirec[p][tot].dati[vcprt];n++)
+        for(p=0;p<=1;p++){
+         for(n=1;n<=datirec[p][tot].dati[vcprt];n++)
           if (datirec[p][n].dati[vconc]==1){
            if (rl[p].length==0)
             rl[p]='Entrate: ';
@@ -3216,8 +3195,7 @@ stati mostra:
               rl[p]+=', entra ';
              rl[p]+=getgiocperref(p,g);
             }
-           } else {
-            //errore già in campo
+           } else {//errore già in campo
             if ((intflag&2)!=0){
              u='ATT['+u+': in campo, niente sostituzione]';
              righe.splice(r+1,0,u);
@@ -3238,8 +3216,7 @@ stati mostra:
               rl[p]+=', esce ';
              rl[p]+=getgiocperref(p,g);
             }
-           } else {
-            //errore non in campo
+           } else {//errore non in campo
             if ((intflag&2)!=0){
              u='ATT['+u+': fuori campo, niente sostituzione]';
              righe.splice(r+1,0,u);
@@ -3252,7 +3229,7 @@ stati mostra:
         }
        }
        if ((intflag&32)!=0)
-        for (p=0;p<=1;p++)
+        for(p=0;p<=1;p++)
          if (d[p]==1){
           //decrementa minuti e secondi al precedente quintetto
           quintrec[quintidx[p]].datipro[vcmin]-=m;
@@ -3282,10 +3259,8 @@ stati mostra:
        break;
       case 8: //CP
        contropiedecmb=true;
-       if ((contropiede&1)!=0)
-        contropiede=0;
-       else
-        contropiede=1;
+       if ((contropiede&1)!=0) contropiede=0;
+       else contropiede=1;
        break;
       case 9:
       case 10: //DA e DB
@@ -3395,8 +3370,8 @@ function inviodati(azione,dato){
      .removeClass('btn-danger btn-info btn-warning')
      .addClass('btn-success');
    }
-   var t=String(data);
-   if ((azione=='adt')&&(t.length>0)){
+   var t=''+data;
+   if ((azione=='adt')&&(t.substr(0,4)=='TMP[')){
     var d,h,i,p,r,s;
     t=t.slice(0,-1);
     //aggiorna oldtmp
@@ -3416,9 +3391,9 @@ function inviodati(azione,dato){
     i.splice(p,0,'');
     info=i.join('\n');
     s=$('#reftab tr');
-    for (t=s.length-1;t>=p;t--) s.eq(t).remove();
+    for(t=s.length-1;t>=p;t--) s.eq(t).remove();
     s=$('#reftab');
-    for (t=p;t<r.length-1;t++){
+    for(t=p;t<r.length-1;t++){
      h='<tr><td><a href="javascript:modrigaref('+t+');">'+r[t]+'</a></td>';
      h+='<td>'+d[t]+'</td>';
      h+='<td>'+i[t]+'</td></tr>';
@@ -3457,14 +3432,14 @@ function minent(){
 
 function periodoazzera(p){
  var i,j;
- for (i=0;i<=1;i++)
-  for (j=0;j<=voci;j++)
+ for(i=0;i<=1;i++)
+  for(j=0;j<=voci;j++)
    periodi[p].dati[i][j]=0;
 }
 
 function periodocopiatot(p,s){
- for (var j=0;j<=voci;j++)
-  periodi[p].dati[s][j]=datirec[s][tot].dati[j];
+ var j;
+ for(j=0;j<=voci;j++) periodi[p].dati[s][j]=datirec[s][tot].dati[j];
 }
 
 function periododiff(p,s,v){
@@ -3492,20 +3467,18 @@ function puntiqavv(q){
 }
 
 function quadra2tonda(s){
- s=s.replace(/\[/g,'(');
- s=s.replace(/\]/g,')');
- return s;
+ return s.replace(/\[/g,'(').replace(/\]/g,')');
 }
 
 function quintcerca(s){
  var g,q,result;
  q='';
- for (g=1;g<=maxgioc;g++)
+ for(g=1;g<=maxgioc;g++)
   if (datirec[s][g].dati[vconc]==1)
    q+=String.fromCharCode(65+s)+datirec[s][g].nmaglia+' ';
  q=$.trim(q);
  result=-1;
- for (g=0;g<quintrec.length;g++)
+ for(g=0;g<quintrec.length;g++)
   if (quintrec[g].nmaglia==q){
    //trovato
    result=g;
@@ -3521,7 +3494,7 @@ function quintcerca(s){
  quintrec[result].datipro=new Array(voci+1);
  quintrec[result].datiavv=new Array(voci+1);
  quintrec[result].nmaglia=q;
- for (g=0;g<=voci;g++){
+ for(g=0;g<=voci;g++){
   quintrec[result].datipro[g]=0;
   quintrec[result].datiavv[g]=0;
  }
@@ -3573,7 +3546,7 @@ function refleggadd(rl){
  var l,i;
  l=reflegg.length;
  reflegg[l]={riga:['','','']};
- for (i=0;i<=2;i++){
+ for(i=0;i<=2;i++){
   reflegg[l].riga[i]=rl[i];
   rl[i]='';
  }
@@ -3617,7 +3590,7 @@ function resetdati(soloprt){
  tempodigioco=0;
  contropiede=0;
  contropiedecmb=false;
- rimbalzooff=false;
+ rimbalzooff=0;
  possiniz=true;
  selsq=0;
  selgioc=sq;
@@ -3633,11 +3606,11 @@ function resetdati(soloprt){
  datirec=new Array(2);
  datirec[0]=new Array(tot+1);
  datirec[1]=new Array(tot+1);
- for (x=0;x<=1;x++){
-  for (y=dcpunti;y<=dcmp;y++){
+ for(x=0;x<=1;x++){
+  for(y=dcpunti;y<=dcmp;y++){
    daticmp[x][y]=0;
   }
-  for (y=0;y<=tot;y++){
+  for(y=0;y<=tot;y++){
    datirec[x][y]={
     codgioc:0,
     cognome:'',
@@ -3651,13 +3624,13 @@ function resetdati(soloprt){
     tiri:''
    };
    datirec[x][y].dati=new Array(voci+1);
-   for (z=0;z<=voci;z++){
+   for(z=0;z<=voci;z++){
     datirec[x][y].dati[z]=0
    }
   }
  }
  adrec=new Array(2);
- for (x=0;x<=1;x++){
+ for(x=0;x<=1;x++){
   adrec[x]={
    cpnum:0,
    cppp:0,
@@ -3696,7 +3669,7 @@ function resetdati(soloprt){
  };
  attaccorec[0].dati=new Array(voci+1);
  attaccoidx=[0,0];
- for (z=0;z<=voci;z++){
+ for(z=0;z<=voci;z++){
   quintrec[0].datipro[z]=0;
   quintrec[0].datiavv[z]=0;
   difesarec[0].dati[z]=0;
@@ -3716,11 +3689,11 @@ function saveallref(){
  localStorage.refertotxt=prt2rec.referto;
 }
 
-function saveprt(){
- var g,i,s,ndq,cg,dq,rg;
+function saveprt(callback,cbparam){
+ var cg,dq,g,i,mappa,ndq,o,s;
  // per inserire ris e parz nel referto
  refiniz();
- s={referto:prt2rec.referto,
+ s={codprt:prtrec.codprt,referto:prt2rec.referto,
   nomesqa:prt2rec.nomesq[0],nomesqb:prt2rec.nomesq[1],
   coacha:prt2rec.coach[0],coachb:prt2rec.coach[1],
   ris:prt2rec.ris,
@@ -3729,58 +3702,63 @@ function saveprt(){
   rilevatori:prt2rec.rilevatori,
   note:prt2rec.note
  };
- updaterec('prt2',prtrec.codprt,s);
- deleterec('dati',function(x,y){
-  return adb.dati[x][adf.dati.codprt]==y;
- },prtrec.codprt);
- //salva i record dati
- ndq=0;
- for(i=0;i<=1;i++){
-  for(g=1;g<=tot;g++){
-   if ((g<=datirec[i][tot].dati[vcprt])||(g>=sq)){
-    if (g>=sq){
-     cg=maxgioc-g;
-     if (g==sq)
-      dq='0';
-     else
-      dq=ndq;
-    } else {
-     cg=datirec[i][g].codgioc;
-     if (datirec[i][g].dati[vcff]>=camprec.maxfalli){
-      dq=1;
-      ndq++;
-     } else
-      dq=0;
+ fdb.updateRec('prt2',s,saveprtcb1);
+
+ function saveprtcb1(){
+  fdb.deleteRec('dati',function(x,y){
+   return x.codprt==y;
+  },prtrec.codprt,saveprtcb2);
+ }
+
+ function saveprtcb2(){
+  fdb.idNewRec('dati',saveprtcb3);
+ }
+
+ function saveprtcb3(id){
+  mappa=[];
+  ndq=0;
+  for(i=0;i<=1;i++){
+   for(g=1;g<=tot;g++){
+    if ((g<=datirec[i][tot].dati[vcprt])||(g>=sq)){
+     if (g>=sq){
+      cg=maxgioc-g;
+      if (g==sq) dq='0';
+      else dq=ndq;
+     } else {
+      cg=datirec[i][g].codgioc;
+      if (datirec[i][g].dati[vcff]>=camprec.maxfalli){
+       dq=1;
+       ndq++;
+      } else dq=0;
+     }
+     s={coddati:id,codprt:prtrec.codprt,
+      codgioc:cg,codsq:prtrec.codsq[i],
+      nmaglia:datirec[i][g].nmaglia,
+      prt:datirec[i][g].dati[vcprt],dq:dq,st:datirec[i][g].dati[vcst],
+      min:datirec[i][g].dati[vcmin],sec:datirec[i][g].dati[vcsec],
+      ff:datirec[i][g].dati[vcff],fs:datirec[i][g].dati[vcfs],
+      ts1:datirec[i][g].dati[vcts1],ts0:datirec[i][g].dati[vcts0],
+      tf1:datirec[i][g].dati[vctf1],tf0:datirec[i][g].dati[vctf0],
+      t31:datirec[i][g].dati[vct31],t30:datirec[i][g].dati[vct30],
+      tl1:datirec[i][g].dati[vctl1],tl0:datirec[i][g].dati[vctl0],
+      ro:datirec[i][g].dati[vcro],rd:datirec[i][g].dati[vcrd],
+      sd:datirec[i][g].dati[vcsd],ss:datirec[i][g].dati[vcss],
+      pp:datirec[i][g].dati[vcpp],pr:datirec[i][g].dati[vcpr],
+      ass:datirec[i][g].dati[vcas],sc:datirec[i][g].dati[vcsc1],
+      pm:datirec[i][g].dati[vcpm],stl1:datirec[i][g].dati[vcstl1],
+      stl6:datirec[i][g].dati[vcstl6],seqtl:datirec[i][g].seqtl,
+      tiri:datirec[i][g].tiri};
+     mappa.push(s);
+     id++;
     }
-    s={codprt:prtrec.codprt,
-     codgioc:cg,
-     codsq:prtrec.codsq[i],
-     nmaglia:datirec[i][g].nmaglia,
-     prt:datirec[i][g].dati[vcprt],dq:dq,st:datirec[i][g].dati[vcst],
-     min:datirec[i][g].dati[vcmin],sec:datirec[i][g].dati[vcsec],
-     ff:datirec[i][g].dati[vcff],fs:datirec[i][g].dati[vcfs],
-     ts1:datirec[i][g].dati[vcts1],ts0:datirec[i][g].dati[vcts0],
-     tf1:datirec[i][g].dati[vctf1],tf0:datirec[i][g].dati[vctf0],
-     t31:datirec[i][g].dati[vct31],t30:datirec[i][g].dati[vct30],
-     tl1:datirec[i][g].dati[vctl1],tl0:datirec[i][g].dati[vctl0],
-     ro:datirec[i][g].dati[vcro],rd:datirec[i][g].dati[vcrd],
-     sd:datirec[i][g].dati[vcsd],ss:datirec[i][g].dati[vcss],
-     pp:datirec[i][g].dati[vcpp],pr:datirec[i][g].dati[vcpr],
-     ass:datirec[i][g].dati[vcas],sc:datirec[i][g].dati[vcsc1],
-     pm:datirec[i][g].dati[vcpm],stl1:datirec[i][g].dati[vcstl1],
-     stl6:datirec[i][g].dati[vcstl6],seqtl:datirec[i][g].seqtl,
-     tiri:datirec[i][g].tiri};
-    rg=newrec('dati');
-    updaterec('dati',rg,s);
    }
   }
+  fdb.tabPut('dati',mappa,saveprtcb4);
  }
- savedb();
- alert('INFORMAZIONE\nSalvataggio dati eseguito!');
- localStorage.removeItem('refertotxt');
- sessionStorage.removeItem('refertoold');
- localStorage.removeItem('abflag');
- vai('index.htm');
+
+ function saveprtcb4(){
+  eseguiCB(callback,cbparam);
+ }
 }
 
 function setdatocmp(s,d){
@@ -3917,7 +3895,7 @@ function sintassi(testo,intflag){
   }
   tdc=trim(testo.substr(((puflag)?1:0),sep-((puflag)?1:0)));
   //cerca un giocatore della squadra selezionata
-  sint=-1;
+  sint=-1;//non accettabile
   s=selsq;
   dato=gioccerca(s,tdc);
   s=dato[0];
@@ -3943,7 +3921,7 @@ function sintassi(testo,intflag){
       testo=testo.substring(0,sp)+t+testo.substr(sp);
      }
     } else {
-     sint=-1;
+     sint=-1;//non accettabile
      puflag=false;
     }
    }
@@ -3970,14 +3948,14 @@ function sintassi(testo,intflag){
    }
   }
   //cerca dato stat
-  if (sint==-1){
+  if (sint==-1){//non accettabile
    v='FF FS TS1TS0TF1TF0T31T30TL1TL0RO RD SD SS PP PR AS SC1PRIAP RFTFFPFSPFFAFSATL-TX1TX0TY1TY0'.indexOf((tdc+'   ').substr(0,3));
    dato=Math.floor(v/3)+vcff;
    if ((v%3)==0){
     sint=0;
     //se selgioc=sq scarta alcuni dati
     if ((selgioc==sq)&&([vcts0,vctf0,vct30,vctl1,vctl0,vcsd,vcss,vcas,vcsc1,vctlm,vctx0,vcty0].indexOf(dato)>=0)){
-     sint=2; //error no alla squadra
+     sint=2;//errore no alla squadra
      errore=quadra2tonda(trim(testo.substr(0,sp)));
     }
     if (sint==0){
@@ -4069,7 +4047,7 @@ function sintassi(testo,intflag){
         }
        }
        if (dato>vcsc1){
-        sint=5; //errore tiro indefinito
+        sint=5;//errore tiro indefinito
         errore=quadra2tonda(trim(testo.substring(0,sp)));
        }
        if (sint!=5){
@@ -4085,13 +4063,13 @@ function sintassi(testo,intflag){
       case vctl0:
       case vctlm:
        if ((tdc.length>5)||(['-','--','---','0-0'].indexOf((tdc.substr(2)).replace(/1/g,'0'))>=0)){
-        sint=-1;
-        errore=tdc;
+        sint=-1;//non accettabile
+        errore=quadra2tonda(tdc);
        } else
-        for (i=2;i<tdc.length;i++)
+        for(i=2;i<tdc.length;i++)
          if ('-01'.indexOf(tdc.charAt(i))<0){
-          sint=-1;
-          errore=tdc;
+          sint=-1;//non accettabile
+          errore=quadra2tonda(tdc);
          }
        if (sint==0){
         righe.push(giocsel+' '+tdc);
@@ -4158,7 +4136,7 @@ function sintassi(testo,intflag){
    }
   }
   //altre voci
-  if (sint==-1){
+  if (sint==-1){//non accettabile
    v=("NOTE'   ERR ATT ENT S   TMP CP  DA  DB  AA  AB  ").indexOf((tdc+'    ').substr(0,4));
    dato=Math.floor(v/4)+1;
    if ((v%4)==0){
@@ -4246,7 +4224,7 @@ function sintassi(testo,intflag){
   //aggiunge avvertenze ed errori di sintassi
   switch (sint){
    case -1:
-    righe.push('ERR['+trim(testo.substring(0,sp))+': non accettabile]');
+    righe.push('ERR['+quadra2tonda(trim(testo.substring(0,sp)))+': non accettabile]');
     break;
    case 0: //OK
    case 1: //non in campo
@@ -4331,7 +4309,7 @@ function stpattacchi(esporta){
  w+='<colgroup></colgroup>';
  w+='<colgroup></colgroup>';
  w+='<colgroup></colgroup>';
- for (s=0;s<=1;s++){
+ for(s=0;s<=1;s++){
   if (datirec[s][tot].dati[vcprt]==0)
    continue;
   w+='<tr class="tac"><td colspan="25" class="titolo lrg"><b>'+htmlentities(prt2rec.nomesq[s])+'</b></td></tr>';
@@ -4354,7 +4332,7 @@ function stpattacchi(esporta){
   w+='<td><i>VAL</i></td>';
   w+='<td class="tac"><i>OERR</i></td>';
   w+='<td><i>&plusmn;</i></td></tr>';
-  for (q=1;q<attaccorec.length;q++){
+  for(q=1;q<attaccorec.length;q++){
    if (attaccorec[q].dati[vcprt]!=s)
     continue;
    w+='<tr class="tar">';
@@ -4362,7 +4340,7 @@ function stpattacchi(esporta){
    possessi=attaccorec[q].dati[vcts1]+attaccorec[q].dati[vcts0]+attaccorec[q].dati[vctf1]+attaccorec[q].dati[vctf0]+attaccorec[q].dati[vct31]+attaccorec[q].dati[vct30]+attaccorec[q].dati[vcpp]-attaccorec[q].dati[vcro]+Math.floor(attaccorec[q].dati[vcstl6]/6);
    w+='<td>'+possessi+'</td>';
    w+='<td>'+puntia(q)+'</td>';
-   for (i=vcff;i<=vcfs;i++)
+   for(i=vcff;i<=vcfs;i++)
     w+='<td>'+attaccorec[q].dati[i]+'</td>';
    i=vcts1;
    while (i<vctl0){
@@ -4389,7 +4367,7 @@ function stpattacchi(esporta){
     x=(attaccorec[q].dati[vcstl6]%6)==0?0:1;
     w+='<td>('+(attaccorec[q].dati[vcstl6]/6).toFixed(x).replace('.',',')+')</td>';
    }
-   for (i=vcro;i<=vcas;i++)
+   for(i=vcro;i<=vcas;i++)
     w+='<td>'+attaccorec[q].dati[i]+'</td>';
    w+='<td>'+valuta(q)+'</td>';
    //j=possessi+attaccorec[q].dati[vcro];
@@ -4405,7 +4383,7 @@ function stpattacchi(esporta){
    w+='<td>100</td>';
    mlt=100/possessi;
    w+='<td>'+(puntia(q)*mlt).toFixed(1).replace('.',',')+'</td>';
-   for (i=vcff;i<=vcfs;i++)
+   for(i=vcff;i<=vcfs;i++)
     w+='<td>'+(attaccorec[q].dati[i]*mlt).toFixed(1).replace('.',',')+'</td>';
    i=vcts1;
    while (i<vctl0){
@@ -4427,7 +4405,7 @@ function stpattacchi(esporta){
    } else {
     w+='<td>('+(attaccorec[q].dati[vcstl6]/6*mlt).toFixed(1).replace('.',',')+')</td>';
    }
-   for (i=vcro;i<=vcas;i++)
+   for(i=vcro;i<=vcas;i++)
     w+='<td>'+(attaccorec[q].dati[i]*mlt).toFixed(1).replace('.',',')+'</td>';
    w+='<td>'+(valuta(q)*mlt).toFixed(1).replace('.',',')+'</td>';
    w+='<td>'+(attaccorec[q].dati[vcpm]*mlt).toFixed(1).replace('.',',')+'</td>';
@@ -4498,7 +4476,7 @@ function stpdifese(esporta){
  w+='<colgroup></colgroup>';
  w+='<colgroup></colgroup>';
  w+='<colgroup></colgroup>';
- for (s=0;s<=1;s++){
+ for(s=0;s<=1;s++){
   if (datirec[1-s][tot].dati[vcprt]==0)
    continue;
   w+='<tr class="tac"><td colspan="25" class="titolo lrg"><b>'+htmlentities(prt2rec.nomesq[s])+'</b></td></tr>';
@@ -4521,7 +4499,7 @@ function stpdifese(esporta){
   w+='<td><i>VAL</i></td>';
   w+='<td class="tac"><i>OERR</i></td>';
   w+='<td><i>&plusmn;</i></td></tr>';
-  for (q=1;q<difesarec.length;q++){
+  for(q=1;q<difesarec.length;q++){
    if (difesarec[q].dati[vcprt]!=s)
     continue;
    w+='<tr class="tar">';
@@ -4529,7 +4507,7 @@ function stpdifese(esporta){
    possessi=difesarec[q].dati[vcts1]+difesarec[q].dati[vcts0]+difesarec[q].dati[vctf1]+difesarec[q].dati[vctf0]+difesarec[q].dati[vct31]+difesarec[q].dati[vct30]+difesarec[q].dati[vcpp]-difesarec[q].dati[vcro]+Math.floor(difesarec[q].dati[vcstl6]/6);
    w+='<td>'+possessi+'</td>';
    w+='<td>'+puntid(q)+'</td>';
-   for (i=vcff;i<=vcfs;i++)
+   for(i=vcff;i<=vcfs;i++)
     w+='<td>'+difesarec[q].dati[i]+'</td>';
    i=vcts1;
    while (i<vctl0){
@@ -4556,7 +4534,7 @@ function stpdifese(esporta){
     x=(difesarec[q].dati[vcstl6]%6)==0?0:1;
     w+='<td>('+(difesarec[q].dati[vcstl6]/6).toFixed(x).replace('.',',')+')</td>';
    }
-   for (i=vcro;i<=vcas;i++)
+   for(i=vcro;i<=vcas;i++)
     w+='<td>'+difesarec[q].dati[i]+'</td>';
    w+='<td>'+valutd(q)+'</td>';
    //j=possessi+difesarec[q].dati[vcro];
@@ -4572,7 +4550,7 @@ function stpdifese(esporta){
    w+='<td>100</td>';
    mlt=100/possessi;
    w+='<td>'+(puntid(q)*mlt).toFixed(1).replace('.',',')+'</td>';
-   for (i=vcff;i<=vcfs;i++)
+   for(i=vcff;i<=vcfs;i++)
     w+='<td>'+(difesarec[q].dati[i]*mlt).toFixed(1).replace('.',',')+'</td>';
    i=vcts1;
    while (i<vctl0){
@@ -4595,7 +4573,7 @@ function stpdifese(esporta){
    } else {
     w+='<td>('+(difesarec[q].dati[vcstl6]/6*mlt).toFixed(1).replace('.',',')+')</td>';
    }
-   for (i=vcro;i<=vcas;i++)
+   for(i=vcro;i<=vcas;i++)
     w+='<td>'+(difesarec[q].dati[i]*mlt).toFixed(1).replace('.',',')+'</td>';
    w+='<td>'+(valutd(q)*mlt).toFixed(1).replace('.',',')+'</td>';
    w+='<td>'+(difesarec[q].dati[vcpm]*mlt).toFixed(1).replace('.',',')+'</td>';
@@ -4645,7 +4623,7 @@ function stpmappe(s,esporta){
  w+='<h2>Mappe di tiro '+htmlentities(prt2rec.nomecortosq[s])+'</h2>';
  w+='<table class="ctr">';
  x=2;
- for (g=1;g<=datirec[s][tot].dati[vcprt];g++){
+ for(g=1;g<=datirec[s][tot].dati[vcprt];g++){
   x++;
   if (x>=y){
    if (g>1)
@@ -4684,7 +4662,7 @@ function stpmappe(s,esporta){
   w+='</table>';
   w+='</td>';
  }
- for (g=x+1;g<y;g++){
+ for(g=x+1;g<y;g++){
   w+='<td></td>';
  }
  if (datirec[s][tot].dati[vcprt]>=1)
@@ -4692,9 +4670,10 @@ function stpmappe(s,esporta){
  w+='</table>';
  if (esporta){
   w+='<script>'+nl;
-  w+='var cvs=document.getElementsByTagName("canvas");'+nl;
+  w+='var c,cvs;'+nl;
+  w+='cvs=document.getElementsByTagName("canvas");'+nl;
   w+='if (cvs.length>0){'+nl;
-  w+=' for (var c=0;c<cvs.length;c++){'+nl;
+  w+=' for(c=0;c<cvs.length;c++){'+nl;
   w+='  disvert(cvs[c],cvs[c].height,cvs[c].width);'+nl;
   w+='  distiri(cvs[c],cvs[c].dataset.tiro+",");'+nl;
   w+=' }'+nl;
@@ -4738,7 +4717,7 @@ function stpmappaint(esporta){
  w+='<form name="mappa">';
  w+='<table class="table table-striped table-bordered" style="margin-left: auto; margin-right: auto;">';
  w+='<thead><tr><th class="tal"><div class="checkbox"><label><input name="sq[]" type="checkbox" checked>'+htmlentities(prt2rec.nomecortosq[0])+'</label></div></th>';
- for (g=1;g<=tempodigioco;g++){
+ for(g=1;g<=tempodigioco;g++){
   w+='<th><div class="checkbox"><label><input name="tempo[]" type="checkbox" checked>';
   if (g<=camprec.tempi)
    w+=g+'&ordm; tempo';
@@ -4750,7 +4729,7 @@ function stpmappaint(esporta){
  w+='</tr></thead><tbody>';
  if (datirec[0][tot].dati[vcprt]>=datirec[1][tot].dati[vcprt]) m=datirec[0][tot].dati[vcprt];
  else m=datirec[1][tot].dati[vcprt];
- for (g=1;g<=m;g++){
+ for(g=1;g<=m;g++){
   w+='<tr>';
   if (g<=datirec[0][tot].dati[vcprt]){
    w+='<td class="tal"><div class="checkbox"><label><input name="gioca[]" type="checkbox" checked>';
@@ -4790,18 +4769,18 @@ function stpmappaint(esporta){
   w+=' var ta='+JSON.stringify(ta)+';'+nl;
   w+='ridisegna();'+nl;
   w+='e=(document.mappa.elements[\'sq[]\'])||new Array();'+nl;
-  w+='for (i=0;i<e.length;i++) e[i].onclick=Function(\'setsqclick(\'+i+\',this.checked);\');'+nl;
+  w+='for(i=0;i<e.length;i++) e[i].onclick=Function(\'setsqclick(\'+i+\',this.checked);\');'+nl;
   w+='e=(document.mappa.elements[\'tempo[]\'])||new Array();'+nl;
-  w+='for (i=0;i<e.length;i++) e[i].onclick=ridisegna;'+nl;
-  w+='for (c=0;c<=1;c++){'+nl;
+  w+='for(i=0;i<e.length;i++) e[i].onclick=ridisegna;'+nl;
+  w+='for(c=0;c<=1;c++){'+nl;
   w+=' e=(document.mappa.elements[\'gioc\'+((\'ab\').charAt(c))+\'[]\'])||new Array();'+nl;
-  w+=' for (i=0;i<e.length;i++) e[i].onclick=ridisegna;'+nl;
+  w+=' for(i=0;i<e.length;i++) e[i].onclick=ridisegna;'+nl;
   w+='}'+nl;
   w+=nl;
   w+='function setsqclick(s,c){'+nl;
   w+=' var g,gioc;'+nl;
   w+=' gioc=(document.mappa.elements[\'gioc\'+((\'ab\').charAt(s))+\'[]\'])||new Array();'+nl;
-  w+=' for (g=0;g<gioc.length;g++) gioc[g].checked=c;'+nl;
+  w+=' for(g=0;g<gioc.length;g++) gioc[g].checked=c;'+nl;
   w+=' ridisegna();'+nl;
   w+='}'+nl;
   w+=nl;
@@ -4809,9 +4788,9 @@ function stpmappaint(esporta){
   w+=' var g,gioc,s,t,tmp;'+nl;
   w+=' tmp=(document.mappa.elements[\'tempo[]\'])||new Array();'+nl;
   w+=' disvert(cvs,560,300,false);'+nl;
-  w+=' for (s=0;s<=1;s++){'+nl;
+  w+=' for(s=0;s<=1;s++){'+nl;
   w+='  gioc=(document.mappa.elements[\'gioc\'+((\'ab\').charAt(s))+\'[]\'])||new Array();'+nl
-  w+='  for (t=0;t<tmp.length;t++) if (tmp[t].checked) for (g=0;g<gioc.length;g++) if (gioc[g].checked) distiri(cvs,ta[s][g][t]+\',\',s);'+nl;
+  w+='  for(t=0;t<tmp.length;t++) if (tmp[t].checked) for(g=0;g<gioc.length;g++) if (gioc[g].checked) distiri(cvs,ta[s][g][t]+\',\',s);'+nl;
   w+=' }'+nl;
   w+='}'+nl;
   w+=nl;
@@ -4866,10 +4845,10 @@ function stppresroster(esporta){
  w+='<h5>Arbitri: '+htmlentities(prt2rec.arbitri)+'</h5>';
  w+='<h1>'+htmlentities(prt2rec.nomesq[0])+'<br>vs<br>'+htmlentities(prt2rec.nomesq[1])+'</h1>';
  w+='<table class="ctr">';
- for (s=0;s<=1;s++){
+ for(s=0;s<=1;s++){
   w+='<tr class="tac"><td colspan="5"><h3>'+htmlentities(prt2rec.nomecortosq[s])+'</h3>All.: '+htmlentities(prt2rec.coach[s])+'</td></tr>';
   w+='<tr><th>#</th><th></th><th>Anno</th><th>Alt.</th><th>Ruolo</th></tr>';
-  for (g=1;g<=datirec[s][tot].dati[vcprt];g++){
+  for(g=1;g<=datirec[s][tot].dati[vcprt];g++){
    w+='<tr class="tar">';
    w+='<td>'+datirec[s][g].nmaglia+'</td>';
    w+='<td class="tal">'+htmlentities(datirec[s][g].nome+' '+datirec[s][g].cognome)+'</td>';
@@ -4946,7 +4925,7 @@ function stpquintetti(esporta){
  w+='<colgroup></colgroup>';
  w+='<colgroup></colgroup>';
  w+='<colgroup></colgroup>';
- for (s=0;s<=1;s++){
+ for(s=0;s<=1;s++){
   if (datirec[s][tot].dati[vcprt]==0)
    continue;
   w+='<tr class="tac"><td colspan="30" class="lrg"><b>'+htmlentities(prt2rec.nomesq[s])+'</b></td></tr>';
@@ -4969,7 +4948,7 @@ function stpquintetti(esporta){
   w+='<td><i>VAL</i></td>';
   w+='<td class="tac"><i>OERR</i></td>';
   w+='<td><i>&plusmn;</i></td></tr>';
-  for (q=1;q<quintrec.length;q++){
+  for(q=1;q<quintrec.length;q++){
    if (quintrec[q].nmaglia.charCodeAt()-65!=s)
     continue;
    w+='<tr class="tar">';
@@ -4992,7 +4971,7 @@ function stpquintetti(esporta){
    j=j%60;
    t=i+'&prime;'+(('0'+j).slice(-2))+'&Prime;';
    w+='<td rowspan="2">'+t+'</td>';
-   for (i=vcff;i<=vcfs;i++)
+   for(i=vcff;i<=vcfs;i++)
     w+='<td>'+quintrec[q].datipro[i]+'</td>';
    i=vcts1;
    while (i<vctl0){
@@ -5019,7 +4998,7 @@ function stpquintetti(esporta){
     x=(quintrec[q].datipro[vcstl6]%6)==0?0:1;
     w+='<td>('+(quintrec[q].datipro[vcstl6]/6).toFixed(x).replace('.',',')+')</td>';
    }
-   for (i=vcro;i<=vcas;i++)
+   for(i=vcro;i<=vcas;i++)
     w+='<td>'+quintrec[q].datipro[i]+'</td>';
    w+='<td>'+valutq(q)+'</td>';
    j=quintrec[q].datipro[vcts1]+quintrec[q].datipro[vcts0]+quintrec[q].datipro[vctf1]+quintrec[q].datipro[vctf0]+quintrec[q].datipro[vct31]+quintrec[q].datipro[vct30]+quintrec[q].datipro[vcpp]-quintrec[q].datipro[vcro];
@@ -5034,7 +5013,7 @@ function stpquintetti(esporta){
    w+='<tr class="tar">';
    w+='<td class="tal"><i>Avversari</i></td>';
    w+='<td>'+puntiqavv(q)+'</td>';
-   for (i=vcff;i<=vcfs;i++)
+   for(i=vcff;i<=vcfs;i++)
     w+='<td>'+quintrec[q].datiavv[i]+'</td>';
    i=vcts1;
    while (i<vctl0){
@@ -5061,7 +5040,7 @@ function stpquintetti(esporta){
     x=(quintrec[q].datiavv[vcstl6]%6)==0?0:1;
     w+='<td>('+(quintrec[q].datiavv[vcstl6]/6).toFixed(x).replace('.',',')+')</td>';
    }
-   for (i=vcro;i<=vcas;i++)
+   for(i=vcro;i<=vcas;i++)
     w+='<td>'+quintrec[q].datiavv[i]+'</td>';
    w+='<td>'+valutqavv(q)+'</td>';
    j=quintrec[q].datiavv[vcts1]+quintrec[q].datiavv[vcts0]+quintrec[q].datiavv[vctf1]+quintrec[q].datiavv[vctf0]+quintrec[q].datiavv[vct31]+quintrec[q].datiavv[vct30]+quintrec[q].datiavv[vcpp]-quintrec[q].datiavv[vcro];
@@ -5120,7 +5099,7 @@ function stpreflegg(esporta){
  w+='<col style="width: 40%;">';
  w+='<col style="width: 20%;">';
  w+='<col style="width: 40%;">';
- for (r=0;r<reflegg.length;r++){
+ for(r=0;r<reflegg.length;r++){
   w+='<tr>';
   d=reflegg[r].riga[0].indexOf('<div');
   if (d>0)
@@ -5142,7 +5121,7 @@ function stpreflegg(esporta){
   w+='<script>'+nl;
   w+='var cvs=document.getElementsByTagName("canvas");'+nl;
   w+='if (cvs.length>0){'+nl;
-  w+=' for (var c=0;c<cvs.length;c++){'+nl;
+  w+=' for(var c=0;c<cvs.length;c++){'+nl;
   w+='  disvert(cvs[c],cvs[c].height,cvs[c].width);'+nl;
   w+='  distiri(cvs[c],cvs[c].dataset.tiro+",");'+nl;
   w+=' }'+nl;
@@ -5200,9 +5179,9 @@ function stpstatistiche(esporta){
  w+=' ('+prt2rec.parz+') &bull; Arbitri: '+htmlentities(prt2rec.arbitri);
  w+='</i></b></td></tr>';
  if (tempodigioco>1)
-  for (s=0;s<=1;s++)
+  for(s=0;s<=1;s++)
    periodocopiatot(tempodigioco,s);
- for (s=0;s<=1;s++){
+ for(s=0;s<=1;s++){
   if (datirec[s][tot].dati[vcprt]==0)
    continue;
   j=datirec[s][tot].dati[vcts1]+datirec[s][tot].dati[vcts0]+datirec[s][tot].dati[vctf1]+datirec[s][tot].dati[vctf0]+datirec[s][tot].dati[vct31]+datirec[s][tot].dati[vct30]+datirec[s][tot].dati[vcpp];
@@ -5245,7 +5224,7 @@ function stpstatistiche(esporta){
   if (numcol==27)
    w+='<td><i>&plusmn;</i></td>';
   w+='</tr>';
-  for (g=1;g<=tot;g++){
+  for(g=1;g<=tot;g++){
    if ((g<=datirec[s][tot].dati[vcprt])||(g>=sq)){
     flag=(g!=sq);
     w+='<tr class="tar">';
@@ -5307,7 +5286,7 @@ function stpstatistiche(esporta){
     } else
      t='';
     w+='<td>'+t+'</td>';
-    for (i=vcro;i<=vcas;i++){
+    for(i=vcro;i<=vcas;i++){
      if ((flag)||([vcro,vcrd,vcpp].indexOf(i)>=0))
       t=datirec[s][g].dati[i];
      else
@@ -5338,7 +5317,7 @@ function stpstatistiche(esporta){
    }
   }
   if (tempodigioco>1){
-   for (g=1;g<=Math.abs(ent[s]);g++){
+   for(g=1;g<=Math.abs(ent[s]);g++){
     w+='<tr class="tar">';
     if (g<=camprec.tempi)
      t=g+'&ordm; tempo';
@@ -5354,7 +5333,7 @@ function stpstatistiche(esporta){
     j=j%60;
     t=i+'&prime;'+(('0'+j).slice(-2))+'&Prime;';
     w+='<td>'+t+'</td>';
-    for (i=vcff;i<=vcfs;i++)
+    for(i=vcff;i<=vcfs;i++)
      w+='<td>'+periododiff(g,s,i)+'</td>';
     i=vcts1;
     while (i<vctl0){
@@ -5384,7 +5363,7 @@ function stpstatistiche(esporta){
      t='('+(t/6).toFixed(x).replace('.',',')+')';
     }
     w+='<td>'+t+'</td>';
-    for (i=vcro;i<=vcas;i++){
+    for(i=vcro;i<=vcas;i++){
      t=periododiff(g,s,i);
      w+='<td>'+t+'</td>';
     }
@@ -5424,17 +5403,15 @@ function stpstatistiche(esporta){
 }
 
 function stptabcsv(esporta){
- var nl='\n';
- var w='';
- if (! esporta)
-  w+='<pre>';
+ var d,g,i,m,nl='\n',p,s,w='',y;
+ if (!esporta) w+='<pre>';
  w+='"'+camprec.nomecamp+' Gir. '+camprec.girone+'"'+nl;
- var s=prtrec.dataora;
- var y=parseInt(s.substr(0,4),10);
- var m=parseInt(s.substr(5,2),10);
- var g=parseInt(s.substr(8,2),10);
- var d=new Date(y,m-1,g);
- var p=[punti(0,sq),punti(1,sq)];
+ s=prtrec.dataora;
+ y=parseInt(s.substr(0,4),10);
+ m=parseInt(s.substr(5,2),10);
+ g=parseInt(s.substr(8,2),10);
+ d=new Date(y,m-1,g);
+ p=[punti(0,sq),punti(1,sq)];
  w+='"'+g+'/'+m+'/'+y+ '"'+nl;
  w+=nl;
  w+=nl;
@@ -5447,7 +5424,7 @@ function stptabcsv(esporta){
   m=datirec[0][tot].dati[vcprt];
  else
   m=datirec[1][tot].dati[vcprt];
- for (var i=1;i<=m;i++){
+ for(i=1;i<=m;i++){
   if (i<=datirec[0][tot].dati[vcprt]){
    w+='"'+datirec[0][i].nmaglia+'"'+';';
    w+='"'+datirec[0][i].cognome+' '+datirec[0][i].nome+'";';
@@ -5461,7 +5438,7 @@ function stptabcsv(esporta){
   }
   w+=nl;
  }
- for (i=m+1;i<=12;i++)
+ for(i=m+1;i<=12;i++)
   w+=';;;;;;' + nl;
  if (p[0]+p[1]!=0){
   if (p[0]!=0){
@@ -5488,20 +5465,19 @@ function stptabcsv(esporta){
 }
 
 function stptabtxt(esporta){
- var nl='\n';
- var w='';
+ var i,nl='\n',p,s,w='';
  if (! esporta)
   w+='<pre style="white-space: pre-wrap; white-space: -moz-pre-wrap; white-space: -pre-wrap; white-space: -o-pre-wrap; word-wrap: break-word;">';
  w+=prt2rec.nomecortosq[0]+' - '+prt2rec.nomecortosq[1]+' '+prt2rec.ris+nl;
  w+='('+prt2rec.parz+')'+nl;
- for (var s=0;s<=1;s++){
+ for(s=0;s<=1;s++){
   w+=nl;
   w+=prt2rec.nomesq[s]+': ';
-  for (var i=1;i<=datirec[s][tot].dati[vcprt];i++){
+  for(i=1;i<=datirec[s][tot].dati[vcprt];i++){
    if (i>1)
     w+=', ';
    w+=datirec[s][i].cognome+' '+datirec[s][i].nome;
-   var p=punti(s,i);
+   p=punti(s,i);
    if (p>0)
     w+=' '+p;
   }

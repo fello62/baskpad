@@ -85,16 +85,13 @@
 
 <script src="js/jquery-1.11.2.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
-<script src="js/localforage.min.js"></script>
 <script src="js/ctrldata.js"></script>
 <script src="js/bp.js"></script>
 <script>
 <!--
-var rg;
-var act;
-var ordine='societa';
-var verso='asc';
-leggirighe();
+var act,ordine='societa',rg,verso='asc';
+
+aspettaDB(leggirighe);
 
 $('#intest > th[data-ord]')
 .css('cursor','pointer')
@@ -113,16 +110,13 @@ $('#intest > th[data-ord]')
 });
 
 $('#modModal').on('show.bs.modal',function(event){
+ var bt,button,hid,modal,titolo,vis;
  // trova il Button che ha aperto il Modal
- var button=$(event.relatedTarget);
+ button=$(event.relatedTarget);
  // trova la riga del Button
  rg=button.data('riga');
  act=button.hasClass('eli');
- var modal=$(this);
- var titolo;
- var bt;
- var hid;
- var vis;
+ modal=$(this);
  if (act){
   titolo='Eliminazione';
   $('#elinome').text($('#rg'+rg).text());
@@ -148,10 +142,11 @@ $('#modModal').on('show.bs.modal',function(event){
 });
 
 $('#modModal').on('shown.bs.modal',function(event){
+ var o;
  if (act){
   $(this).find('button[type=submit]').focus();
  } else {
-  var o=document.f.nome;
+  o=document.f.nome;
   o.focus();
   o.setSelectionRange(0,o.value.length);
  }
@@ -164,55 +159,51 @@ $(document.f.nome).on('blur',function(event){
 $(document.f).on('submit',function(event){
  var ar;
  if (act){
-  deleterec('soc',function(x,y){
-   return adb.soc[x][0]==y;
-  },rg);
+  fdb.deleteRec('soc',function(x,y){
+   return x.codsoc==y;
+  },rg,leggirighe);
  } else {
-  if (rg==0)
-   rg=newrec('soc');
   maiusc(document.f.nome);
-  ar={societa:document.f.nome.value};
-  updaterec('soc',rg,ar);
+  if (rg==0) fdb.idNewRec('soc',saveRec);
+  else saveRec(rg);
+
+  function saveRec(rg){
+   ar={codsoc:rg,societa:document.f.nome.value};
+   fdb.updateRec('soc',ar,leggirighe);
+  }
  }
  $('#modModal').modal('hide');
- savedb();
- leggirighe();
  return false;
 });
 
 function leggirighe(){
- var c,i,h,r,mappa,chiavi;
- if (leggendo){
-  setTimeout(function(){leggirighe();},100);
-  return;
- }
- chiavi=Object.keys(adf.soc);
- chiavi.pop();
- mappa=adb.soc.map(function(el){
-  h={};
-  for(i=0;i<chiavi.length;i++)
-   h[chiavi[i]]=el[i];
-  return h;
- });
- if (adf.soc.tipo[adf.soc[ordine]]=='n')
-  mappa.sort(function(a,b){
-   return (a[ordine]-b[ordine])*(verso=='asc'?1:-1);
-  });
- else
-  mappa.sort(function(a,b){
-   return ((a[ordine]==b[ordine])?0:((a[ordine]>b[ordine])?1:-1))*(verso=='asc'?1:-1);
-  });
- h='';
- for(i=0;i<mappa.length;i++){
-  r=mappa[i];
-  c=r.codsoc;
-  j=r.societa;
-  h+='<tr><td><button type="button" class="btn btn-default" data-toggle="modal" data-target="#modModal" data-riga="'+c+'"><span class="glyphicon glyphicon-pencil"></span></button></td>';
-  h+='<td><button type="button" class="btn btn-default eli" data-toggle="modal" data-target="#modModal" data-riga="'+c+'"><span class="glyphicon glyphicon-remove"></span></button></td>';
-  h+='<td id="rg'+c+'">'+htmlentities(j)+'</td>';
-  h+='<td>'+c+'</td></tr>';
- }
- $('#righe').html(h);
+ var h,i,r;
+ fdb.tabRec('soc',leggirighecb);
+
+ function leggirighecb(mappa){
+  if (mappa.length>0){
+   if (adf.soc.tipo[adf.soc[ordine]]=='n')
+    mappa.sort(function(a,b){
+     return (a[ordine]-b[ordine])*(verso=='asc'?1:-1);
+    });
+   else
+    mappa.sort(function(a,b){
+     return ((a[ordine]==b[ordine])?0:((a[ordine]>b[ordine])?1:-1))*(verso=='asc'?1:-1);
+    });
+  } else {//nessun record
+   $('#righe').html('');
+   return;
+  }
+  h='';
+  for(i=0;i<mappa.length;i++){
+   r=mappa[i];
+   h+='<tr><td><button type="button" class="btn btn-default" data-toggle="modal" data-target="#modModal" data-riga="'+r.codsoc+'"><span class="glyphicon glyphicon-pencil"></span></button></td>';
+   h+='<td><button type="button" class="btn btn-default eli" data-toggle="modal" data-target="#modModal" data-riga="'+r.codsoc+'"><span class="glyphicon glyphicon-remove"></span></button></td>';
+   h+='<td id="rg'+r.codsoc+'">'+htmlentities(r.societa)+'</td>';
+   h+='<td>'+r.codsoc+'</td></tr>';
+  }
+  $('#righe').html(h);
+ };
 }
 -->
 </script>

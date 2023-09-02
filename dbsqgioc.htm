@@ -138,18 +138,15 @@
 
 <script src="js/jquery-1.11.2.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
-<script src="js/localforage.min.js"></script>
 <script src="js/fastclick.min.js"></script>
 <script src="js/ctrldata.js"></script>
 <script src="js/bp.js"></script>
 <script>
 <!--
-var rg;
-var ansp='';
-var codsq='';
-var cat='';
-var codsqgioc='';
-leggioptas();
+var ansp,cat,codgioc,codsq,codsqgioc,rg;
+ansp=cat=codgioc=codsq=codsqgioc='';
+
+aspettaDB(leggioptas);
 
 $('button.tast').click(function(event){
  var v,i=$(document.f.nmaglia);
@@ -178,8 +175,9 @@ $('#modModal').on('show.bs.modal',function(event){
   button=$('#sg'+codsqgioc);
  } else {
   button=$(event.relatedTarget);
-  codsqgioc=button.attr('id').substr(2);
+  codsqgioc=1*(button.attr('id').substr(2));
  }
+ codgioc=button.data('codgioc');
  $('#gioc').text(button.parents('td').next('td').text());
  document.f.nmaglia.value=button.text().replace(/[^\d]/g,'');
 });
@@ -192,6 +190,7 @@ $('#modModal').on('shown.bs.modal',function(event){
 
 $('#modModal').on('hidden.bs.modal',function(event){
  codsqgioc='';
+ codgioc='';
 });
 
 $(document.f.nmaglia).on('input',function(event){
@@ -199,14 +198,14 @@ $(document.f.nmaglia).on('input',function(event){
 });
 
 $(document.f).on('submit',function(event){
- var nm,s;
+ var ar,nm;
  solonumeri(document.f.nmaglia);
  nm=('  '+document.f.nmaglia.value).substr(document.f.nmaglia.value.length);
- s={nmaglia:((nm=='  ')?'':nm)};
- $('#sg'+codsqgioc).text(nm);
+ nm=(nm=='  ')?'':nm;
+ ar={codsqgioc:codsqgioc,codsq:codsq,codgioc:codgioc,nmaglia:nm};
+ $('#sg'+codsqgioc).text((nm=='')?'?':nm);
  $('#modModal').modal('hide');
- updaterec('sqgioc',codsqgioc,s);
- savedb();
+ fdb.updateRec('sqgioc',ar);
  return false;
 });
 
@@ -216,28 +215,34 @@ $(document.a.annosport).on('change',function(event){
 });
 
 $(document.a.codsq).on('change',function(event){
- var s=$(this).val();
- var p=s.indexOf('_');
+ var p,s=$(this).val();
+ p=s.indexOf('_');
  codsq=s.substr(0,p);
  cat=s.substr(p+1);
- leggirighetg();
- leggirighegs();
+ leggirighe(3);
 });
 
 $('#righetg').on('click','button.mover',moverclick);
 $('#righegs').on('click','button.movel',movelclick);
 
 function moverclick(event){
- // trova il Button che ha aperto il Modal
- var button=$(this);
+ var ar,button,cg;
+ // trova il Button che ha lanciato la funzione
+ button=$(this);
  // trova la riga del Button
- rg=button.data('riga');
+ cg=button.data('riga');
  button.parents('tr').remove();
- ar={codsq:codsq,codgioc:rg,nmaglia:''};
- codsqgioc=newrec('sqgioc');
- updaterec('sqgioc',codsqgioc,ar);
- savedb();
- leggirighegs();
+ fdb.idNewRec('sqgioc',saveRec);
+
+ function saveRec(rg){
+  codsqgioc=rg;
+  ar={codsqgioc:codsqgioc,codsq:codsq,codgioc:cg,nmaglia:''};
+  fdb.updateRec('sqgioc',ar,saveRec2);
+ }
+
+ function saveRec2(){
+  leggirighe(2);//giocatori squadra
+ }
 };
 
 function movelclick(event){
@@ -246,157 +251,131 @@ function movelclick(event){
  // trova la riga del Button
  rg=button.data('riga');
  button.parents('tr').remove();
- deleterec('sqgioc',function(x,y){
-  return adb.sqgioc[x][0]==y;
- },rg);
- savedb();
- leggirighetg();
+ fdb.deleteRec('sqgioc',function(x,y){
+  return x.codsqgioc==y;
+ },rg,deleRec);
+
+ function deleRec(){
+  leggirighe(1);//tutti i gioc
+ }
 }
 
 function leggioptas(){
- var d,h,i,r,t,sel,v1;
- if (leggendo){
-  setTimeout(function(){leggioptas();},100);
-  return;
+ var h,i,sel,t,v1;
+ fdb.tabAs('sq',leggioptascb);
+
+ function leggioptascb(mappa){
+  h=v1='';
+  for(i=0;i<mappa.length;i++){
+   t=mappa[i];
+   if (i==0) v1=t;
+   if ((ansp.length>0)&&(ansp==t)) v1=t;
+   h+='<option>'+t+'</option>';
+  }
+  ansp=v1;
+  sel=$(document.a.annosport);
+  sel.html(h);
+  if (ansp.length>0) sel.val(ansp);
+  leggioptcs();
  }
- r={};
- d=adf.sq.annosport;
- for(i=0;i<adb.sq.length;i++)
-  r[adb.sq[i][d]]=i;
- r=Object.keys(r);
- r.sort(function(a,b){
-  return ((a==b)?0:((a>b)?-1:1));
- });
- h=v1='';
- for(i=0;i<r.length;i++){
-  t=r[i];
-  if (i==0)
-   v1=t;
-  if ((ansp.length>0)&&(ansp==t))
-   v1=t;
-  h+='<option>'+t+'</option>';
- }
- ansp=v1;
- sel=$(document.a.annosport);
- sel.html(h);
- if (ansp.length>0)
-  sel.val(ansp);
- leggioptcs();
 }
 
 function leggioptcs(){
- var c,d,h,i,j,r,ar,ccodsoc,chiavi,mappa,v1,v2;
- chiavi=Object.keys(adf.sq);
- chiavi.pop();
- r=chiavi.length;
- c=adf.sq.codsoc;
- d=adf.sq.annosport;
- mappa=[];
- for(i=0;i<adb.sq.length;i++)
-  if (adb.sq[i][d]==ansp){
-   h={};
-   for(j=0;j<r;j++)
-    h[chiavi[j]]=adb.sq[i][j];
-   mappa.push(h);
+ var c,h,i,r,v1,v2;
+ fdb.tabRecAs('sq',ansp,leggioptcscb);
+
+ function leggioptcscb(mappa){
+  if (mappa.length>0){
+   h=adf.sq.nomi;
+   for(i=adf.sq.sesso;i>=adf.sq.nomesq;i--)
+    mappa.sort(function(a,b){
+     return ((a[h[i]]==b[h[i]])?0:((a[h[i]]>b[h[i]])?1:-1));
+    });
   }
- if (mappa.length>0){
-  h=Object.keys(mappa[0]);
-  for(i=5;i>=3;i--)
-   mappa.sort(function(a,b){
-    return ((a[h[i]]==b[h[i]])?0:((a[h[i]]>b[h[i]])?1:-1));
-   });
- }
- h=v1=v2='';
- for(i=0;i<mappa.length;i++){
-  r=mappa[i];
-  c=''+r.codsq+'_'+r.cat;
-  if (i==0) {
-   v1=r.codsq;
-   v2=r.cat;
+  h=v1=v2='';
+  for(i=0;i<mappa.length;i++){
+   r=mappa[i];
+   c=''+r.codsq+'_'+r.cat;
+   if (i==0) {
+    v1=r.codsq;
+    v2=r.cat;
+   }
+   h+='<option value="'+c+'">'+r.nomesq+', '+r.cat+', '+r.sesso+'</option>';
   }
-  h+='<option value="'+c+'">'+r.nomesq+', '+r.cat+', '+r.sesso+'</option>';
- }
- codsq=v1;
- cat=v2;
- sel=$(document.a.codsq);
- sel.html(h);
- if (codsq.length>0)
-  sel.val(''+codsq+'_'+cat);
- leggirighetg();
- leggirighegs();
+  codsq=v1;
+  cat=v2;
+  sel=$(document.a.codsq);
+  sel.html(h);
+  if (codsq.length>0) sel.val(''+codsq+'_'+cat);
+  leggirighe(3);//entrambe
+ };
 }
 
-function leggirighetg(){
- var h,i,j,r,mappa,mappasq,mappasqgioc;
+function leggirighe(lrmodo){
+ var i,mappa,mappacodgioc,mappasqas,mappasqgioc,r;
  if (codsq.length==0) {
   $('#righetg').html('');
   return;
  }
- mappasq=[];
- for(i=0;i<adb.sq.length;i++)
-  if ((adb.sq[i][adf.sq.annosport]==ansp)&&(adb.sq[i][adf.sq.cat]==cat))
-   mappasq[adb.sq[i][0]]=-1;
- mappasqgioc=[];
- for(i=0;i<adb.sqgioc.length;i++)
-  if (mappasq[adb.sqgioc[i][adf.sqgioc.codsq]]==-1)
-   mappasqgioc[adb.sqgioc[i][adf.sqgioc.codgioc]]=-1;
- r=Object.keys(adf.gioc);
- r.pop();
- mappa=[];
- for(i=0;i<adb.gioc.length;i++)
-  if (mappasqgioc[adb.gioc[i][0]]!=-1){
-   h={};
-   for(j=0;j<r.length;j++)
-    h[r[j]]=adb.gioc[i][j];
-   mappa.push(h);
-  }
- if (mappa.length>0){
-  h=Object.keys(mappa[0]);
-  for(i=2;i>=1;i--)
-   mappa.sort(function(a,b){
-    return ((a[h[i]]==b[h[i]])?0:((a[h[i]]>b[h[i]])?1:-1));
-   });
- }
- $('#righetg').html(scrivirighe(mappa,'codgioc'));
-}
+ mappasqas=[];
+ if ((lrmodo&1)==0){
+  leggirighecb1([{codsq:codsq,cat:cat}]);
+ } else fdb.tabRecAs('sq',ansp,leggirighecb1);//trova i codsq con la categoria cat
 
-function leggirighegs(){
- var c,h,i,j,r,mappa,mappacodgioc,mappasqgioc;
- if (codsq.length==0) {
-  $('#righegs').html('');
-  return;
- }
- mappasqgioc=[];
- mappacodgioc=[];
- j=-1;
- for(i=0;i<adb.sqgioc.length;i++)
-  if (adb.sqgioc[i][adf.sqgioc.codsq]==codsq){
-   j++;
-   mappacodgioc[adb.sqgioc[i][adf.sqgioc.codgioc]]=j;
-   mappasqgioc[j]={codsqgioc:adb.sqgioc[i][0],nmaglia:adb.sqgioc[i][adf.sqgioc.nmaglia]};
+ function leggirighecb1(mappa){
+  for(i=0;i<mappa.length;i++){
+   r=mappa[i];
+   if (r.cat==cat) mappasqas[r.codsq]=-1;
   }
- r=Object.keys(adf.gioc);
- r.pop();
- mappa=[];
- for(i=0;i<adb.gioc.length;i++)
-  if ((c=mappacodgioc[adb.gioc[i][0]])>-1){
-   h={};
-   for(j=0;j<r.length;j++)
-    h[r[j]]=adb.gioc[i][j];
-   h.codsqgioc=mappasqgioc[c].codsqgioc;
-   h.nmaglia=mappasqgioc[c].nmaglia;
-   mappa.push(h);
-  }
- if (mappa.length>0){
-  h=Object.keys(mappa[0]);
-  for(i=2;i>=1;i--)
-   mappa.sort(function(a,b){
-    return ((a[h[i]]==b[h[i]])?0:((a[h[i]]>b[h[i]])?1:-1));
-   });
+  fdb.tabRecFilter(
+   'sqgioc',
+   function(x,y,z){if (y[x.codsq]==-1) z.push(x);},
+   mappasqas,
+   leggirighecb2);
  }
- $('#righegs').html(scrivirighe(mappa,'codsqgioc'));
- if (String(codsqgioc).length>0) {
-  $('#modModal').modal('show');
+
+ function leggirighecb2(mappasg){
+  mappacodgioc=[];
+  mappasqgioc=[];
+  for(i=0;i<mappasg.length;i++){
+   r=mappasg[i];
+   if (r.codsq==codsq){
+    mappacodgioc[r.codgioc]=-1+mappasqgioc.push({codsqgioc:r.codsqgioc,nmaglia:r.nmaglia});
+   } else {
+    mappacodgioc[r.codgioc]=-1+mappasqgioc.push(-1);
+   }
+  }
+  fdb.tabRec('gioc',leggirighecb3);
+ }
+
+ function leggirighecb3(mappagioc){
+  mappa=[[],[]];
+  for(i=0;i<mappagioc.length;i++){
+   r=mappagioc[i];
+   if (typeof mappacodgioc[r.codgioc]!='undefined'){
+    if ((c=mappasqgioc[mappacodgioc[r.codgioc]])!=-1){//gioc in squadra
+     if ((lrmodo&2)==2){
+      r.codsqgioc=c.codsqgioc;
+      r.nmaglia=c.nmaglia;
+      mappa[1].push(r);
+     }
+    }
+   } else {
+    if ((lrmodo&1)==1) mappa[0].push(r);//gioc fuori dalle squadre
+   }
+  }
+  h=adf.gioc.nomi;
+  for(r=0;r<2;r++)
+   if (mappa[r].length>0)
+    for(i=adf.gioc.nome;i>=adf.gioc.cognome;i--)
+     mappa[r].sort(function(a,b){
+      return ((a[h[i]]==b[h[i]])?0:((a[h[i]]>b[h[i]])?1:-1));
+     });
+  if ((lrmodo&1)==1) $('#righetg').html(scrivirighe(mappa[0],'codgioc'));
+  if ((lrmodo&2)==2){
+   $('#righegs').html(scrivirighe(mappa[1],'codsqgioc'));
+   if (String(codsqgioc).length>0) $('#modModal').modal('show');
+  }
  }
 }
 
@@ -416,7 +395,7 @@ function scrivirighe(mappa,cod){
   h+='<tr><td><button class="btn btn-default move'+v.charAt(0)+'" data-riga="'+c+'"><span class="glyphicon glyphicon-arrow-'+v+'"></span></button></td>';
   if (cod=='codsqgioc'){
    nm=(''+r.nmaglia).replace(/[^\d]/g,'');
-   h+='<td><button data-toggle="modal" data-target="#modModal" id="sg'+c+'" class="btn btn-default">'+((nm=='')?'?':nm)+'</button></td>';
+   h+='<td><button data-toggle="modal" data-target="#modModal" id="sg'+c+'" data-codgioc="'+r.codgioc+'" class="btn btn-default">'+((nm=='')?'?':nm)+'</button></td>';
   }
   h+='<td>'+htmlentities(ar[0]+' '+ar[1]);
   for(j=2; j<ar.length; j++){

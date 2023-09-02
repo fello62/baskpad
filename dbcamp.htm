@@ -147,17 +147,13 @@
 
 <script src="js/jquery-1.11.2.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
-<script src="js/localforage.min.js"></script>
 <script src="js/ctrldata.js"></script>
 <script src="js/bp.js"></script>
 <script>
 <!--
-var rg;
-var act;
-var ansp='';
-var ordine='nomecamp';
-var verso='asc';
-leggioptas();
+var act,ansp='',ordine='nomecamp',rg,verso='asc';
+
+aspettaDB(leggioptas);
 
 $('#intest > th[data-ord]')
 .css('cursor','pointer')
@@ -176,16 +172,17 @@ $('#intest > th[data-ord]')
 });
 
 $('#modModal').on('show.bs.modal',function(event){
+ var bt,button,d,hid,modal,titolo,vis,y;
  // trova il Button che ha aperto il Modal
- var button=$(event.relatedTarget);
+ button=$(event.relatedTarget);
  // trova la riga del Button
  rg=button.data('riga');
  act=button.hasClass('eli');
- var modal=$(this);
- var titolo;
- var bt;
- var hid;
- var vis;
+ modal=$(this);
+ titolo;
+ bt;
+ hid;
+ vis;
  if (act){
   titolo='Eliminazione';
   vis='.eli';
@@ -202,10 +199,9 @@ $('#modModal').on('show.bs.modal',function(event){
  } else {
   if (rg=="0") {
    titolo='Nuovo';
-   var d=new Date();
-   var y=d.getFullYear();
-   if (d.getMonth()<7)
-    y--;
+   d=new Date();
+   y=d.getFullYear();
+   if (d.getMonth()<6) y--;
    document.f.annosport.value=''+y+'-'+String(1+y).slice(-2);
    document.f.nomecamp.value='';
    document.f.girone.value='';
@@ -236,10 +232,11 @@ $('#modModal').on('show.bs.modal',function(event){
 });
 
 $('#modModal').on('shown.bs.modal',function(event){
+ var o;
  if (act){
   $(this).find('button[type=submit]').focus();
  } else {
-  var o=document.f.annosport;
+  o=document.f.annosport;
   o.focus();
   o.setSelectionRange(0,o.value.length);
  }
@@ -281,9 +278,9 @@ $(document.f.maxfalli).on('blur',function(event){
 $(document.f).on('submit',function(event){
  var ar;
  if (act){
-  deleterec('camp',function(x,y){
-   return adb.camp[x][0]==y;
-  },rg);
+  fdb.deleteRec('camp',function(x,y){
+   return x.codcamp==y;
+  },rg,leggioptas);
  } else {
   maiusc(document.f.nomecamp);
   maiusc(document.f.girone);
@@ -293,95 +290,77 @@ $(document.f).on('submit',function(event){
   ctrlnumero(document.f.suppl,1,99);
   ctrlnumero(document.f.maxfalli,1,9);
   ansp=document.f.annosport.value;
-  ar={annosport:ansp,nomecamp:document.f.nomecamp.value,girone:document.f.girone.value,fase:document.f.fase.value,tempi:document.f.tempi.value,durata:document.f.durata.value,suppl:document.f.suppl.value,maxfalli:document.f.maxfalli.value};
-  if (rg==0)
-   rg=newrec('camp');
-  updaterec('camp',rg,ar);
+  if (rg==0) fdb.idNewRec('camp',saveRec);
+  else saveRec(rg);
+
+  function saveRec(rg){
+   ar={codcamp:rg,annosport:ansp,nomecamp:document.f.nomecamp.value,girone:document.f.girone.value,fase:document.f.fase.value,tempi:document.f.tempi.value,durata:document.f.durata.value,suppl:document.f.suppl.value,maxfalli:document.f.maxfalli.value};
+   fdb.updateRec('camp',ar,leggioptas);
+  }
  }
  $('#modModal').modal('hide');
- savedb();
- leggioptas();
  return false;
 });
 
 function leggioptas(){
- var d,h,i,r,t,sel,v1;
- if (leggendo){
-  setTimeout(function(){leggioptas();},100);
-  return;
+ var h,i,sel,t,v1;
+ fdb.tabAs('camp',leggioptascb);
+
+ function leggioptascb(mappa){
+  h=v1='';
+  for(i=0;i<mappa.length;i++){
+   t=mappa[i];
+   if (i==0) v1=t;
+   if ((ansp.length>0)&&(ansp==t)) v1=t;
+   h+='<option>'+t+'</option>';
+  }
+  ansp=v1;
+  sel=$(document.a.annosport);
+  sel.html(h);
+  if (ansp.length>0) sel.val(ansp);
+  leggirighe();
  }
- r={};
- d=adf.camp.annosport;
- for(i=0;i<adb.camp.length;i++)
-  r[adb.camp[i][d]]=i;
- r=Object.keys(r);
- r.sort(function(a,b){
-  return ((a==b)?0:((a>b)?-1:1));
- });
- h=v1='';
- for(i=0;i<r.length;i++){
-  t=r[i];
-  if (i==0)
-   v1=t;
-  if ((ansp.length>0)&&(ansp==t))
-   v1=t;
-  h+='<option>'+t+'</option>';
- }
- ansp=v1;
- sel=$(document.a.annosport);
- sel.html(h);
- if (ansp.length>0)
-  sel.val(ansp);
- leggirighe();
 }
 
 function leggirighe(){
- var c,d,h,i,j,r,ar,chiavi,mappa;
- if (ansp.length==0){
-  $('#righe').html('');
-  return;
- }
- chiavi=Object.keys(adf.camp);
- chiavi.pop();
- r=chiavi.length;
- d=adf.camp.annosport;
- mappa=[];
- for(i=0;i<adb.camp.length;i++)
-  if (adb.camp[i][d]==ansp){
-   h={};
-   for(j=0;j<r;j++)
-    h[chiavi[j]]=adb.camp[i][j];
-   mappa.push(h);
+ var ar,c,h,i,j,r;
+ fdb.tabRecAs('camp',ansp,leggirighecb);
+
+ function leggirighecb(mappa){
+  if (mappa.length>0){
+   if (adf.camp.tipo[adf.camp[ordine]]=='n')
+    mappa.sort(function(a,b){
+     return (a[ordine]-b[ordine])*(verso=='asc'?1:-1);
+    });
+   else
+    mappa.sort(function(a,b){
+     return ((a[ordine]==b[ordine])?0:((a[ordine]>b[ordine])?1:-1))*(verso=='asc'?1:-1);
+    });
+  } else {//nessun record
+   $('#righe').html('');
+   return;
   }
- if (adf.camp.tipo[adf.camp[ordine]]=='n')
-  mappa.sort(function(a,b){
-   return (a[ordine]-b[ordine])*(verso=='asc'?1:-1);
-  });
- else
-  mappa.sort(function(a,b){
-   return ((a[ordine]==b[ordine])?0:((a[ordine]>b[ordine])?1:-1))*(verso=='asc'?1:-1);
-  });
- h='';
- for(i=0;i<mappa.length;i++){
-  r=mappa[i];
-  c=r.codcamp;
-  ar=[];
-  ar.push(r.nomecamp);
-  ar.push(r.girone);
-  ar.push(r.fase);
-  ar.push(r.tempi);
-  ar.push(r.durata);
-  ar.push(r.suppl);
-  ar.push(r.maxfalli);
-  ar.push(c);
-  h+='<tr><td><button type="button" class="btn btn-default" data-toggle="modal" data-target="#modModal" data-riga="'+c+'"><span class="glyphicon glyphicon-pencil"></span></button></td>';
-  h+='<td><button type="button" class="btn btn-default eli" data-toggle="modal" data-target="#modModal" data-riga="'+c+'"><span class="glyphicon glyphicon-remove"></span></button></td>';
-  for(j=0;j<ar.length;j++){
-   h+='<td id="rg'+c+String.fromCharCode(97+j)+'">'+htmlentities(ar[j])+'</td>';
+  h='';
+  for(i=0;i<mappa.length;i++){
+   r=mappa[i];
+   ar=[];
+   ar.push(r.nomecamp);
+   ar.push(r.girone);
+   ar.push(r.fase);
+   ar.push(r.tempi);
+   ar.push(r.durata);
+   ar.push(r.suppl);
+   ar.push(r.maxfalli);
+   ar.push(r.codcamp);
+   h+='<tr><td><button type="button" class="btn btn-default" data-toggle="modal" data-target="#modModal" data-riga="'+r.codcamp+'"><span class="glyphicon glyphicon-pencil"></span></button></td>';
+   h+='<td><button type="button" class="btn btn-default eli" data-toggle="modal" data-target="#modModal" data-riga="'+r.codcamp+'"><span class="glyphicon glyphicon-remove"></span></button></td>';
+   for(j=0;j<ar.length;j++){
+    h+='<td id="rg'+r.codcamp+String.fromCharCode(97+j)+'">'+htmlentities(ar[j])+'</td>';
+   }
+   h+='</tr>';
   }
-  h+='</tr>';
- }
- $('#righe').html(h);
+  $('#righe').html(h);
+ };
 }
 -->
 </script>

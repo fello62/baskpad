@@ -96,7 +96,6 @@
 
 <script src="js/jquery-1.11.2.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
-<script src="js/localforage.min.js"></script>
 <script src="js/ctrldata.js"></script>
 <script src="js/bp.js"></script>
 <script>
@@ -134,7 +133,7 @@ $('#modSharing').find('.btn-danger').click(function(){
   spia
    .removeClass('btn-warning btn-success btn-danger')
    .addClass('btn-info');
-  inviodati('end','');
+  //inviodati('end','');
  });
 $('#modSharing').find('.btn-success').click(function(){
   sharing=true;
@@ -185,7 +184,7 @@ setInterval(function(){
 },100);
 
 function chiudiconn(){
- inviodati('end','');
+ //inviodati('end','');
 }
 
 function esci(){

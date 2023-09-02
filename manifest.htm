@@ -11,55 +11,59 @@
 <script src="js/jquery-1.11.2.min.js"></script>
 <script>
 <!--
-var appCache,cacheProperties,displayProgress,offlineReady;
+var appCache,displayProgress,offlineReady;
 appCache=window.applicationCache;
 offlineReady=parent.offlineReady;
 displayProgress=parent.displayProgress;
 
-cacheProperties=parent.cacheProperties;
-
-$('#manualUpdate',window.parent.document).click(function(event){
+parent.mu.click(function(event){
  event.preventDefault();
  parent.getTotalFiles();
  setTimeout(function(){appCache.update();},2000);
 });
 
-$(appCache).on('checking',function(event){
- displayProgress('Esecuzione in corso');
+appCache.onchecking=function(event){
+ displayProgress('Controllo files da caricare');
  offlineReady(false);
-});
+};
 
-$(appCache).on('noupdate',function(event){
+appCache.onnoupdate=function(event){
  displayProgress('Nessun aggiornamento');
  offlineReady(true);
-});
+};
 
-$(appCache).on('downloading',function(event){
- displayProgress('Caricamento file cache');
- cacheProperties=parent.cacheProperties;
-});
+appCache.ondownloading=function(event){
+ displayProgress('Caricamento lista files');
+};
 
-$(appCache).on('progress',function(event){
+appCache.onprogress=function(event){
  displayProgress();
-});
+};
 
-$(appCache).on('cached',function(event){
+appCache.oncached=function(event){
  displayProgress('Caricati tutti i files');
+ alert('Application Cache pronta');
+ parent.checkOL();
+ //fine del primo caricamento
  offlineReady(true);
-});
+};
 
-$(appCache).on('updateready',function(event){
+appCache.onupdateready=function(event){
  displayProgress('Nuovi files disponibili');
+ displayProgress('Pagina in ricaricamento...');
  appCache.swapCache();
+ alert('Application cache aggiornata: ricaricamento pagina');
  setTimeout(function(){
   window.parent.location.reload();
  },2000);
-});
+};
 
-$(appCache).on('error',function(event){
+appCache.onerror=function(event){
  displayProgress('Errore nel controllo');
- offlineReady((parent.swOK)||(parent.acOK));
-});
+ offlineReady(parent.acOK);
+};
+
+offlineReady(false,appCache);
 -->
 </script>
 </body>

@@ -33,26 +33,18 @@
 
 <script src="js/jquery-1.11.2.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
-<script src="js/localforage.min.js"></script>
-<script src="js/ctrldata.js"></script>
 <script src="js/bp.js"></script>
 <script>
 <!--
-if (confirm('ATTENZIONE\nSei sicuro di voler resettare il database?'))
- resetdb();
+if (confirm('ATTENZIONE\nSei sicuro di voler resettare il database?')) aspettaDB(resetdb);
 
 function resetdb(){
- var i,t;
- if (leggendo){
-  setTimeout(function(){resetdb();},100);
-  return;
- }
- t=Object.keys(adb);
- for(i=0;i<t.length;i++)
-  adb[t[i]]=[];
- savedb();
- alert('INFORMAZIONE\nReset database effettuato!');
- vai('index.htm');
+ fdb.deleteDB(function(){
+  fdb.iniziaDB(function(){
+   alert('INFORMAZIONE\nReset database effettuato!');
+   vai('index.htm');
+  });
+ });
 }
 -->
 </script>
