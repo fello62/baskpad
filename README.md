@@ -27,28 +27,26 @@ Tecnologia consigliata su browsers recenti, consente anche lei la memorizzazione
 ## Database
 
 Il database è suddiviso in tabelle che vanno impostate prima di poter rilevare una partita:
-
-Società
-    Nomi delle società cui appartengono le squadre
-Squadre
-    Squadre che disputano i vari campionati
-Campionati
-    Nomi dei campionati o delle fasi di campionato che vengono disputati dalle squadre
-Campionati-Squadre
-    Tabella di relazione per collegare le squadre ad uno o più campionati che disputano
-Giocatori
-    Dati degli atleti
-Squadre-Giocatori
-    Tabella di relazione per collegare un giocatore ad una o più squadre di appartenenza. Per poter assegnare un giocatore a più squadre contemporaneamente, occorre che le categorie delle squadre siano diverse (es.: Senior, Under 19). Se si vuole assegnare un giocatore ad un'altra squadra della stessa categoria di quella cui già appartiene, bisogna rimuoverlo dalla prima squadra
-Partite
-    Elenco delle partite di un campionato. È sufficiente immettere solo gli incontri di cui si vogliono rilevare le statistiche
+#### Società
+Nomi delle società cui appartengono le squadre
+#### Squadre
+Squadre che disputano i vari campionati
+#### Campionati
+Nomi dei campionati o delle fasi di campionato che vengono disputati dalle squadre
+#### Campionati-Squadre
+Tabella di relazione per collegare le squadre ad uno o più campionati che disputano
+#### Giocatori
+Dati degli atleti
+#### Squadre-Giocatori
+Tabella di relazione per collegare un giocatore ad una o più squadre di appartenenza. Per poter assegnare un giocatore a più squadre contemporaneamente, occorre che le categorie delle squadre siano diverse (es.: Senior, Under 19). Se si vuole assegnare un giocatore ad un'altra squadra della stessa categoria di quella cui già appartiene, bisogna rimuoverlo dalla prima squadra
+#### Partite
+Elenco delle partite di un campionato. È sufficiente immettere solo gli incontri di cui si vogliono rilevare le statistiche
 
 Tutte le assegnazioni di squadre e campionati sono relative ad un anno sportivo, questo per poter suddividere i dati tra le varie annate.
 
 È possibile resettare, importare ed esportare il database. I files di importazione ed esportazione sono in formato di testo SQL compatibile con SQLite. Nel caso in cui si utilizzi l'app a tutto schermo sui dispositivi mobili, si potrebbero verificare problemi relativi alle procedure di importazione ed esportazione del database (così come nel caso di upload del referto della partita), dovuti al fatto che i sistemi operativi dei dispositivi possono bloccare le operazioni sui files: in tali situazioni è possibile bypassare i problemi applicando dei semplici "copia-incolla" sulle apposite aree di testo.
 
-
-Generali
+## Generali
 
 I dati generali sono la somma dei valori ricavati da tutte le partite giocate da una squadra, in uno o più campionati disputati.
 
