@@ -50,8 +50,7 @@ Tutte le assegnazioni di squadre e campionati sono relative ad un anno sportivo,
 
 I dati generali sono la somma dei valori ricavati da tutte le partite giocate da una squadra, in uno o più campionati disputati.
 
-
-Partita
+## Partita
 
 La procedura della partita inizia con la scelta della gara su cui si vuole lavorare.
 
@@ -65,96 +64,99 @@ La pagina della partita presenta, nella barra del menù, due bottoni per zoomare
 
 Il riquadro della partita presenta un campo per immissione di testo: qui verranno immessi, tramite i vari bottoni presenti oppure anche direttamente con la tastiera (metodo sconsigliato!), le sigle di giocatori ed azioni che avvengono durante la gara; le sigle immesse verranno poi elaborate quando verrà premuto il grande bottone blu a destra del campo di immissione. Il bottone con freccia destra, posto a sinistra del campo, consente di cancellare l'ultima sigla immessa, mentre il bottone SP consente di aggiungere uno spazio per separare l'ultima sigla immessa da quella che verrà (utile solo in caso di opzione "punto" selezionata per evitare di assegnare un'azione corrispondente).
 
-Sigle
+### Sigle
 
 Le sigle utilizzate per l'immissione sono le seguenti:
 
-PP
-    palla persa
-PR
-    palla rubata (o azione recuperata se assegnata alla squadra)
-SD
-    stoppata data
-SS
-    stoppata subita
-FF
-    fallo fatto
-FS
-    fallo subito
-FFP
-    fallo fatto in attacco con palla persa (se è iniziato, conclude anche il contropiede): sfondamento o tecnico
-FFA
-    fallo fatto con azione persa: con libero aggiuntivo, tecnico in difesa, antisportivo, squalificante
-FSP, FSA
-    fallo subito con azione recuperata: in difesa, con libero aggiuntivo, tecnico, antisportivo, squalificante; sono identiche, ma cambia il loro dato corrispondente (FFP o FFA) in caso di immissione dati con l'opzione "punto"
-AS
-    assist
-CP
-    azione in contropiede (il contropiede viene concluso in automatico da un tiro o una palla persa, ma ricomincia se il tiro sbagliato è seguito da rimbalzo offensivo; reinserendo la sigla, lo stato di contropiede viene chiuso)
-RO
-    rimbalzo offensivo
-RD
-    rimbalzo difensivo
-PRI
-    palla recuperata iniziale (da usare per la palla a due di inizio partita o per impostare il possesso alternato in caso di falli negli intervalli)
-RFT
-    rimbalzo difensivo di fine tempo (da assegnare dopo un tiro sbagliato allo scadere, oppure dopo un tiro libero sbagliato seguito da rimessa laterale, causato da fallo tecnico, antisportivo o squalificante, in inglese dead ball rebound)
-AP
-    azione persa: il dato corrispondente è un'azione recuperata (SQ PR)
-SC1
-    schiacciata realizzata
-TS1
-    tiro da sotto realizzato
-TS0
-    tiro da sotto sbagliato
-TF1
-    tiro da fuori realizzato
-TF0
-    tiro da fuori sbagliato
-T31
-    tiro da tre realizzato
-T30
-    tiro da tre sbagliato
-TX...
-    tiro eseguito nella metà campo dove attacca la squadra A (viene poi trasformato in TS, TF o T3)
-TY...
-    tiro eseguito nella metà campo dove attacca la squadra B (viene poi trasformato in TS, TF o T3)
-TL1,TL0,TL00,TL01,TL10,TL11,TL000,TL111,ecc.
-    tiri liberi
-'
-    commento (da non visualizzare nel referto leggibile)
-NOTE
-    commento (da visualizzare nel referto leggibile)
-TMP
-    tempo rimasto da giocare (usato solo per compatibilità col programma per PC)
-AA
-    attacco squadra A
-AB
-    attacco squadra B
-DA
-    difesa squadra A
-DB
-    difesa squadra B
-ENT
-    entrate (all'inizio dei tempi di gioco)
-S
-    sostituzione
-A4,A5,A12,A00,A33,ecc.
-    giocatori della squadra A
-B4,B5,B12,B00,B33,ecc.
-    giocatori della squadra B
-ASQ
-    squadra A (per assegnarle falli, rimbalzi e palle)
-BSQ
-    squadra B (per assegnarle falli, rimbalzi e palle)
+##### PP
+palla persa
+##### PR
+palla rubata (o azione recuperata se assegnata alla squadra)
+##### SD
+stoppata data
+##### SS
+stoppata subita
+##### FF
+fallo fatto
+##### FS
+fallo subito
+##### FFP
+fallo fatto in attacco con palla persa (se è iniziato, conclude anche il contropiede): sfondamento o tecnico
+##### FFA
+fallo fatto con azione persa: con libero aggiuntivo, tecnico in difesa, antisportivo, squalificante
+##### FSP, FSA
+fallo subito con azione recuperata: in difesa, con libero aggiuntivo, tecnico, antisportivo, squalificante; sono identiche, ma cambia il loro dato corrispondente (FFP o FFA) in caso di immissione dati con l'opzione "punto"
+##### AS
+assist
+##### CP
+azione in contropiede (il contropiede viene concluso in automatico da un tiro o una palla persa, ma ricomincia se il tiro sbagliato è seguito da rimbalzo offensivo; reinserendo la sigla, lo stato di contropiede viene chiuso)
+##### RO
+rimbalzo offensivo
+##### RD
+rimbalzo difensivo
+##### PRI
+palla recuperata iniziale (da usare per la palla a due di inizio partita o per impostare il possesso alternato in caso di falli negli intervalli)
+##### RFT
+rimbalzo difensivo di fine tempo (da assegnare dopo un tiro sbagliato allo scadere, oppure dopo un tiro libero sbagliato seguito da rimessa laterale, causato da fallo tecnico, antisportivo o squalificante, in inglese dead ball rebound)
+##### AP
+azione persa: il dato corrispondente è un'azione recuperata (SQ PR)
+##### SC1
+schiacciata realizzata
+##### TS1
+tiro da sotto realizzato
+##### TS0
+tiro da sotto sbagliato
+##### TF1
+tiro da fuori realizzato
+##### TF0
+tiro da fuori sbagliato
+##### T31
+tiro da tre realizzato
+##### T30
+tiro da tre sbagliato
+##### TX...
+tiro eseguito nella metà campo dove attacca la squadra A (viene poi trasformato in TS, TF o T3)
+##### TY...
+tiro eseguito nella metà campo dove attacca la squadra B (viene poi trasformato in TS, TF o T3)
+##### TL1,TL0,TL00,TL01,TL10,TL11,TL000,TL111,ecc.
+tiri liberi
+##### '
+commento (da non visualizzare nel referto leggibile)
+##### NOTE
+commento (da visualizzare nel referto leggibile)
+##### TMP
+tempo rimasto da giocare (usato solo per compatibilità col programma per PC)
+##### AA
+attacco squadra A
+##### AB
+attacco squadra B
+##### DA
+difesa squadra A
+##### DB
+difesa squadra B
+##### ENT
+entrate (all'inizio dei tempi di gioco)
+##### S
+sostituzione
+##### A4,A5,A12,A00,A33,ecc.
+giocatori della squadra A
+##### B4,B5,B12,B00,B33,ecc.
+giocatori della squadra B
+##### ASQ
+squadra A (per assegnarle falli, rimbalzi e palle)
+##### BSQ
+squadra B (per assegnarle falli, rimbalzi e palle)
 
-Immissione tiri
+### Immissione tiri
 
 Se si è optato per la rilevazione dei tiri sul campo di gioco:
 
-    l'orientamento del campo varia col variare di quello del tablet, verticale od orizzontale
-    la scelta del canestro in cui tirano le due squadre si ottiene tramite i due piccoli bottoni A e B posti dietro i canestri
-    il tiro viene registrato cliccando la posizione sul campo da gioco, indicata da un pallino rosso; continuando la pressione del click o del tap per più di mezzo secondo, il pallino cambia colore diventando verde. Al momento del rilascio, in caso di pallino rosso, il tiro verrà registrato come sbagliato, mentre se il pallino è verde il tiro verrà indicato come realizzato. In caso di schiacciata realizzata, premere il bottone SC1: se questo risulta essere l'ultima sigla nella riga d'immissione, a questo punto, cliccando la posizione sul campo (senza bisogno di pressione "lunga"), la posizione della schiacciata verrà inserita nella riga d'immissione.
+1) l'orientamento del campo varia col variare di quello del tablet, verticale od orizzontale
+
+2) la scelta del canestro in cui tirano le due squadre si ottiene tramite i due piccoli bottoni A e B posti dietro i canestri
+
+3) il tiro viene registrato cliccando la posizione sul campo da gioco, indicata da un pallino rosso; continuando la pressione del click o del tap per più di mezzo secondo, il pallino cambia colore diventando verde. Al momento del rilascio, in caso di pallino rosso, il tiro verrà registrato come sbagliato, mentre se il pallino è verde il tiro verrà indicato come realizzato. In caso di schiacciata realizzata, premere il bottone SC1: se questo risulta essere l'ultima sigla nella riga d'immissione, a questo punto, cliccando la posizione sul campo (senza bisogno di pressione "lunga"), la posizione della schiacciata verrà inserita nella riga d'immissione.
+
 
 Il tiro verrà poi elaborato dall'app in automatico come tiro da sotto, da fuori o da tre a seconda della posizione indicata e dell'opzione "3 metri/area" selezionata.
 
@@ -162,26 +164,28 @@ In caso di errore dovuto alla mancata sistemazione dei bottoni A e B, per cui, a
 
 In caso di tiri liberi immessi tramite l'apposita finestra di dialogo, se nessun libero è realizzato, verrà cancellato l'eventuale assist presente nella riga d'immisione.
 
-Opzione "punto"
+### Opzione "punto"
 
 Quando si rilevano due squadre contemporaneamente, l'uso del punto è praticamente indispensabile perché riduce il numero dei click necessari durante l'immissione dei dati. Il concetto da capire è questo: per ogni azione ne esiste una corrispondente, per cui, se dopo l'azione mettiamo un punto e la sigla di un giocatore, a questo verrà assegnata l'azione corrispondente. Qualche esempio:
 
-A5 TS0.A7
-    tiro sbagliato del 5 e rimbalzo offensivo del 7 della squadra A
-A5 TS0.B7
-    tiro sbagliato del 5 della squadra A e rimbalzo difensivo del 7 della squadra B
-A5 TS1.A7
-    assist del 7 e tiro da sotto realizzato dal 5 della squadra A
-A5 FF.B7
-    fallo fatto del 5 della squadra A e fallo subito del 7 della squadra B
+##### A5 TS0.A7
+tiro sbagliato del 5 e rimbalzo offensivo del 7 della squadra A
+##### A5 TS0.B7
+tiro sbagliato del 5 della squadra A e rimbalzo difensivo del 7 della squadra B
+##### A5 TS1.A7
+assist del 7 e tiro da sotto realizzato dal 5 della squadra A
+##### A5 FF.B7
+fallo fatto del 5 della squadra A e fallo subito del 7 della squadra B
 
 Negli ultimi due casi, usando la tastiera per l'immissione, volendo si potrebbe omettere l'inserimento della lettera tra il punto ed il numero del giocatore perché è implicito che l'assist lo dia un giocatore della stessa squadra o che il fallo sia subito da uno dell'altra.
-Parentesi []
+
+### Parentesi []
 
 Molti dati vengono racchiusi tra parentesi quadre poste dopo una sigla: posizioni dei tiri, tempo di gioco e numeri dei giocatori per entrate e sostituzioni, ecc. Se si vogliono rilevare attacchi e difese, dentro le parentesi va immesso il nome dell'attacco o della difesa.
-Dati comparativi
 
-Al di sotto dei bottoni con le sigle dei giocatori, c'è una tabella contenente i dati che servono per controllare e verificare il lavoro che si sta facendo comparandoli tra le due squadre: ci sono i punti (da verificare sul tabellone elettronico), la situazione del bonus, falli fatti e subiti, rimbalzi difensivi e difensivi degli avversari (trovati usando la formula tiri sbagliati - rimbalzi offensivi), stoppate date e subite, palle perse e recuperate, chi ha il possesso del pallone (indicato dal numero 1); ci sono inoltre i quozienti di tiro. Se qualche valore non combina col corrispondente della squadra avversaria, viene segnalato cambiandogli il colore di sfondo.
+### Dati comparativi
+
+Al di sotto dei bottoni con le sigle dei giocatori, c'è una tabella contenente i dati che servono per controllare e verificare il lavoro che si sta facendo comparandoli tra le due squadre: ci sono i punti (da verificare sul tabellone elettronico), la situazione del bonus, falli fatti e subiti, rimbalzi difensivi e difensivi degli avversari (trovati usando la formula _tiri sbagliati - rimbalzi offensivi_), stoppate date e subite, palle perse e recuperate, chi ha il possesso del pallone (indicato dal numero 1); ci sono inoltre i quozienti di tiro. Se qualche valore non combina col corrispondente della squadra avversaria, viene segnalato cambiandogli il colore di sfondo.
 La tabella Referto
 
 La tabella del referto, posta in basso a destra, presenta tre colonne:
