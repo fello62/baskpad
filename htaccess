@@ -1,0 +1,8 @@
+AddType text/cache-manifest .manifest
+FileETag None
+Header unset ETag
+Header set Cache-Control max-age=0
+Header append Cache-Control no-cache
+Header append Cache-Control must-revalidate
+Header set Pragma no-cache
+Header set Expires "Mon, 17 Jul 1992 01:30:00 GMT"
