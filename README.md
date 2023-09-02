@@ -216,4 +216,5 @@ inizio contropiede
 fine contropiede
 
 Quando compaiono queste sigle, nelle righe successive di solito vengono annullate: se questo non avviene, ci deve essere un errore.
+
 3) informazioni: se l'azione è un fallo fatto, vengono riportati i falli del giocatore, se è un tiro realizzato, i punti individuali ed il quoziente di tiro, ecc.
