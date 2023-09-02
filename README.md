@@ -186,35 +186,34 @@ Molti dati vengono racchiusi tra parentesi quadre poste dopo una sigla: posizion
 ### Dati comparativi
 
 Al di sotto dei bottoni con le sigle dei giocatori, c'è una tabella contenente i dati che servono per controllare e verificare il lavoro che si sta facendo comparandoli tra le due squadre: ci sono i punti (da verificare sul tabellone elettronico), la situazione del bonus, falli fatti e subiti, rimbalzi difensivi e difensivi degli avversari (trovati usando la formula _tiri sbagliati - rimbalzi offensivi_), stoppate date e subite, palle perse e recuperate, chi ha il possesso del pallone (indicato dal numero 1); ci sono inoltre i quozienti di tiro. Se qualche valore non combina col corrispondente della squadra avversaria, viene segnalato cambiandogli il colore di sfondo.
-La tabella Referto
+
+### La tabella Referto
 
 La tabella del referto, posta in basso a destra, presenta tre colonne:
+1) il referto vero e proprio, con le sigle normalizzate nella forma "giocatore azione[]" oppure "sigla[]", con le parentesi quadre che per molte sigle sono opzionali oppure non servono. Ogni riga di questa colonna è cliccabile per poterla modificare
+2) punteggio progressivo e differenze tra le squadre: le sigle qui utilizzate consentono di scovare eventuali errori di rilevazione:
+##### 1fa
+c'è un fallo fatto in più per A
+##### 1pa
+c'è una palla persa in più per A
+##### 1sa
+c'è una stoppata data in più per A
+##### -1ra
+c'è un rimbalzo in meno, difensivo per A, offensivo per B
+##### 1fb
+c'è un fallo fatto in più per B
+##### 1pb
+c'è una palla persa in più per B
+##### 1sb
+c'è una stoppata data in più per B
+##### -1rb
+c'è un rimbalzo in meno, difensivo per B, offensivo per A
+##### 1az
+l'azione fa sì che la differenza tra possesso A e possesso B sia maggiore di 1, e quindi viene snaturata la normale alternanza dei possessi
+##### cp1
+inizio contropiede
+##### cp0
+fine contropiede
 
-    il referto vero e proprio, con le sigle normalizzate nella forma "giocatore azione[]" oppure "sigla[]", con le parentesi quadre che per molte sigle sono opzionali oppure non servono. Ogni riga di questa colonna è cliccabile per poterla modificare
-    punteggio progressivo e differenze tra le squadre: le sigle qui utilizzate consentono di scovare eventuali errori di rilevazione:
-
-    1fa
-        c'è un fallo fatto in più per A
-    1pa
-        c'è una palla persa in più per A
-    1sa
-        c'è una stoppata data in più per A
-    -1ra
-        c'è un rimbalzo in meno, difensivo per A, offensivo per B
-    1fb
-        c'è un fallo fatto in più per B
-    1pb
-        c'è una palla persa in più per B
-    1sb
-        c'è una stoppata data in più per B
-    -1rb
-        c'è un rimbalzo in meno, difensivo per B, offensivo per A
-    1az
-        l'azione fa sì che la differenza tra possesso A e possesso B sia maggiore di 1, e quindi viene snaturata la normale alternanza dei possessi
-    cp1
-        inizio contropiede
-    cp0
-        fine contropiede
-
-    Quando compaiono queste sigle, nelle righe successive di solito vengono annullate: se questo non avviene, ci deve essere un errore.
-    informazioni: se l'azione è un fallo fatto, vengono riportati i falli del giocatore, se è un tiro realizzato, i punti individuali ed il quoziente di tiro, ecc.
+Quando compaiono queste sigle, nelle righe successive di solito vengono annullate: se questo non avviene, ci deve essere un errore.
+3) informazioni: se l'azione è un fallo fatto, vengono riportati i falli del giocatore, se è un tiro realizzato, i punti individuali ed il quoziente di tiro, ecc.
