@@ -2,19 +2,19 @@
 Web App per la rilevazione statistica nella pallacanestro.
 
 BaskPad è una "web app", cioè un'applicazione in grado di girare con il supporto di un navigatore web; grazie alle caratteristiche dei browser moderni, è in grado di lavorare anche offline, senza avere il bisogno di essere connessi ad Internet. Tutti i dati memorizzati dall'applicazione risiedono e vengono mantenuti all'interno del dispositivo che la utilizza, e quindi non vengono inviati ad un server esterno, con l'esclusione di apposite procedure per l'esportazione dei dati che ne permettono il backup.
-Può essere utilizzato qualsiasi browser moderno. Il codice Javascript usato è stato volutamente mantenuto compatibile il più possibile con le vecchie specifiche ECMA5, anche con librerie esterne non aggiornate all'ultima versione; questo per fare in modo che anche vecchi dispositivi possano utilizzare l'app. L'unica eccezione al riguardo è l'installazione offline con service worker, dove, per forza di cose, si devono usare le Promise di ECMA6.
+Può essere utilizzato qualsiasi browser moderno. Il codice Javascript usato è stato volutamente mantenuto compatibile il più possibile con le vecchie specifiche ECMA5, anche con librerie esterne non aggiornate all'ultima versione; questo per fare in modo che anche vecchi dispositivi possano utilizzare l'app. L'unica eccezione al riguardo è l'installazione offline con service worker, dove, per forza di cose, si devono usare le _Promise_ di ECMA6.
 
 È possibile usare l'applicazione su PC (Windows, Linux o Mac) o su tablet (iPad oppure Android): si potrebbe usarla anche su smartphone, ma le dimensioni limitate degli schermi ne ostacolerebbero il corretto utilizzo.
 
 Termini legali: l'app è liberamente utilizzabile da chiunque. Al suo interno vengono usate librerie di terzi (Bootstrap, FastClick, JQuery) per le cui licenze si rimanda ai rispettivi produttori. Non vengono usati cookies, ma tecnologie di memorizzazione dati nel browser, che quindi non implicano l'invio dei dati ad un server esterno.
-Installazione offline
 
-Esistono due tecnologie per l'installazione offline dell'app; la prima è basata sull' application cache, la seconda sul service worker. Si consiglia di usare l'application cache su browsers obsoleti, mentre il service worker va usato su quelli più recenti. Tenere anche in conto che l'Application Cache viene considerata deprecata, per cui, andando avanti col tempo, i browsers tenderanno a rimuoverne il supporto.
+## Installazione offline
 
-In caso di mancato funzionamento di queste due tecnologie, questo può dipendere dal tipo di connessione col server: i browsers più recenti esigono per sicurezza solo connessioni https, cioè criptate, cosa questa poi assolutamente obbligatoria per l'uso di un service worker. In caso di malfunzionamento, modificare l'URL di questa pagina da http a https.
+Esistono due tecnologie per l'installazione offline dell'app; la prima è basata sull'_application cache_, la seconda sul _service worker_. Si consiglia di usare l'application cache su browsers obsoleti, mentre il service worker va usato su quelli più recenti. Tenere anche in conto che l'Application Cache viene considerata deprecata, per cui, andando avanti col tempo, i browsers tenderanno a rimuoverne il supporto.
 
+In caso di mancato funzionamento di queste due tecnologie, questo può dipendere dal tipo di connessione col server: i browsers più recenti esigono per sicurezza solo connessioni https, cioè criptate, cosa questa poi assolutamente obbligatoria per l'uso di un service worker. In caso di malfunzionamento, modificare l'URL di questa pagina da _http_ a _https_.
 
-Installazione database
+## Installazione database
 
 Sono disponibili tre diverse tecnologie per la memorizzazione sul proprio dispositivo dei dati necessari al funzionamento dell'app:
 
