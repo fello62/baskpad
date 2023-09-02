@@ -17,18 +17,14 @@ In caso di mancato funzionamento di queste due tecnologie, questo può dipendere
 ## Installazione database
 
 Sono disponibili tre diverse tecnologie per la memorizzazione sul proprio dispositivo dei dati necessari al funzionamento dell'app:
+#### Array di dati su localStorage
+Tutto l'archivio viene completamente contenuto in memoria, e salvato in modo permanente usando la tecnologia localStorage; si consiglia l'uso per archivi di piccole dimensioni, visto che i browsers limitano la capienza di localStorage a 5/10 Mb. Può funzionare su praticamente qualsiasi navigatore, vecchio o nuovo che sia.
+#### WebSql
+Tecnologia consigliata su vecchi browsers, consente la memorizzazione di ampie moli di dati. I problemi sono che non viene più aggiornata, alcuni navigatori non l'hanno mai adottata, ed altri l'hanno rimossa o lo faranno in futuro. È basata sulla libreria SQLite, che veniva usata anche quando questa app era un programma in Pascal per PC sotto Linux o Windows, per cui l'esportazione dei dati è stata comunque mantenuta con un linguaggio SQL compatibile con questa libreria.
+#### IndexedDb
+Tecnologia consigliata su browsers recenti, consente anche lei la memorizzazione di ampie moli di dati. Il problema è che sui dispositivi più vecchi non funziona oppure è buggata.
 
-Array di dati su localStorage
-    Tutto l'archivio viene completamente contenuto in memoria, e salvato in modo permanente usando la tecnologia localStorage; si consiglia l'uso per archivi di piccole dimensioni, visto che i browsers limitano la capienza di localStorage a 5/10 Mb. Può funzionare su praticamente qualsiasi navigatore, vecchio o nuovo che sia.
-
-WebSql
-    Tecnologia consigliata su vecchi browsers, consente la memorizzazione di ampie moli di dati. I problemi sono che non viene più aggiornata, alcuni navigatori non l'hanno mai adottata, ed altri l'hanno rimossa o lo faranno in futuro. È basata sulla libreria SQLite, che veniva usata anche quando questa app era un programma in Pascal per PC sotto Linux o Windows, per cui l'esportazione dei dati è stata comunque mantenuta con un linguaggio SQL compatibile con questa libreria.
-
-IndexedDb
-    Tecnologia consigliata su browsers recenti, consente anche lei la memorizzazione di ampie moli di dati. Il problema è che sui dispositivi più vecchi non funziona oppure è buggata.
-
-
-Database
+## Database
 
 Il database è suddiviso in tabelle che vanno impostate prima di poter rilevare una partita:
 
