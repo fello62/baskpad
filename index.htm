@@ -570,14 +570,6 @@ function checkOL(){
 function offlineReady(state,ac){
  console.log('offlineReady',state);
  offlineState.text(state?pronto:nonpronto);
- if (ac){
-  if (ac.status==0){
-   alert("L'Application Cache sembra non funzionare.\nProvare il Service Worker!");
-   bpStatus=(bpStatus|3)-3;
-   localStorage.bpstatus=bpStatus;
-   window.location.reload();
-  }
- }
 }
 
 function acLoad(){

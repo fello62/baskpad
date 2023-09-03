@@ -63,7 +63,14 @@ appCache.onerror=function(event){
  offlineReady(parent.acOK);
 };
 
-offlineReady(false,appCache);
+setTimeout(function(){
+ if (appCache.status==0){
+  alert("L'Application Cache sembra non funzionare.\nProvare il Service Worker!");
+  parent.bpStatus=(parent.bpStatus|3)-3;
+  localStorage.bpstatus=parent.bpStatus;
+  parent.location.reload();
+ }
+},1000);
 -->
 </script>
 </body>
