@@ -423,8 +423,9 @@ $(document.impoffline).on('submit',function(){
  return false;
 });
 
-$(document.impdb).on('submit',function(){
+$(document.impdb).on('submit',function(event){
  var i,v='';
+ event.preventDefault();
  for(i=0;i<document.impdb.dbtype.length;i++)
   if (document.impdb.dbtype[i].checked) v=document.impdb.dbtype[i].value;
  if (v=='') alert('Selezionare una scelta.');
