@@ -198,17 +198,21 @@ $(function(){
 });
 
 function DBInit(){
- if (localStorage.getItem('bpstatus')===null){
-  bpStatus=0;
- } else {
-  bpStatus=parseInt(localStorage.bpstatus,10);
+ try{
+  if (localStorage.getItem('bpstatus')===null){
+   bpStatus=0;
+  } else {
+   bpStatus=parseInt(localStorage.bpstatus,10);
+  }
+ }catch(e){
+  alert('Errore LS '+e);
  }
  switch (bpStatus&28){//installa db
   case 4://IndexedDb
-   fdb=new IndexedDbFn();
+   fdb= new IndexedDbFn();
    break;
   case 8://ArrayDb
-   fdb=new(ArrayDbFn)();
+   fdb=new ArrayDbFn();
    break;
   case 16://WebSqlDb
    fdb=new WebSqlDbFn();
@@ -241,10 +245,13 @@ function ArrayDbFn(){
  };
 
  this.iniziaDB=function(callback){
-  var i;
+  var k;
   dbready=false;
-  adb={};
-  for(i=0;i<adf.nomi.length;i++) adb[adf.nomi[i]]=[];
+  k=adf.nomi;
+  adb=k.reduce(function(obj,elem,index){
+   obj[elem]=[];
+   return obj;
+  },{});
   if (!localStorage.adb){
    savedb();
    dbready=true;
@@ -502,10 +509,14 @@ function ArrayDbFn(){
  };
 
  this.tabGet=function(tab,id,callback){//ritorna un record specifico di una tabella
-  var i,indice,r={};
+  var k,indice,r;
   dbready=false;
+  k=adf[tab].nomi;
   indice=findrec(tab,id);
-  for(i=0;i<adf[tab].nomi.length;i++) r[adf[tab].nomi[i]]=adb[tab][indice][i];
+  r=k.reduce(function(obj,elem,index){
+   obj[elem]=adb[tab][indice][index];
+   return obj;
+  },{});
   dbready=true;
   eseguiCB(callback,r);
  };
@@ -520,11 +531,14 @@ function ArrayDbFn(){
  };
 
  this.tabRec=function(tab,callback){//ritorna tutti i record di una tabella
-  var i,j,mappa=[],r;
+  var i,k,mappa=[],r;
   dbready=false;
+  k=adf[tab].nomi;
   for(i=0;i<adb[tab].length;i++){
-   r={};
-   for(j=0;j<adf[tab].nomi.length;j++) r[adf[tab].nomi[j]]=adb[tab][i][j];
+   r=k.reduce(function(obj,elem,index){
+    obj[elem]=adb[tab][i][index];
+    return obj;
+   },{});
    mappa.push(r);
   }
   dbready=true;
@@ -532,12 +546,15 @@ function ArrayDbFn(){
  };
 
  this.tabRecAs=function(tab,ansp,callback){//ritorna i record in un anno sportivo di camp o sq
-  var i,j,mappa=[],r;
+  var i,k,mappa=[],r;
   dbready=false;
+  k=adf[tab].nomi;
   for(i=0;i<adb[tab].length;i++){
    if (adb[tab][i][adf[tab].annosport]==ansp){
-    r={};
-    for(j=0;j<adf[tab].nomi.length;j++) r[adf[tab].nomi[j]]=adb[tab][i][j];
+    r=k.reduce(function(obj,elem,index){
+     obj[elem]=adb[tab][i][index];
+     return obj;
+    },{});
     mappa.push(r);
    }
   }
@@ -595,7 +612,7 @@ function IndexedDbFn(){
    }
   };
   openReq.onerror=function(event){
-    alert('Errore '+this.openReq.error);
+    alert('Errore '+openReq.error);
   };
   openReq.onsuccess=function(event){
    adb=event.target.result;
@@ -973,9 +990,13 @@ function WebSqlDbFn(){
 
  this.iniziaDB=function(callback){
   dbready=false;
-  adb=openDatabase(nomeDB,'1.0','BaskPad database',50*1024*1024);
-  if ((bpStatus&32)==0) upgradeNeeded();
-  else dbready=true;
+  try{
+   adb=openDatabase(nomeDB,'1.0','BaskPad database',10*1024*1024);//solo 10Mb perché 50 danno un bug su IOS10
+   if ((bpStatus&32)==0) upgradeNeeded();
+   else dbready=true;
+  } catch (e) {
+   alert('Errore WS '+e);
+  }
 
   function upgradeNeeded(){
    var i,s;
