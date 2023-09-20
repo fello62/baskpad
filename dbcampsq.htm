@@ -92,7 +92,7 @@
 <script src="js/bp.js"></script>
 <script>
 <!--
-var ansp='',codcamp,rg;
+var ansp='',codcamp='',rg;
 
 aspettaDB(leggioptas);
 
@@ -144,17 +144,16 @@ $(document.a.codcamp).on('change',function(event){
 });
 
 function leggioptas(){
- var h,i,sel,t,v1;
+ var h,sel,v1;
  fdb.tabAs('camp',leggioptascb);
 
  function leggioptascb(mappa){
-  h=v1='';
-  for(i=0;i<mappa.length;i++){
-   t=mappa[i];
-   if (i==0) v1=t;
-   if ((ansp.length>0)&&(ansp==t)) v1=t;
-   h+='<option>'+t+'</option>';
-  }
+  v1='';
+  h=mappa.reduce(function(str,elem,index){
+   str+='<option>'+elem+'</option>';
+   if ((index==0)||((ansp.length>0)&&(ansp==elem))) v1=elem;
+   return str;
+  },'');
   ansp=v1;
   sel=$(document.a.annosport);
   sel.html(h);
@@ -174,17 +173,17 @@ function leggioptcc(){
     mappa.sort(function(a,b){
      return ((a[h[i]]==b[h[i]])?0:((a[h[i]]>b[h[i]])?1:-1));
     });
+   h='';
+   for(i=0;i<mappa.length;i++){
+    r=mappa[i];
+    h+='<option value="'+r.codcamp+'">'+r.nomecamp+', '+r.girone+', '+r.fase+'</option>';
+   }
+   codcamp=''+(mappa[0].codcamp);
+   sel=$(document.a.codcamp);
+   sel.html(h);
+   if (codcamp.length>0) sel.val(codcamp);
+   leggirighe(3);//entrambe
   }
-  h='';
-  for(i=0;i<mappa.length;i++){
-   r=mappa[i];
-   h+='<option value="'+r.codcamp+'">'+r.nomecamp+', '+r.girone+', '+r.fase+'</option>';
-  }
-  codcamp=''+(mappa[0].codcamp);
-  sel=$(document.a.codcamp);
-  sel.html(h);
-  if (codcamp.length>0) sel.val(codcamp);
-  leggirighe(3);//entrambe
  }
 }
 
