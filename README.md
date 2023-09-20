@@ -2,7 +2,7 @@
 Web App per la rilevazione statistica nella pallacanestro.
 
 BaskPad è una "web app", cioè un'applicazione in grado di girare con il supporto di un navigatore web; grazie alle caratteristiche dei browser moderni, è in grado di lavorare anche offline, senza avere il bisogno di essere connessi ad Internet. Tutti i dati memorizzati dall'applicazione risiedono e vengono mantenuti all'interno del dispositivo che la utilizza, e quindi non vengono inviati ad un server esterno, con l'esclusione di apposite procedure per l'esportazione dei dati che ne permettono il backup.
-Può essere utilizzato qualsiasi browser moderno. Il codice Javascript usato è stato volutamente mantenuto compatibile il più possibile con le vecchie specifiche ECMA5, anche con librerie esterne non aggiornate all'ultima versione; questo per fare in modo che anche vecchi dispositivi possano utilizzare l'app. L'unica eccezione al riguardo è l'installazione offline con service worker, dove, per forza di cose, si devono usare le _Promise_ di ECMA6.
+Può essere utilizzato qualsiasi browser moderno. Il codice Javascript usato è stato volutamente mantenuto compatibile il più possibile con le vecchie specifiche ECMA5, anche con librerie esterne non aggiornate all'ultima versione; questo per fare in modo che anche vecchi dispositivi possano utilizzare l'app. L'unica eccezione al riguardo è l'installazione offline con service worker, dove, per forza di cose, si devono usare le _Promises_ di ECMA6.
 
 È possibile usare l'applicazione su PC (Windows, Linux o Mac) o su tablet (iPad oppure Android): si potrebbe usarla anche su smartphone, ma le dimensioni limitate degli schermi ne ostacolerebbero il corretto utilizzo.
 
