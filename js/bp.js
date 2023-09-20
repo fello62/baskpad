@@ -209,7 +209,7 @@ function DBInit(){
  }
  switch (bpStatus&28){//installa db
   case 4://IndexedDb
-   fdb= new IndexedDbFn();
+   fdb=new IndexedDbFn();
    break;
   case 8://ArrayDb
    fdb=new ArrayDbFn();
@@ -879,10 +879,15 @@ function IndexedDbFn(){
 
  // inizio routine gestione
  this.tabAs=function(tab,callback){//ritorna gli anni sportivi di una tabella, solo camp e sq che hanno l'indice
-  var cursor,mappa=[],tx;
+  var cursor,mappa=[],o,tx;
   dbready=false;
   tx=adb.transaction([tab]);
-  tx.objectStore(tab).index('annosport').openKeyCursor(null,'prevunique').onsuccess=function(event){
+  o=tx.objectStore(tab).index('annosport').openKeyCursor(null,'prevunique');
+  o.onerror=function(event){//per evitare l'errore IOS 'Unable to open cursor' su ricerca unique in tabelle vuote
+   dbready=true;
+   eseguiCB(callback,mappa);
+  };
+  o.onsuccess=function(event){
    cursor=event.target.result;
    if (cursor){
     mappa.push(cursor.key);
