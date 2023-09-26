@@ -565,6 +565,7 @@ function ArrayDbFn(){
  this.tabRecFilter=function(tab,filtro,param,callback){//ritorna i dati di una tabella dopo filtro(record,paramfiltro,datiritornati)
   var i,k,mappa=[],r;
   dbready=false;
+  k=adf[tab].nomi;
   for(i=0;i<adb[tab].length;i++){
    r=k.reduce(function(obj,elem,index){
     obj[elem]=adb[tab][i][index];
