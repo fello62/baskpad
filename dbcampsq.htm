@@ -107,11 +107,9 @@ function moverclick(event){
 
  function saveRec(id){
   ar={codcampsq:id,codcamp:codcamp,codsq:rg};
-  fdb.updateRec('campsq',ar,saveRec2);
- }
-
- function saveRec2(){
-  leggirighe(2);//squadre campionato
+  fdb.updateRec('campsq',ar,function(){
+   leggirighe(2);//squadre campionato
+  });
  }
 }
 

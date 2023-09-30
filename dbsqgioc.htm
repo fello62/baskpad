@@ -203,9 +203,10 @@ $(document.f).on('submit',function(event){
  nm=('  '+document.f.nmaglia.value).substr(document.f.nmaglia.value.length);
  nm=(nm=='  ')?'':nm;
  ar={codsqgioc:codsqgioc,codsq:codsq,codgioc:codgioc,nmaglia:nm};
- $('#sg'+codsqgioc).text((nm=='')?'?':nm);
  $('#modModal').modal('hide');
- fdb.updateRec('sqgioc',ar);
+ fdb.updateRec('sqgioc',ar,function(){
+  $('#sg'+codsqgioc).text((nm=='')?'?':nm);
+ });
  return false;
 });
 
@@ -237,11 +238,9 @@ function moverclick(event){
  function saveRec(rg){
   codsqgioc=rg;
   ar={codsqgioc:codsqgioc,codsq:codsq,codgioc:cg,nmaglia:''};
-  fdb.updateRec('sqgioc',ar,saveRec2);
- }
-
- function saveRec2(){
-  leggirighe(2);//giocatori squadra
+  fdb.updateRec('sqgioc',ar,function(){
+   leggirighe(2);//giocatori squadra
+  });
  }
 };
 

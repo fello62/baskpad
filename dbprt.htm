@@ -306,11 +306,9 @@ $(document.f).on('submit',function(event){
   function saveRecPrt2(id){
    rg=id;
    ar=newRec('prt2',id);
-   fdb.updateRec('prt2',ar,saveRec);
-  }
-
-  function saveRec(){
-   saveReccb(rg);
+   fdb.updateRec('prt2',ar,function(){
+    saveReccb(rg);
+   });
   }
 
   function saveReccb(rg){
