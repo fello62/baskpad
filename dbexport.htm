@@ -75,10 +75,16 @@
 <script>
 <!--
 
-aspettaDB(elabora);
+$('#attesa').one('shown.bs.modal',function(){
+ aspettaDB(elabora);
+});
+$('#attesa').modal('show');
 
 $('#indicizza').click(function(){
- reindex();
+ $('#attesa').one('shown.bs.modal',function(){
+  reindex();
+ });
+ $('#attesa').modal('show');
  return false;
 });
 
@@ -88,7 +94,6 @@ $(document.a).on('submit', function (event) {
 });
 
 function elabora(){
- $('#attesa').modal('show');
  fdb.esportaDB(document.a.txt,eleboracb);
 
  function eleboracb(){
@@ -98,13 +103,11 @@ function elabora(){
 }
 
 function reindex(){
- $('#attesa').modal('show');
  fdb.reindexDB(reindexcb);
 
  function reindexcb(){
   document.a.txt.value='';
   elabora();
-  $('#attesa').modal('hide');
  }
 }
 -->

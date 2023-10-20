@@ -81,15 +81,22 @@ $(document.a).on('submit',function(event){
 });
 
 $('#dlurl').click(function(event){
- $('#concluso').hide();
- $.get(document.a.url.value,function(data){
-  document.a.sql.value=data;
- });
+ $('#attesa')
+ .one('shown.bs.modal',function(){
+  $.get(document.a.url.value,function(data){
+   document.a.sql.value=data;
+   $('#attesa').modal('hide');
+  });
+ })
+ .modal('show');
 });
 
 $('#dosql').click(function(event){
- $('#attesa').modal('show');
- aspettaDB(elabora);
+ $('#attesa')
+ .one('shown.bs.modal',function(){
+  elabora();
+ })
+ .modal('show');
 });
 
 function elabora(){
