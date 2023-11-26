@@ -4821,6 +4821,7 @@ function stppresroster(esporta){
  } else
   w+='<style scoped>';
  w+='h1, h2, h3, h4, h5 {text-align: center !important;}';
+ w+='h3 {margin-bottom: 0;}';
  w+='.ctr {margin-left: auto; margin-right: auto; white-space: nowrap;}';
  w+='.ctr td {padding: 2px !important;}';
  w+='.tac {text-align: center !important;}';
@@ -4831,19 +4832,19 @@ function stppresroster(esporta){
   w+='</head>';
   w+='<body>';
  }
- w+='<h4>Anno sportivo '+camprec.annosport+'</h4>';
- w+='<h2>'+htmlentities(camprec.nomecamp)+'</h2>';
- w+='<h3>Girone '+htmlentities(camprec.girone+' - '+camprec.fase)+'</h3>';
- w+='<h4>'+prtrec.giornata+'&ordf; giornata - ';
+ w+='<h4>Anno sportivo '+camprec.annosport;
+ w+=' '+htmlentities(camprec.nomecamp)+' - ';
+ w+='Girone '+htmlentities(camprec.girone+' - '+camprec.fase)+' - ';
+ w+=prtrec.giornata+'&ordf; giornata<br><small>';
  s=prtrec.dataora;
  y=parseInt(s.substr(0,4),10);
  m=parseInt(s.substr(5,2),10);
  g=parseInt(s.substr(8,2),10);
  d=new Date(y,m-1,g);
- w+='DOMLUNMARMERGIOVENSAB'.substr(d.getDay()*3,3)+' '+g+'/'+m+'/'+y+' ore'+s.substr(10);
- w+=' - '+htmlentities(prtrec.luogo)+'</h4>';
- w+='<h5>Arbitri: '+htmlentities(prt2rec.arbitri)+'</h5>';
- w+='<h1>'+htmlentities(prt2rec.nomesq[0])+'<br>vs<br>'+htmlentities(prt2rec.nomesq[1])+'</h1>';
+ w+='DOMLUNMARMERGIOVENSAB'.substr(d.getDay()*3,3)+' '+g+'/'+m+'/'+y+' ore'+s.substr(10)+' - ';
+ w+=htmlentities(prtrec.luogo)+' -  ';
+ w+='Arbitri: '+htmlentities(prt2rec.arbitri)+'</small></h4>';
+ w+='<h3>'+htmlentities(prt2rec.nomesq[0])+' vs '+htmlentities(prt2rec.nomesq[1])+'</h3>';
  w+='<table class="ctr">';
  for(s=0;s<=1;s++){
   w+='<tr class="tac"><td colspan="5"><h3>'+htmlentities(prt2rec.nomecortosq[s])+'</h3>All.: '+htmlentities(prt2rec.coach[s])+'</td></tr>';
@@ -4857,8 +4858,6 @@ function stppresroster(esporta){
    w+='<td>'+datirec[s][g].ruolo+'</td>';
    w+='</tr>';
   }
-  if (s==0)
-   w+='<tr><td colspan="5"><h1>&nbsp;</h1></td></tr>';
  }
  w+='</table>';
  if (esporta){
