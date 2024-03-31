@@ -3871,8 +3871,7 @@ function sintassi(testo,intflag){
   } else {
    pu=-1;
   }
-  if (pu>=0)
-   puflag=false;
+  if (pu>=0) puflag=false;
   //trova il separatore principale, quello che limita il dato da cercare
   if ((qua>=0)&&(qua<sp)){
    sep=qua;
@@ -3920,13 +3919,12 @@ function sintassi(testo,intflag){
      } else { //altrimenti inserisce nel testo
       testo=testo.substring(0,sp)+t+testo.substr(sp);
      }
-    } else {
-     sint=-1;//non accettabile
+    } else {//annulla puflag e accetta il giocatora trovato
+     //sint=-1;//non accettabile
      puflag=false;
     }
    }
-   if (sint==0){
-    //se non erano puflag e assist, modifica selsq selgioc selgiocidx giocsel
+   if (sint==0){//se non erano puflag e assist, modifica selsq selgioc selgiocidx giocsel
     if (!(puflag&&(d[s]==13)&&(dato!=sq))){
      selsq=s;
      selgioc=dato;
@@ -3941,7 +3939,7 @@ function sintassi(testo,intflag){
     //aggiunge un warning se non era in campo
     if ((dato<sq)&&(datirec[s][dato].dati[vconc]==0)){
      //warning non in campo
-     //da non inserite in righe perché qui non vengono gestite le sostituzioni
+     //da non inserire in righe perché qui non vengono gestite le sostituzioni
      sint=1; //warning non in campo
      errore=rtrim(numeri[selsq].substr(selgiocidx*4-4,4));
     }
@@ -4230,7 +4228,7 @@ function sintassi(testo,intflag){
    case 1: //non in campo
     break;
    case 2:
-    righe.push('ERR['+errore+': non attribuibile alla squadra]');
+    righe.push('ERR['+errore+': non attribuibile]');
     break;
    case 3:
     righe.push('ATT['+errore+': sintassi troppo lunga]');
