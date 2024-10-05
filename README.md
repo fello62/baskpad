@@ -83,9 +83,9 @@ fallo subito
 ##### FFP
 fallo fatto in attacco con palla persa (se è iniziato, conclude anche il contropiede): sfondamento o tecnico
 ##### FFA
-fallo fatto con azione persa: con libero aggiuntivo, tecnico in difesa, antisportivo, squalificante
+fallo fatto con azione persa: con libero aggiuntivo, tecnico in difesa, antisportivo, squalificante, su rimessa
 ##### FSP, FSA
-fallo subito con azione recuperata: in difesa, con libero aggiuntivo, tecnico, antisportivo, squalificante; sono identiche, ma cambia il loro dato corrispondente (FFP o FFA) in caso di immissione dati con l'opzione "punto"
+fallo subito con azione recuperata: in difesa, con libero aggiuntivo, tecnico, antisportivo, squalificante, su rimessa; sono identiche, ma cambia il loro dato corrispondente (FFP o FFA) in caso di immissione dati con l'opzione "punto"
 ##### AS
 assist
 ##### CP
