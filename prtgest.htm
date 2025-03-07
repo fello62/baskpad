@@ -991,6 +991,8 @@ $('#modTL button.btn-lg').click(function(event){
  }
 });
 
+$('#reftab').on('click','a',function(event){modrigaref(this);});
+
 $(document.sh).on('submit',function(){return false;});
 
 spia=$('#sharespy');
@@ -1452,9 +1454,11 @@ function modrefshow(){
  $('#modRef').modal('show');
 }
 
-function modrigaref(riga){
- var cella,d,old,r,s,t;
- cella=$(document.getElementById("reftab").rows[riga].cells[0]).text();
+function modrigaref(this_){
+ var atag,cella,d,old,r,riga,s,t;
+ atag=$(this_);
+ riga=atag.closest('tr').index();
+ cella=atag.text();
  t=prompt('Modifica referto riga '+riga,cella);
  if (t!=null){
   s=sintassi(t,2);
@@ -1662,7 +1666,7 @@ function mostraref(riga){
  h='';
  for(x=0;x<r.length-1;x++){
   h+='<tr>';
-  h+='<td><a href="javascript:modrigaref('+x+');">'+r[x]+'</a></td>';
+  h+='<td><a href="javascript:void(0);">'+r[x]+'</a></td>';
   h+='<td>'+d[x]+'</td>';
   h+='<td>'+i[x]+'</td>';
   h+='</tr>';
@@ -1791,7 +1795,7 @@ function stackpush(funzione,parametro){
 }
 
 function tiroclick(e){
- var mlt,p,testo,x,xxx,y,yyy;
+ var mlt,p,testo,s,x,xxx,y,yyy;
  p=(abflag)?1:0;
  mlt=300/15000;
  if (vertflag){
@@ -1810,7 +1814,7 @@ function tiroclick(e){
   y=Math.round(7500-yyy);
   testo='XY'.substr(p,1);
  }
- var s=(rtrim(document.f.dati.value)).toUpperCase();
+ s=(rtrim(document.f.dati.value)).toUpperCase();
  p=s.lastIndexOf('SC1');
  if ((p>=0)&&(p+4>=s.length)){
   s=document.f.dati.value;
@@ -1825,12 +1829,11 @@ function tiroclick(e){
 }
 
 function tiroend(x,y){
- var fatto;
- var p=$('#pun0');
- if (fatto=((p.css('display'))=='none'))
-  p=$('#pun1');
+ var fatto,o,p;
+ p=$('#pun0');
+ if (fatto=((p.css('display'))=='none')) p=$('#pun1');
  p.offset({top:y-5,left:x-5});
- var o=$('canvas#disegno').offset();
+ o=$('canvas#disegno').offset();
  xmouse=x-o.left;
  ymouse=y-o.top;
  tiroclick(fatto);
@@ -3310,7 +3313,7 @@ stati mostra:
   if ((intflag&4)!=0){
    m=result.length-1;
    addreftab+='<tr>';
-   addreftab+='<td><a href="javascript:modrigaref('+righereftab+');">'+result[m]+'</a></td>';
+   addreftab+='<td><a href="javascript:void(0);">'+result[m]+'</a></td>';
    addreftab+='<td>'+dif[m]+'</td>';
    addreftab+='<td>'+inf[m]+'</td>';
    addreftab+='</tr>';
@@ -3348,11 +3351,13 @@ stati mostra:
 }
 
 function inviodati(azione,dato){
+ var refp;
  if (sharing){
   spia
    .removeClass('btn-danger btn-info btn-success')
    .addClass('btn-warning');
  }
+ refp=getrigheref();
  $.ajax({
   method:'POST',
   url:document.sh.url.value,
@@ -3373,45 +3378,42 @@ function inviodati(azione,dato){
    var t=''+data;
    if ((azione=='adt')&&(t.substr(0,4)=='TMP[')){
     var d,h,i,p,r,s;
-    t=t.slice(0,-1);
-    //aggiorna oldtmp
-    s=interprete(t,0);
     //trova la posizione dei dati immessi e inserisce il tempo
     s=getrigheref();
-    p=s.lastIndexOf(dato);
-    r=s.split('\n');
-    p=r.length-((s.substr(p)).split('\n')).length;
-    r.splice(p,0,t);
-    setrigheref(r.join('\n'));
-    saveallref();
-    d=diff.split('\n');
-    d.splice(p,0,'');
-    diff=d.join('\n');
-    i=info.split('\n');
-    i.splice(p,0,'');
-    info=i.join('\n');
-    s=$('#reftab tr');
-    for(t=s.length-1;t>=p;t--) s.eq(t).remove();
-    s=$('#reftab');
-    for(t=p;t<r.length-1;t++){
-     h='<tr><td><a href="javascript:modrigaref('+t+');">'+r[t]+'</a></td>';
-     h+='<td>'+d[t]+'</td>';
-     h+='<td>'+i[t]+'</td></tr>';
-     s.append(h);
+    //se non è cambiato nulla nel frattempo
+    if (refp===s){
+     t=t.slice(0,-1);
+     //aggiorna oldtmp
+     r=interprete(t,0);
+     p=s.lastIndexOf(dato);
+     r=s.split('\n');
+     p=r.length-((s.substr(p)).split('\n')).length;
+     r.splice(p,0,t);
+     setrigheref(r.join('\n'));
+     saveallref();
+     d=diff.split('\n');
+     d.splice(p,0,'');
+     diff=d.join('\n');
+     i=info.split('\n');
+     i.splice(p,0,'');
+     info=i.join('\n');
+     s=$('#reftab tr');
+     h='<tr><td><a href="javascript:void(0);">'+r[p]+'</a></td>';
+     h+='<td>'+d[p]+'</td>';
+     h+='<td>'+i[p]+'</td></tr>';
+     s.eq(p).before(h);
+     t=r.length-1;
+     if (r.length>1) $('#refdiv').scrollTop($(document.getElementById("reftab").rows[t]).position().top-$('#reftab').position().top);
+    } else {
+     //se è cambiato il referto nel frattempo, lo reinvia
+     setTimeout(function(){
+      sharingon();
+     },10);
     }
-    t=t-1;
-    if (r.length>1)
-     $('#refdiv').scrollTop($(document.getElementById("reftab").rows[t]).position().top-$('#reftab').position().top);
    }
   },
   error:function(){
-   if (sharing){
-    spia
-     .removeClass('btn-success btn-info btn-warning')
-     .addClass('btn-danger');
-    //resetta user e password per fermare la connessione mantenendo la spia in errore
-    document.sh.pass.value=document.sh.user.value='';
-   }
+   sharingstop();
   }
  });
 }
@@ -3821,6 +3823,16 @@ function sharingon(){
   .removeClass('btn-warning btn-info btn-danger')
   .addClass('btn-success');
  inviodati('ref',prt2rec.referto);
+}
+
+function sharingstop(){
+ if (sharing){
+  spia
+   .removeClass('btn-success btn-info btn-warning')
+   .addClass('btn-danger');
+  //resetta user e password per fermare la connessione mantenendo la spia in errore
+  document.sh.pass.value=document.sh.user.value='';
+ }
 }
 
 //funzione di controllo della sintassi prima dell'invio al server
