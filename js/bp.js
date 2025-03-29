@@ -381,7 +381,6 @@ function ArrayDbFn(){
 
  //inizio gestione record
  this.deleteRec=function(tab,funzione,parametro,callback){
-  var i,id,r;
   dbready=false;
   deleteRec2(tab,funzione,parametro);
   savedb();
@@ -389,6 +388,7 @@ function ArrayDbFn(){
   eseguiCB(callback);
 
   function deleteRec2(tab,funzione,parametro){
+   var i,id,r;
    for(i=adb[tab].length-1;i>=0;i--){
     r=adf[tab].nomi.reduce(function(obj,elem,index){
      obj[elem]=adb[tab][i][index];
