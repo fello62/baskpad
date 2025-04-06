@@ -162,7 +162,7 @@ Il tiro verrà poi elaborato dall'app in automatico come tiro da sotto, da fuori
 
 In caso di errore dovuto alla mancata sistemazione dei bottoni A e B, per cui, ad esempio, un tiro da sotto venisse trasformato in un tiro da 3 da oltre metà campo, basterà modificare il referto sostituendo il T3 con un TY se il tiro era della squadra A, altrimenti con un TX in caso di squadra B.
 
-In caso di tiri liberi immessi tramite l'apposita finestra di dialogo, se nessun libero è realizzato, verrà cancellato l'eventuale assist presente nella riga d'immisione.
+In caso di tiri liberi immessi tramite l'apposita finestra di dialogo, se nessun libero è realizzato, verrà cancellato l'eventuale assist presente nella riga d'immissione.
 
 ### Opzione "punto"
 
