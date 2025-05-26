@@ -210,6 +210,14 @@ La tabella del referto, posta in basso a destra, presenta tre colonne:
    c'è un rimbalzo in meno, difensivo per B, offensivo per A
    ##### 1az
    l'azione fa sì che la differenza tra possesso A e possesso B sia maggiore di 1, e quindi viene snaturata la normale alternanza dei possessi
+   ##### 1ga
+   in campo c'è un giocatore A in più di quelli entrati ad inizio tempo
+   ##### -1ga
+   in campo c'è un giocatore A in meno di quelli entrati ad inizio tempo
+   ##### 1gb
+   in campo c'è un giocatore B in più di quelli entrati ad inizio tempo
+   ##### -1gb
+   in campo c'è un giocatore B in meno di quelli entrati ad inizio tempo
    ##### cp1
    inizio contropiede
    ##### cp0
@@ -217,4 +225,4 @@ La tabella del referto, posta in basso a destra, presenta tre colonne:
 
    Quando compaiono queste sigle, nelle righe successive di solito vengono annullate: se questo non avviene, ci deve essere un errore.
 
-3. informazioni: se l'azione è un fallo fatto, vengono riportati i falli del giocatore, se è un tiro realizzato, i punti individuali ed il quoziente di tiro, ecc.
+4. informazioni: se l'azione è un fallo fatto, vengono riportati i falli del giocatore, se è un tiro realizzato, i punti individuali ed il quoziente di tiro, ecc.
