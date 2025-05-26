@@ -1496,14 +1496,12 @@ function mostradaticmp(){
     f=false;
     if (d==dcposs){
      o=i+dcmp+4;
-     if (Math.abs(daticmp[0][d]-daticmp[1][d])>1)
-      f=true;
+     if (Math.abs(daticmp[0][d]-daticmp[1][d])>1) f=true;
     } else {
      o=i+dcmp+4+((i%2==0)?1:-1);
-     if (daticmp[0][d]!=daticmp[1][d+((d%2==0)?-1:1)])
-      f=true;
+     if (daticmp[0][d]!=daticmp[1][d+((d%2==0)?-1:1)]) f=true;
     }
-    if (f){
+    if (f&&(tempodigioco>=1)&&(ent[0].nent==ent[1].nent)){
      celle.eq(i).attr('class','danger');
      celle.eq(o).attr('class','danger');
     } else {
@@ -2180,30 +2178,35 @@ function getdiff(){
  if (cambioris){
   cambioris=false;
   result=daticmp[0][dcpunti]+'-'+daticmp[1][dcpunti];
- } else
-  result='';
- i=dcff;
- while (i<dcpr){
-  for(s=0;s<=1;s++){
-   r=daticmp[s][i]-daticmp[1-s][i+1];
-   if (r!=0){
-    if (result.length>0)
-     result+=' ';
-    result+=r+u.charAt(i-dcff)+('ab'.charAt(s));
+ } else result='';
+ for(s=0;s<=1;s++){
+  r=ent[s].cent-ent[s].ment;
+  if (r!=0){
+   if (result.length>0) result+=' ';
+   result+=r+'g'+('ab'.charAt(s));
+  }
+  if ((tempodigioco>=1)&&(ent[0].nent==ent[1].nent)){
+   i=dcff;
+   while (i<dcpr){
+    r=daticmp[s][i]-daticmp[1-s][i+1];
+    if (r!=0){
+     if (result.length>0) result+=' ';
+     result+=r+u.charAt(i-dcff)+('ab'.charAt(s));
+    }
+    i+=2;
    }
   }
-  i+=2;
  }
- r=Math.floor(Math.abs(daticmp[0][dcposs]-daticmp[1][dcposs])/2);
- if (r>=1){
-  if (result.length>0)
-   result+=' ';
-  result+=r+'az';
+ if ((tempodigioco>=1)&&(ent[0].nent==ent[1].nent)){
+  r=Math.floor(Math.abs(daticmp[0][dcposs]-daticmp[1][dcposs])/2);
+  if (r>=1){
+   if (result.length>0) result+=' ';
+   result+=r+'az';
+  }
  }
  if (contropiedecmb){
   contropiedecmb=false;
-  if (result.length>0)
-   result+=' ';
+  if (result.length>0) result+=' ';
   if ((contropiede&1)!=0)
    result+='cp1';
   else
@@ -2767,7 +2770,7 @@ stati mostra:
         //aggiorna risultato
         daticmp[sqsel][dcpunti]+=m;
         setposs(1-sqsel,1);
-        if ((tempodigioco>=1)&&(ent[0]==ent[1]))
+        if ((tempodigioco>=1)&&(ent[0].nent==ent[1].nent))
          prt2rec.ris=daticmp[0][dcpunti]+'-'+daticmp[1][dcpunti];
         m=(dato==vcsc1)?vcts1:dato;
        } else {
@@ -2991,7 +2994,7 @@ stati mostra:
        }
        //aggiorna risultato
        daticmp[sqsel][dcpunti]+=m;
-       if ((tempodigioco>=1)&&(ent[0]==ent[1]))
+       if ((tempodigioco>=1)&&(ent[0].nent==ent[1].nent))
         prt2rec.ris=daticmp[0][dcpunti]+'-'+daticmp[1][dcpunti];
        if ((intflag&64)!=0){
         if (m>0){
@@ -3069,17 +3072,18 @@ stati mostra:
           //se è la prima di queste entrate per una squadra,
           //azzero vconc e sistemo bonus e sequenze tiri e
           //registro i parziali dei periodi
-          if (ent[p]<1){
-           ent[p]=Math.abs(ent[p])+1;
+          if (ent[p].nent<1){
+           ent[p].nent=Math.abs(ent[p].nent)+1;
            tempodigioco=maxent();
-           while (ent[p]>=periodi.length){
+           ent[p].ment=ent[p].cent=0;
+           while (ent[p].nent>=periodi.length){
             periodi.push({dati:[]});
             periodi[periodi.length-1].dati[0]=new Array(voci+1);
             periodi[periodi.length-1].dati[1]=new Array(voci+1);
             periodoazzera(periodi.length-1);
            }
-           if (ent[p]>1)
-            periodocopiatot(ent[p]-1,p);
+           if (ent[p].nent>1)
+            periodocopiatot(ent[p].nent-1,p);
            if (tempodigioco<=camprec.tempi)
             daticmp[p][dcbonus]=0;
            for(n=1;n<=tot;n++){
@@ -3089,11 +3093,7 @@ stati mostra:
              datirec[p][n].tiri+=';';
             }
             //rimuove in campo
-            if ((n<=datirec[p][tot].dati[vcprt])&&(datirec[p][n].dati[vconc]==1)){
-             datirec[p][n].dati[vconc]=0;
-             //gestione minuscolo
-             mostra|=2;
-            }
+            if ((n<=datirec[p][tot].dati[vcprt])&&(datirec[p][n].dati[vconc]==1)) datirec[p][n].dati[vconc]=0;
            }
           }
           //aggiorna i dati
@@ -3104,14 +3104,16 @@ stati mostra:
           datirec[p][g].dati[vcsec]+=s;
           datirec[p][tot].dati[vcsec]+=s;
           datirec[p][g].dati[vconc]=1;
-          //gestione maiuscolo
-          mostra|=2;
+          ent[p].ment++;
+          ent[p].cent++;
          }
         }
        }
+       //se ho introdotto delle entrate, mostrale
+       if (ent[0].ment+ent[1].ment>0) mostra|=2;
        if ((intflag&32)!=0)
         for(p=0;p<=1;p++)
-         if (ent[p]>0){
+         if (ent[p].nent>0){
           //cerca il quintetto
           quintidx[p]=quintcerca(p);
           //incrementa minuti e secondi
@@ -3138,9 +3140,9 @@ stati mostra:
         refleggadd(rl);
        }
        //sistema risultati parziali
-       ent[0]=-Math.abs(ent[0]);
-       ent[1]=-Math.abs(ent[1]);
-       if (ent[0]==ent[1]){
+       ent[0].nent=-Math.abs(ent[0].nent);
+       ent[1].nent=-Math.abs(ent[1].nent);
+       if (ent[0].nent==ent[1].nent){
         if (tempodigioco==1)
          prt2rec.parz='';
         else if ((tempodigioco>1)&&(tempodigioco>prt2rec.parz.split(';').length)){
@@ -3191,6 +3193,7 @@ stati mostra:
             datirec[p][g].dati[vcsec]+=s;
             datirec[p][tot].dati[vcsec]+=s;
             datirec[p][g].dati[vconc]=1;
+            ent[p].cent++;
             if ((intflag&64)!=0){
              if (rl[p].length==0)
               rl[p]='Entra ';
@@ -3212,6 +3215,7 @@ stati mostra:
             datirec[p][g].dati[vcsec]-=s;
             datirec[p][tot].dati[vcsec]-=s;
             datirec[p][g].dati[vconc]=0;
+            ent[p].cent--;
             if ((intflag&64)!=0){
              if (rl[p].length==0)
               rl[p]='Esce ';
@@ -3226,11 +3230,11 @@ stati mostra:
             }
            }
           }
-          //gestione maiuscolo
-          mostra|=2;
          }
         }
        }
+       //se uno dei due quintetti cambia, mostrali
+       if (d[0]+d[1]>0) mostra|=2;
        if ((intflag&32)!=0)
         for(p=0;p<=1;p++)
          if (d[p]==1){
@@ -3419,17 +3423,17 @@ function inviodati(azione,dato){
 }
 
 function maxent(){
- if (Math.abs(ent[0])>=Math.abs(ent[1]))
-  return Math.abs(ent[0]);
+ if (Math.abs(ent[0].nent)>=Math.abs(ent[1].nent))
+  return Math.abs(ent[0].nent);
  else
-  return Math.abs(ent[1]);
+  return Math.abs(ent[1].nent);
 }
 
 function minent(){
- if (Math.abs(ent[1])>=Math.abs(ent[0]))
-  return Math.abs(ent[0]);
+ if (Math.abs(ent[1].nent)>=Math.abs(ent[0].nent))
+  return Math.abs(ent[0].nent);
  else
-  return Math.abs(ent[1]);
+  return Math.abs(ent[1].nent);
 }
 
 function periodoazzera(p){
@@ -3600,7 +3604,10 @@ function resetdati(soloprt){
  info='';
  incmp=false;
  cambioris=false;
- ent=[0,0];
+ //nent numero tempi di gioco con entrate
+ //ment numero di giocatori nell'ultima entrata
+ //cent numero giocatori in campo
+ ent=[{nent:0,ment:0,cent:0},{nent:0,ment:0,cent:0}];
  dq='';
  daticmp=new Array(2);
  daticmp[0]=new Array(dcmp+1);
@@ -4962,7 +4969,7 @@ function stpquintetti(esporta){
     continue;
    w+='<tr class="tar">';
    t=quintrec[q].nmaglia+' ';
-   while (t.length>0){
+   for(j=1;j<=5;j++){
     i=t.indexOf(' ');
     if (i>=0){
      tdc=t.substr(0,i);
@@ -4971,7 +4978,7 @@ function stpquintetti(esporta){
       g=Math.floor(g/4)+1;
      w+='<td class="tac" rowspan="2">'+htmlentities(datirec[s][g].cognome)+'<br>'+htmlentities(datirec[s][g].nome)+'</td>';
      t=ltrim(t.substr(i));
-    }
+    } else w+='<td rowspan="2"></td>';
    }
    w+='<td class="tal"><i>Quintetto</i></td>';
    w+='<td>'+puntiq(q)+'</td>';
@@ -5326,7 +5333,7 @@ function stpstatistiche(esporta){
    }
   }
   if (tempodigioco>1){
-   for(g=1;g<=Math.abs(ent[s]);g++){
+   for(g=1;g<=Math.abs(ent[s].nent);g++){
     w+='<tr class="tar">';
     if (g<=camprec.tempi)
      t=g+'&ordm; tempo';
