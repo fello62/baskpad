@@ -163,7 +163,7 @@ $('button.dele').click(function(event){
  var v,i=$(document.f.nmaglia);
  v=i.val();
  if (v.length>0) {
-  v=v.substr(0,v.length-1);
+  v=v.substring(0,v.length-1);
   i.val(v);
  }
 });
@@ -175,7 +175,7 @@ $('#modModal').on('show.bs.modal',function(event){
   button=$('#sg'+codsqgioc);
  } else {
   button=$(event.relatedTarget);
-  codsqgioc=1*(button.attr('id').substr(2));
+  codsqgioc=1*(button.attr('id').substring(2));
  }
  codgioc=button.data('codgioc');
  $('#gioc').text(button.parents('td').next('td').text());
@@ -200,7 +200,7 @@ $(document.f.nmaglia).on('input',function(event){
 $(document.f).on('submit',function(event){
  var ar,nm;
  solonumeri(document.f.nmaglia);
- nm=('  '+document.f.nmaglia.value).substr(document.f.nmaglia.value.length);
+ nm=('  '+document.f.nmaglia.value).substring(document.f.nmaglia.value.length);
  nm=(nm=='  ')?'':nm;
  ar={codsqgioc:codsqgioc,codsq:codsq,codgioc:codgioc,nmaglia:nm};
  $('#modModal').modal('hide');
@@ -218,8 +218,8 @@ $(document.a.annosport).on('change',function(event){
 $(document.a.codsq).on('change',function(event){
  var p,s=$(this).val();
  p=s.indexOf('_');
- codsq=s.substr(0,p);
- cat=s.substr(p+1);
+ codsq=s.substring(0,p);
+ cat=s.substring(p+1);
  leggirighe(3);
 });
 

@@ -777,18 +777,17 @@ $('#canc').click(function(event){
   document.f.dati.value='';
   return false;
  }
- s='.'+s.substr(0,s.length-1);
+ s='.'+s.substring(0,s.length-1);
  var p=s.replace(/\s/g,".");
  var pu=p.lastIndexOf(".");
  var qu=p.lastIndexOf("]");
- if (qu<0)
-  qu=pu;
+ if (qu<0) qu=pu;
  if (qu>pu){
   qu=p.lastIndexOf("[");
-  p=p.substr(0,qu);
+  p=p.substring(0,qu);
   pu=p.lastIndexOf(".");
  }
- s=s.substr(1,pu);
+ s=s.substring(1,pu+1);
  document.f.dati.value=s;
  return false;
 });
@@ -877,7 +876,7 @@ $('button.dele').click(function(event){
  var i=$('#tempo');
  var v=i.val();
  if (v.length>0){
-  v=v.substr(0,v.length-1);
+  v=v.substring(0,v.length-1);
   i.val(v);
  }
 });
@@ -937,9 +936,9 @@ $('button.sost').click(function(event){
   bnum=numeri[s].length/4;
   for(i=0;i<bnum-1;i++){
    if ((! entrate)&&(datirec[s][i+1].dati[vconc]!=0))
-    ic+='<button type="button" class="btn btn-success" data-sost="1">'+trim(numeri[s].substr(i*4,4))+'</button>';
+    ic+='<button type="button" class="btn btn-success" data-sost="1">'+trim(numeri[s].substring(i*4,4+i*4))+'</button>';
    else
-    fc+='<button type="button" class="btn btn-danger" data-sost="0">'+trim(numeri[s].substr(i*4,4))+'</button>';
+    fc+='<button type="button" class="btn btn-danger" data-sost="0">'+trim(numeri[s].substring(i*4,4+i*4))+'</button>';
   }
   fc+='</div>';
   ic+='</div>';
@@ -972,20 +971,20 @@ $('button.tirilib').click(function(event){
 
 $('#modTL button.dele').click(function(event){
  var o=document.getElementById('testotl');
- o.value=o.value.substr(0,o.value.length-1);
+ o.value=o.value.substring(0,o.value.length-1);
 });
 
 $('#modTL button.btn-lg').click(function(event){
  var o=document.getElementById('testotl');
  var button=$(this);
- if (o.value.substr(0,2)!='TL') o.value='TL';
+ if (o.value.substring(0,2)!='TL') o.value='TL';
  if (o.value.length<5) o.value+=button.text();
  if (button.hasClass('btn-primary')){
   $('#modTL').modal('hide');
   document.f.dati.value+=' '+o.value+(punto?'.':' ');
-  if ('000'.indexOf(o.value.substr(2))==0){
+  if ('000'.indexOf(o.value.substring(2))==0){
    var a=document.f.dati.value.lastIndexOf(' AS ');
-   if (a>=0) document.f.dati.value=document.f.dati.value.substr(0,a)+document.f.dati.value.substr(a+4);
+   if (a>=0) document.f.dati.value=document.f.dati.value.substring(0,a)+document.f.dati.value.substring(a+4);
   }
   o.value='';
  }
@@ -1134,8 +1133,8 @@ function checktempo(a){
  v=i.val();
  v=parseInt(v,10)||0;
  s=('000'+v).slice(-4);
- mm=parseInt(s.substr(0,2),10)||0;
- ss=parseInt(s.substr(2,2),10)||0;
+ mm=parseInt(s.substring(0,2),10)||0;
+ ss=parseInt(s.substring(2,4),10)||0;
  if (ss>=60)
   ss=59;
  s=mm+('0'+ss).slice(-2);
@@ -1283,7 +1282,7 @@ function impnmsave(){
  i=prt2rec.referto.indexOf('<num>\n');
  s=prt2rec.referto.indexOf('</num>\n');
  if (start) sessionStorage.refertoold=prt2rec.referto;
- prt2rec.referto=prt2rec.referto.substr(0,i)+e+prt2rec.referto.substr(s);
+ prt2rec.referto=prt2rec.referto.substring(0,i)+e+prt2rec.referto.substring(s);
  modificato=true;
  resetdati(true);
  caricanummag();
@@ -1531,9 +1530,9 @@ function mostragioc(){
    for(i=0;i<bnum;i++){
     c=((s==selsq)&&(i==selgiocidx-1));
     if ((i<bnum-1)&&(datirec[s][i+1].dati[vconc]==0))
-     fc+='<button type="button" class="btn btn-'+(nmagliagiu?'xs':'sm')+' btn-'+(c?'info':'danger')+'" data-onc="btn-danger">'+trim(numeri[s].substr(i*4,4))+'</button>';
+     fc+='<button type="button" class="btn btn-'+(nmagliagiu?'xs':'sm')+' btn-'+(c?'info':'danger')+'" data-onc="btn-danger">'+trim(numeri[s].substring(i*4,4+i*4))+'</button>';
     else
-     ic+='<button type="button" class="btn '+(cellulare?'':(nmagliagiu?'btn-gioc '+(vertflag?'gioc-v ':'gioc-o '):'btn-lg '))+'btn-'+(c?'info':'success')+'" data-onc="btn-success">'+trim(numeri[s].substr(i*4,4))+'</button>';
+     ic+='<button type="button" class="btn '+(cellulare?'':(nmagliagiu?'btn-gioc '+(vertflag?'gioc-v ':'gioc-o '):'btn-lg '))+'btn-'+(c?'info':'success')+'" data-onc="btn-success">'+trim(numeri[s].substring(i*4,4+i*4))+'</button>';
    }
    fc+='</div>';
    ic+='</div>';
@@ -1639,7 +1638,7 @@ function mostrainfopop(elim,o,f,t){
     return w;
    },
    placement: function(){
-    return ('PaTi'.indexOf(t.substr(0,2))>=0)?'left':'right';
+    return ('PaTi'.indexOf(t.substring(0,2))>=0)?'left':'right';
    },
    html: true,
    title: t,
@@ -1806,17 +1805,17 @@ function tiroclick(e){
  if (xxx>14000){
   x=Math.round(26425-xxx);
   y=Math.round(yyy-7500);
-  testo='YX'.substr(p,1);
+  testo='YX'.charAt(p);
  } else {
   x=Math.round(xxx-1575);
   y=Math.round(7500-yyy);
-  testo='XY'.substr(p,1);
+  testo='XY'.charAt(p);
  }
  s=(rtrim(document.f.dati.value)).toUpperCase();
  p=s.lastIndexOf('SC1');
  if ((p>=0)&&(p+4>=s.length)){
   s=document.f.dati.value;
-  s=s.substring(0,p+3)+'[X'+x+'Y'+y+']'+s.substr(p+3);
+  s=s.substring(0,p+3)+'[X'+x+'Y'+y+']'+s.substring(p+3);
   document.f.dati.value=s;
  } else {
   testo=' T'+testo+(e?'1':'0');
@@ -1906,8 +1905,8 @@ function caricanummag(){
   r=num[i].indexOf(',',p+1);
   altezza=num[i].substring(p+1,r);
   ruolo=num[i].substring(r+1);
-  datirec[s][x[s]].nmaglia=nmaglia.substr(1);
-  numeri[s]+=(nmaglia+'  ').substr(0,4);
+  datirec[s][x[s]].nmaglia=nmaglia.substring(1);
+  numeri[s]+=(nmaglia+'  ').substring(0,4);
   datirec[s][x[s]].codgioc=codgioc;
   datirec[s][x[s]].cognome=cognome;
   datirec[s][x[s]].nome=nome;
@@ -2032,13 +2031,13 @@ function cercarefdb(voce){
  var result='';
  if (p<0)
   return result;
- var d=prt2rec.referto.substr(0,p);
+ var d=prt2rec.referto.substring(0,p);
  voce='\n'+voce+'=';
  var v=voce.length;
  p=d.indexOf(voce);
  if (p>=0){
   var r=d.indexOf('\n',p+v);
-  result=d.substr(p+v,r-p-v);
+  result=d.substring(p+v,r);
  }
  return result;
 }
@@ -2135,12 +2134,12 @@ function eseguipatch(testo1,testo3){
   if ((c>='0')&&(c<='9')){
    r=t3[i].indexOf(',');
    p=parseInt(t3[i],10)||0;
-   r=parseInt(t3[i].substr(r+1),10)||0;
+   r=parseInt(t3[i].substring(r+1),10)||0;
    if (p>0) p=r;
   } else if (c=='-'){
    t1.splice(p,1);
   } else if (c=='+'){
-   t1.splice(p,0,t3[i].substr(1));
+   t1.splice(p,0,t3[i].substring(1));
    p++;
   }
  }
@@ -2158,7 +2157,7 @@ function eseguipatchctrl(testo1,testo3){
   if ((c>='0')&&(c<='9')){
    r=parseInt(t3[i],10)||0;
   } else if (c=='-'){
-   if (t1[r]!=t3[i].substr(1)){
+   if (t1[r]!=t3[i].substring(1)){
     f=false;
     break;
    }
@@ -2232,13 +2231,13 @@ function gioccerca(s,t){
  var c,i;
  var result=0;
  if ((s==0)||(s==1)){
-  c=numeri[s].indexOf((t+'   ').substr(0,3));
+  c=numeri[s].indexOf((t+'   ').substring(0,3));
   if ((c%4)==1){
    result=Math.floor(c/4)+1;
   }
  } else {
   for(i=0;i<=1;i++){
-   c=numeri[i].indexOf((t+'    ').substr(0,4));
+   c=numeri[i].indexOf((t+'    ').substring(0,4));
    if ((c%4)==0){
     s=i;
     result=Math.floor(c/4)+1;
@@ -2328,7 +2327,7 @@ stati mostra:
     quc=-1;
    }
    //imposta il testo da cercare
-   tdc=trim(riga.substr(0,sep));
+   tdc=trim(riga.substring(0,sep));
    //cerca un giocatore di entrambe le squadre
    sint=-1;
    s=-1;
@@ -2348,13 +2347,13 @@ stati mostra:
     }
     //aggiunge un warning se non era in campo
     if (((intflag&2)!=0)&&(giocsel<sq)&&(datirec[sqsel][giocsel].dati[vconc]==0)){
-     t='ATT['+trim(numeri[sqsel].substr(giocidx*4-4,4))+': non in campo]';
+     t='ATT['+trim(numeri[sqsel].substring(giocidx*4-4,giocidx*4))+': non in campo]';
      righe.splice(r+1,0,t);
     }
    }
    //dati stat
    if (sint==-1){
-    v=('FF FS TS1TS0TF1TF0T31T30TL1TL0RO RD SD SS PP PR AS SC1PRIAP RFTFFPFSPFFAFSATL-').indexOf((tdc+'   ').substr(0,3));
+    v=('FF FS TS1TS0TF1TF0T31T30TL1TL0RO RD SD SS PP PR AS SC1PRIAP RFTFFPFSPFFAFSATL-').indexOf((tdc+'   ').substring(0,3));
     dato=Math.floor(v/3)+vcff;
     if ((v%3)==0){
      sint=0;
@@ -2704,7 +2703,10 @@ stati mostra:
         rinfo+='autocanestro';
        }
        incdato(sqsel,giocsel,dato);
-       if (giocsel<sq) rinfo+=datirec[sqsel][giocsel].dati[m-((m-vcts1)%2)]+'/'+(datirec[sqsel][giocsel].dati[m-((m-vcts1)%2)]+datirec[sqsel][giocsel].dati[m-((m-vcts1)%2)+1])+('tstft3'.substr(Math.floor((m-vcts1)/2)*2,2));
+       if (giocsel<sq){
+        m-=((m-vcts1)&1);
+        rinfo+=datirec[sqsel][giocsel].dati[m]+'/'+(datirec[sqsel][giocsel].dati[m]+datirec[sqsel][giocsel].dati[m+1])+(['ts','tf','t3'][(m-vcts1)>>1]);
+       }
        if ((intflag&32)!=0){
         quintrec[quintidx[sqsel]].datipro[dato]++;
         quintrec[quintidx[1-sqsel]].datiavv[dato]++;
@@ -2716,13 +2718,13 @@ stati mostra:
        //trova i dati dentro le parentesi quadre
        //per aggiungere i tiri alle sequenze di tiro
        if (qua>0){
-        t=riga.substr(qua-1,1)+riga.substring(qua+1,quc);
+        t=riga.charAt(qua-1)+riga.substring(qua+1,quc);
         if (datirec[sqsel][giocsel].tiri.length>0)
-         if (datirec[sqsel][giocsel].tiri.substr(datirec[sqsel][giocsel].tiri.length-1)!=';')
+         if (datirec[sqsel][giocsel].tiri.substring(datirec[sqsel][giocsel].tiri.length-1)!=';')
           datirec[sqsel][giocsel].tiri+=',';
         datirec[sqsel][giocsel].tiri+=t;
         if (datirec[sqsel][tot].tiri.length>0)
-         if (datirec[sqsel][tot].tiri.substr(datirec[sqsel][tot].tiri.length-1)!=';')
+         if (datirec[sqsel][tot].tiri.substring(datirec[sqsel][tot].tiri.length-1)!=';')
           datirec[sqsel][tot].tiri+=',';
         datirec[sqsel][tot].tiri+=t;
        }
@@ -2734,8 +2736,7 @@ stati mostra:
         rinfo+=' '+punti(sqsel,giocsel)+'p';
         //rileva la differenza punti per il plus/minus
         m=punti(sqsel,tot)-daticmp[sqsel][dcpunti];
-        if (m>0)
-         cambioris=true;
+        if (m>0) cambioris=true;
         if ((contropiede&1)!=0){
          adrec[sqsel].cpnum++;
          adrec[sqsel].cppun+=m;
@@ -2881,14 +2882,14 @@ stati mostra:
         //sostituisce 0 o 1 nella seqtl di squadra
         if ((u&1)!=0){
          if (t!='-')
-          datirec[sqsel][tot].seqtl=datirec[sqsel][tot].seqtl.substring(0,d[0]-tdc.length+1+i)+t+datirec[sqsel][tot].seqtl.substr(d[0]-tdc.length+2+i);
+          datirec[sqsel][tot].seqtl=datirec[sqsel][tot].seqtl.substring(0,d[0]-tdc.length+1+i)+t+datirec[sqsel][tot].seqtl.substring(d[0]-tdc.length+2+i);
         } else {
          //allunga la seqtl di squadra
          datirec[sqsel][tot].seqtl+=t;
         }
         if ((u&2)!=0){
          if (t!='-')
-          datirec[sqsel][giocsel].seqtl=datirec[sqsel][giocsel].seqtl.substring(0,d[1]-tdc.length+1+i)+t+datirec[sqsel][giocsel].seqtl.substr(d[1]-tdc.length+2+i);
+          datirec[sqsel][giocsel].seqtl=datirec[sqsel][giocsel].seqtl.substring(0,d[1]-tdc.length+1+i)+t+datirec[sqsel][giocsel].seqtl.substring(d[1]-tdc.length+2+i);
         } else {
          //allunga la seqtl del giocatore
          datirec[sqsel][giocsel].seqtl+=t;
@@ -3027,7 +3028,7 @@ stati mostra:
 
    //altri dati
    if (sint==-1){
-    v=("NOTE'   ERR ATT ENT S   TMP CP  DA  DB  AA  AB  ").indexOf((tdc+'    ').substr(0,4));
+    v=("NOTE'   ERR ATT ENT S   TMP CP  DA  DB  AA  AB  ").indexOf((tdc+'    ').substring(0,4));
     dato=Math.floor(v/4)+1;
     if ((v%4)==0){
      sint=0;
@@ -3051,18 +3052,18 @@ stati mostra:
        i=t.indexOf(' ');
        u=('0000'+t.substring(0,i)).slice(-4);
        //trova minuti e secondi
-       m=parseInt('0'+u.substr(0,2),10);
-       s=parseInt('0'+u.substr(2,2),10);
+       m=parseInt('0'+u.substring(0,2),10);
+       s=parseInt('0'+u.substring(2,4),10);
        //ciclo lungo gli spazi
        while (i>=0){
-        t=t.substr(i+1);
+        t=t.substring(i+1);
         i=t.indexOf(' ');
         u=t.substring(0,i);
         if (u.length>0){
          if (u.charAt(0)=='+'){
           //cerco il giocatore
           p=-1;
-          g=gioccerca(p,u.substr(1));
+          g=gioccerca(p,u.substring(1));
           p=g[0];
           g=g[1];
           //se non ci sono entrate in quintetto
@@ -3167,22 +3168,22 @@ stati mostra:
        i=t.indexOf(' ');
        u=('0000'+t.substring(0,i)).slice(-4);
        //trova minuti e secondi
-       m=parseInt('0'+u.substr(0,2),10);
-       s=parseInt('0'+u.substr(2,2),10);
+       m=parseInt('0'+u.substring(0,2),10);
+       s=parseInt('0'+u.substring(2,4),10);
        if ((intflag&64)!=0){
         tmp=m+':'+('0'+s).slice(-2);
         rl[2]+=tmp;
        }
        //ciclo lungo gli spazi
        while (i>=0){
-        t=t.substr(i+1);
+        t=t.substring(i+1);
         i=t.indexOf(' ');
         u=t.substring(0,i);
         if (u.length>0){
          if ('+-'.indexOf(u.charAt(0))>=0){
           //cerco il giocatore
           p=-1;
-          g=gioccerca(p,u.substr(1));
+          g=gioccerca(p,u.substring(1));
           p=g[0];
           g=g[1];
           if (u.charAt(0)=='+'){
@@ -3257,8 +3258,8 @@ stati mostra:
        if ((intflag&64)!=0){
         u=('0000'+t).slice(-4);
         //trova minuti e secondi
-        m=parseInt('0'+u.substr(0,2),10);
-        s=parseInt('0'+u.substr(2,2),10);
+        m=parseInt('0'+u.substring(0,2),10);
+        s=parseInt('0'+u.substring(2,4),10);
         tmp=m+':'+('0'+s).slice(-2);
         rl[2]=tmp;
         refleggadd(rl);
@@ -3303,7 +3304,7 @@ stati mostra:
     }
    }
    //taglia la parte della riga già elaborata
-   riga=ltrim(riga.substr(sp+1));
+   riga=ltrim(riga.substring(sp+1));
   }
   if ((intflag&1)!=0){
    //registra le differenze comparative
@@ -3380,7 +3381,7 @@ function inviodati(azione,dato){
      .addClass('btn-success');
    }
    var t=''+data;
-   if ((azione=='adt')&&(t.substr(0,4)=='TMP[')){
+   if ((azione=='adt')&&(t.substring(0,4)=='TMP[')){
     var d,h,i,p,r,s;
     //trova la posizione dei dati immessi e inserisce il tempo
     s=getrigheref();
@@ -3391,7 +3392,7 @@ function inviodati(azione,dato){
      r=interprete(t,0);
      p=s.lastIndexOf(dato);
      r=s.split('\n');
-     p=r.length-((s.substr(p)).split('\n')).length;
+     p=r.length-((s.substring(p)).split('\n')).length;
      r.splice(p,0,t);
      setrigheref(r.join('\n'));
      saveallref();
@@ -3544,7 +3545,7 @@ function refiniz(){
   s+='</db>\n<num>\n</num>\n';
   prt2rec.referto=s;
  } else {
-  prt2rec.referto=s+prt2rec.referto.substr(p);
+  prt2rec.referto=s+prt2rec.referto.substring(p);
  }
 }
 
@@ -3811,7 +3812,7 @@ function setposs(s,v){
 function setrigheref(s){
  var r='</num>\n';
  r=prt2rec.referto.indexOf(r)+r.length;
- prt2rec.referto=prt2rec.referto.substr(0,r)+s;
+ prt2rec.referto=prt2rec.referto.substring(0,r)+s;
 }
 
 function sharingoff(){
@@ -3881,7 +3882,7 @@ function sintassi(testo,intflag){
   }
   if ((pu>=0)&&(pu<sp)){
    if (testo.charAt(pu+1)==' '){
-    testo=testo.substr(0,pu)+' '+testo.substr(pu+1);
+    testo=testo.substring(0,pu)+' '+testo.substring(pu+1);
     sp=pu;
     pu=-1;
    } else {
@@ -3904,14 +3905,14 @@ function sintassi(testo,intflag){
    i=testo.charAt(1);
    //se non è ro o as
    if (([3,13].indexOf(d[selsq])<0)&&('AB'.indexOf(i)<0)){
-    testo=testo.substr(0,1)+('BA'.charAt(selsq))+testo.substr(1);
+    testo=testo.substring(0,1)+('BA'.charAt(selsq))+testo.substring(1);
     if (sp>=0){
      sp++;
      sep++;
     }
    }
   }
-  tdc=trim(testo.substr(((puflag)?1:0),sep-((puflag)?1:0)));
+  tdc=trim(testo.substring(((puflag)?1:0),sep));
   //cerca un giocatore della squadra selezionata
   sint=-1;//non accettabile
   s=selsq;
@@ -3931,12 +3932,12 @@ function sintassi(testo,intflag){
    //trova il dato contrario per il punto
    if (puflag){
     if (d[s]!=0){
-     t=' '+('FF FS RO RD SD SS PP PR FFPFSPFFAFSAAS '.substr(d[s]*3-3,3))+' ';
+     t=' '+('FF FS RO RD SD SS PP PR FFPFSPFFAFSAAS '.substring(d[s]*3-3,d[s]*3))+' ';
      //se assist, inserisce precedentemente nelle righe,
      if ((d[s]==13)&&(dato!=sq)){
       righe.splice(righe.length-1,0,('AB'.charAt(s))+datirec[s][dato].nmaglia+' '+trim(t));
      } else { //altrimenti inserisce nel testo
-      testo=testo.substring(0,sp)+t+testo.substr(sp);
+      testo=testo.substring(0,sp)+t+testo.substring(sp);
      }
     } else {//annulla puflag e accetta il giocatora trovato
      //sint=-1;//non accettabile
@@ -3960,20 +3961,20 @@ function sintassi(testo,intflag){
      //warning non in campo
      //da non inserire in righe perché qui non vengono gestite le sostituzioni
      sint=1; //warning non in campo
-     errore=rtrim(numeri[selsq].substr(selgiocidx*4-4,4));
+     errore=rtrim(numeri[selsq].substring(selgiocidx*4-4,selgiocidx*4));
     }
    }
   }
   //cerca dato stat
   if (sint==-1){//non accettabile
-   v='FF FS TS1TS0TF1TF0T31T30TL1TL0RO RD SD SS PP PR AS SC1PRIAP RFTFFPFSPFFAFSATL-TX1TX0TY1TY0'.indexOf((tdc+'   ').substr(0,3));
+   v='FF FS TS1TS0TF1TF0T31T30TL1TL0RO RD SD SS PP PR AS SC1PRIAP RFTFFPFSPFFAFSATL-TX1TX0TY1TY0'.indexOf((tdc+'   ').substring(0,3));
    dato=Math.floor(v/3)+vcff;
    if ((v%3)==0){
     sint=0;
     //se selgioc=sq scarta alcuni dati
     if ((selgioc==sq)&&([vcts0,vctf0,vct30,vctl1,vctl0,vcsd,vcss,vcas,vcsc1,vctlm,vctx0,vcty0].indexOf(dato)>=0)){
      sint=2;//errore no alla squadra
-     errore=quadra2tonda(trim(testo.substr(0,sp)));
+     errore=quadra2tonda(trim(testo.substring(0,sp)));
     }
     if (sint==0){
      switch (dato){
@@ -3997,8 +3998,8 @@ function sintassi(testo,intflag){
       case vcfsa:
        if ((tdc.length>3)&&(dato>vcsc1)){
         sint=3; //warning sintassi troppo lunga
-        errore=quadra2tonda(trim(testo.substr(0,sp-1)));
-        tdc=tdc.substr(0,3);
+        errore=quadra2tonda(trim(testo.substring(0,sp-1)));
+        tdc=tdc.substring(0,3);
        }
        if ((dato==vcap)||(dato==vcrft)) righe.push(trim(('AB'.charAt(selsq))+'SQ '+tdc));
        else righe.push(trim(giocsel+' '+tdc));
@@ -4040,16 +4041,16 @@ function sintassi(testo,intflag){
          if ((dist>6750)||((x<1415)&&(Math.abs(y)>6600))){
           dato=vct30-parseInt(tdc.charAt(2),10);
           //testo:=T3
-          tdc='T3'+tdc.substr(2);
+          tdc='T3'+tdc.substring(2);
          //distingue i TS tra 3 metri o in area
          } else if (((!tsinarea)&&(dist<=3000))||(tsinarea&&((Math.abs(y)<=2450)&&(x<=5800-1575)))){
           dato=vcts0-parseInt(tdc.charAt(2),10);
           //testo:=TS
-          tdc='TS'+tdc.substr(2);
+          tdc='TS'+tdc.substring(2);
          } else {
           dato=vctf0-parseInt(tdc.charAt(2),10);
           //testo:=TF
-          tdc='TF'+tdc.substr(2);
+          tdc='TF'+tdc.substring(2);
          }
         }
         //controlla la coincidenza tipoditiro-coordinate
@@ -4079,7 +4080,7 @@ function sintassi(testo,intflag){
       case vctl1:
       case vctl0:
       case vctlm:
-       if ((tdc.length>5)||(['-','--','---','0-0'].indexOf((tdc.substr(2)).replace(/1/g,'0'))>=0)){
+       if ((tdc.length>5)||(['-','--','---','0-0'].indexOf((tdc.substring(2)).replace(/1/g,'0'))>=0)){
         sint=-1;//non accettabile
         errore=quadra2tonda(tdc);
        } else
@@ -4154,7 +4155,7 @@ function sintassi(testo,intflag){
   }
   //altre voci
   if (sint==-1){//non accettabile
-   v=("NOTE'   ERR ATT ENT S   TMP CP  DA  DB  AA  AB  ").indexOf((tdc+'    ').substr(0,4));
+   v=("NOTE'   ERR ATT ENT S   TMP CP  DA  DB  AA  AB  ").indexOf((tdc+'    ').substring(0,4));
    dato=Math.floor(v/4)+1;
    if ((v%4)==0){
     switch (dato){
@@ -4167,7 +4168,7 @@ function sintassi(testo,intflag){
      case 12: //NOTE, ', ERR, DA, DB, AA e AB
       if (qua>=0){
        sint=0;
-       righe.push(trim(testo.substr(0,sp)));
+       righe.push(trim(testo.substring(0,sp)));
       }
       break;
      case 4: //ATT
@@ -4180,13 +4181,13 @@ function sintassi(testo,intflag){
        i=r.indexOf(' ');
        t=parseInt(r.substring(0,i),10)||0;
        while (i>=0){
-        r=ltrim(r.substr(i+1));
+        r=ltrim(r.substring(i+1));
         i=r.indexOf(' ');
         tdc=r.substring(0,i);
         if (tdc.length>0){
          if (tdc.charAt(0)=='+'){
           s=-1;
-          g=gioccerca(s,tdc.substr(1));
+          g=gioccerca(s,tdc.substring(1));
           s=g[0];
           g=g[1];
           if ((g>0)&&(g<sq)){
@@ -4205,13 +4206,13 @@ function sintassi(testo,intflag){
        i=r.indexOf(' ');
        t=parseInt(r.substring(0,i),10)||0;
        while (i>=0){
-        r=ltrim(r.substr(i+1));
+        r=ltrim(r.substring(i+1));
         i=r.indexOf(' ');
         tdc=r.substring(0,i);
         if (tdc.length>0){
          if ('+-'.indexOf(tdc.charAt(0))>=0){
           s=-1;
-          g=gioccerca(s,tdc.substr(1));
+          g=gioccerca(s,tdc.substring(1));
           s=g[0];
           g=g[1];
           if ((g>0)&&(g<sq)){
@@ -4260,7 +4261,7 @@ function sintassi(testo,intflag){
     break;
   }
   //taglia la parte di testo già elaborata
-  testo=ltrim(testo.substr(sp));
+  testo=ltrim(testo.substring(sp));
  }
  if (((intflag&1)!=0)&&selflag){
   mostragioc();
@@ -4661,7 +4662,7 @@ function stpmappe(s,esporta){
   i=vcts1;
   while (i<vctl0){
    j=datirec[s][g].dati[i];
-   t='TSTFT3TL'.substr(i-vcts1,2)+'&nbsp;'+j+'/';
+   t='TSTFT3TL'.substring(i-vcts1,2+i-vcts1)+'&nbsp;'+j+'/';
    mlt=j;
    j+=datirec[s][g].dati[i+1];
    t+=j;
@@ -4854,11 +4855,11 @@ function stppresroster(esporta){
  w+='Girone '+htmlentities(camprec.girone+' - '+camprec.fase)+' - ';
  w+=prtrec.giornata+'&ordf; giornata<br><small>';
  s=prtrec.dataora;
- y=parseInt(s.substr(0,4),10);
- m=parseInt(s.substr(5,2),10);
- g=parseInt(s.substr(8,2),10);
+ y=parseInt(s.substring(0,4),10);
+ m=parseInt(s.substring(5,7),10);
+ g=parseInt(s.substring(8,10),10);
  d=new Date(y,m-1,g);
- w+='DOMLUNMARMERGIOVENSAB'.substr(d.getDay()*3,3)+' '+g+'/'+m+'/'+y+' ore'+s.substr(10)+' - ';
+ w+='DOMLUNMARMERGIOVENSAB'.substring(d.getDay()*3,3+d.getDay()*3)+' '+g+'/'+m+'/'+y+' ore'+s.substring(10)+' - ';
  w+=htmlentities(prtrec.luogo)+' -  ';
  w+='Arbitri: '+htmlentities(prt2rec.arbitri)+'</small></h4>';
  w+='<h3>'+htmlentities(prt2rec.nomesq[0])+' vs '+htmlentities(prt2rec.nomesq[1])+'</h3>';
@@ -4972,12 +4973,12 @@ function stpquintetti(esporta){
    for(j=1;j<=5;j++){
     i=t.indexOf(' ');
     if (i>=0){
-     tdc=t.substr(0,i);
-     g=numeri[s].indexOf((tdc+'    ').substr(0,4));
+     tdc=t.substring(0,i);
+     g=numeri[s].indexOf((tdc+'    ').substring(0,4));
      if ((g%4)==0)
       g=Math.floor(g/4)+1;
      w+='<td class="tac" rowspan="2">'+htmlentities(datirec[s][g].cognome)+'<br>'+htmlentities(datirec[s][g].nome)+'</td>';
-     t=ltrim(t.substr(i));
+     t=ltrim(t.substring(i));
     } else w+='<td rowspan="2"></td>';
    }
    w+='<td class="tal"><i>Quintetto</i></td>';
@@ -5119,14 +5120,14 @@ function stpreflegg(esporta){
   w+='<tr>';
   d=reflegg[r].riga[0].indexOf('<div');
   if (d>0)
-   d=reflegg[r].riga[0].substr(d)+htmlentities(reflegg[r].riga[0].substr(0,d));
+   d=reflegg[r].riga[0].substring(d)+htmlentities(reflegg[r].riga[0].substring(0,d));
   else
    d=htmlentities(reflegg[r].riga[0]);
   w+='<td>'+d+'</td>';
   w+='<td>'+htmlentities(reflegg[r].riga[2])+'</td>';
   d=reflegg[r].riga[1].indexOf('<div');
   if (d>0)
-   d=reflegg[r].riga[1].substr(d)+htmlentities(reflegg[r].riga[1].substr(0,d));
+   d=reflegg[r].riga[1].substring(d)+htmlentities(reflegg[r].riga[1].substring(0,d));
   else
    d=htmlentities(reflegg[r].riga[1]);
   w+='<td>'+d+'</td>';
@@ -5184,11 +5185,11 @@ function stpstatistiche(esporta){
  w+='<tr class="tac"><td colspan="'+numcol+'"><b>';
  w+=camprec.nomecamp+' Gir. '+camprec.girone+'<br>';
  s=prtrec.dataora;
- y=parseInt(s.substr(0,4),10);
- m=parseInt(s.substr(5,2),10);
- g=parseInt(s.substr(8,2),10);
+ y=parseInt(s.substring(0,4),10);
+ m=parseInt(s.substring(5,7),10);
+ g=parseInt(s.substring(8,10),10);
  d=new Date(y,m-1,g);
- w+='DOMLUNMARMERGIOVENSAB'.substr(d.getDay()*3,3)+' '+g+'/'+m+'/'+y+s.substr(10);
+ w+='DOMLUNMARMERGIOVENSAB'.substring(d.getDay()*3,3+d.getDay()*3)+' '+g+'/'+m+'/'+y+s.substring(10);
  w+=' '+prtrec.giornata+'&ordf; giornata Gara '+prtrec.ngara+'<br>';
  w+='Rilevazioni di '+htmlentities(prt2rec.rilevatori)+'<br><br>';
  w+='<i>'+htmlentities(prt2rec.nomecortosq[0]+' - '+prt2rec.nomecortosq[1])+' '+prt2rec.ris;
@@ -5423,9 +5424,9 @@ function stptabcsv(esporta){
  if (!esporta) w+='<pre>';
  w+='"'+camprec.nomecamp+' Gir. '+camprec.girone+'"'+nl;
  s=prtrec.dataora;
- y=parseInt(s.substr(0,4),10);
- m=parseInt(s.substr(5,2),10);
- g=parseInt(s.substr(8,2),10);
+ y=parseInt(s.substring(0,4),10);
+ m=parseInt(s.substring(5,7),10);
+ g=parseInt(s.substring(8,10),10);
  d=new Date(y,m-1,g);
  p=[punti(0,sq),punti(1,sq)];
  w+='"'+g+'/'+m+'/'+y+ '"'+nl;
