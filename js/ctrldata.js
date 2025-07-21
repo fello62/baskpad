@@ -117,9 +117,9 @@ function ctrldata(o){
  mat[0]="0"+String(dd);
  mat[1]="0"+String(mm);
  mat[2]="000"+String(yy);
- mat[0]=mat[0].substr(mat[0].length-2);
- mat[1]=mat[1].substr(mat[1].length-2);
- mat[2]=mat[2].substr(mat[2].length-4);
+ mat[0]=mat[0].substring(mat[0].length-2);
+ mat[1]=mat[1].substring(mat[1].length-2);
+ mat[2]=mat[2].substring(mat[2].length-4);
  o.value=mat[0]+"/"+mat[1]+"/"+mat[2];
  if(yy==y && mm==m && dd==d){
   return true;
@@ -216,7 +216,7 @@ function ctrltime(o){
  mat[0]="0"+mat[0];
  mat[1]=mat[1]+"00";
  var h=parseInt(mat[0],10);
- var m=parseInt(mat[1].substr(0,2),10);
+ var m=parseInt(mat[1].substring(0,2),10);
  if ((h>23)||(m>59)) {
   alert("Orario non valido.");
   o.focus();
@@ -224,17 +224,17 @@ function ctrltime(o){
  }
  mat[0]="0"+String(h);
  mat[1]="0"+String(m);
- mat[0]=mat[0].substr(mat[0].length-2);
- mat[1]=mat[1].substr(mat[1].length-2);
+ mat[0]=mat[0].substring(mat[0].length-2);
+ mat[1]=mat[1].substring(mat[1].length-2);
  o.value=mat[0]+":"+mat[1];
  return true;
 }
 
 function giosett(o){
  var s=o.value;
- var y=parseInt(s.substr(6,4),10);
- var m=parseInt(s.substr(3,2),10)-1;
- var g=parseInt(s.substr(0,2),10);
+ var y=parseInt(s.substring(6,10),10);
+ var m=parseInt(s.substring(3,5),10)-1;
+ var g=parseInt(s.substring(0,2),10);
  var d=new Date(y,m,g);
  var giorni=["Domenica","Luned&igrave;","Marted&igrave;","Mercoled&igrave;","Gioved&igrave;","Venerd&igrave;","Sabato"];
  return giorni[d.getDay()];
@@ -243,7 +243,7 @@ function giosett(o){
 function proper(o){
  var s=trim(o.value);
  o.value=s.replace(/\w\S*/g, function(txt) {
-  return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+  return txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase();
  });
  return true;
 }
@@ -257,13 +257,13 @@ function solonumeri(o) {
 
 function sql2dataora(s){
  var r=new Array();
- r[0]=s.substr(8,2)+'/'+s.substr(5,2)+'/'+s.substr(0,4);
- r[1]=s.substr(11,5);
+ r[0]=s.substring(8,10)+'/'+s.substring(5,7)+'/'+s.substring(0,4);
+ r[1]=s.substring(11,16);
  return r;
 }
 
 function dataora2sql(d,o){
- return d.substr(6,4)+'-'+d.substr(3,2)+'-'+d.substr(0,2)+' '+o;
+ return d.substring(6,10)+'-'+d.substring(3,5)+'-'+d.substring(0,2)+' '+o;
 }
 
 function trim(stringToTrim){

@@ -135,19 +135,19 @@ const adf={
    if (ref.length>0){
     p=ref.indexOf('codprt=')+7;
     q=ref.indexOf('\n',p);
-    ref=ref.substr(0,p)+v+ref.substr(q);
+    ref=ref.substring(0,p)+v+ref.substring(q);
     p=ref.indexOf('codcamp=')+8;
     q=ref.indexOf('\n',p);
     x=parseInt(ref.substring(p,q),10);
-    if (ar.camp[x]) ref=ref.substr(0,p)+ar.camp[x]+ref.substr(q);
+    if (ar.camp[x]) ref=ref.substring(0,p)+ar.camp[x]+ref.substring(q);
     p=ref.indexOf('codsqa=')+7;
     q=ref.indexOf('\n',p);
     x=parseInt(ref.substring(p,q),10);
-    if(ar.sq[x]) ref=ref.substr(0,p)+ar.sq[x]+ref.substr(q);
+    if(ar.sq[x]) ref=ref.substring(0,p)+ar.sq[x]+ref.substring(q);
     p=ref.indexOf('codsqb=')+7;
     q=ref.indexOf('\n',p);
     x=parseInt(ref.substring(p,q),10);
-    if(ar.sq[x]) ref=ref.substr(0,p)+ar.sq[x]+ref.substr(q);
+    if(ar.sq[x]) ref=ref.substring(0,p)+ar.sq[x]+ref.substring(q);
     p=ref.indexOf('<num>\n')+6;
     q=ref.indexOf('\n</num>\n');
     if (q>p){
@@ -160,7 +160,7 @@ const adf={
        m[j]=n.join(',');
       }
      }
-     ref=ref.substr(0,p)+m.join('\n')+ref.substr(q);
+     ref=ref.substring(0,p)+m.join('\n')+ref.substring(q);
     }
     r.referto=ref
    }
@@ -305,7 +305,7 @@ function ArrayDbFn(){
   ar=[];
   for(i=0;i<linee.length;i++){
    t=trim(linee[i]);
-   if (t.substr(0,6).toUpperCase()=='INSERT') ar.push(t);
+   if (t.substring(0,6).toUpperCase()=='INSERT') ar.push(t);
   }
   linee=[];
   tab='';
@@ -332,11 +332,11 @@ function ArrayDbFn(){
        else j+=2;
       }
       ar.push(s.slice(1,j).replace(/''/g,"'"));
-      s=ltrim(s.substr(s.indexOf(',',j)+1));
+      s=ltrim(s.substring(s.indexOf(',',j)+1));
      } else {
       j=s.indexOf(',');
-      ar.push(1*(rtrim(s.substr(0,j))));
-      s=ltrim(s.substr(j+1));
+      ar.push(1*(rtrim(s.substring(0,j))));
+      s=ltrim(s.substring(j+1));
      }
     }
     adb[tab].push(ar);
@@ -671,7 +671,7 @@ function IndexedDbFn(){
   ar=[];
   for(i=0;i<linee.length;i++){
    t=trim(linee[i]);
-   if (t.substr(0,6).toUpperCase()=='INSERT') ar.push(t);
+   if (t.substring(0,6).toUpperCase()=='INSERT') ar.push(t);
   }
   linee=[];
   tab='';
@@ -710,11 +710,11 @@ function IndexedDbFn(){
        else j+=2;
       }
       ar[k[pa]]=s.slice(1,j).replace(/''/g,"'");
-      s=ltrim(s.substr(s.indexOf(',',j)+1));
+      s=ltrim(s.substring(s.indexOf(',',j)+1));
      } else {
       j=s.indexOf(',');
-      ar[k[pa]]=1*(rtrim(s.substr(0,j)));
-      s=ltrim(s.substr(j+1));
+      ar[k[pa]]=1*(rtrim(s.substring(0,j)));
+      s=ltrim(s.substring(j+1));
      }
      pa++;
     }
@@ -1064,7 +1064,7 @@ function WebSqlDbFn(){
   ar=[];
   for(i=0;i<linee.length;i++){
    t=trim(linee[i]);
-   if (t.substr(0,6).toUpperCase()=='INSERT') ar.push(t);
+   if (t.substring(0,6).toUpperCase()=='INSERT') ar.push(t);
   }
   linee=[];
   tab='';
@@ -1618,7 +1618,7 @@ function distiri(canvas,tiri,squ){
     if (fatto) ctx.fill();
     else ctx.stroke();
    }
-   tiri=tiri.substr(v+1);
+   tiri=tiri.substring(v+1);
   }
  }
 }
