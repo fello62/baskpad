@@ -200,7 +200,7 @@ $(document.f.nmaglia).on('input',function(event){
 $(document.f).on('submit',function(event){
  var ar,nm;
  solonumeri(document.f.nmaglia);
- nm=('  '+document.f.nmaglia.value).substring(document.f.nmaglia.value.length);
+ nm=('  '+document.f.nmaglia.value).slice(-2);
  nm=(nm=='  ')?'':nm;
  ar={codsqgioc:codsqgioc,codsq:codsq,codgioc:codgioc,nmaglia:nm};
  $('#modModal').modal('hide');
