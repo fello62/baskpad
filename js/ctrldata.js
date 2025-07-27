@@ -114,12 +114,9 @@ function ctrldata(o){
  var dd=oggi.getDate();
  var mm=oggi.getMonth()+1;
  var yy=oggi.getFullYear();
- mat[0]="0"+String(dd);
- mat[1]="0"+String(mm);
- mat[2]="000"+String(yy);
- mat[0]=mat[0].substring(mat[0].length-2);
- mat[1]=mat[1].substring(mat[1].length-2);
- mat[2]=mat[2].substring(mat[2].length-4);
+ mat[0]=('0'+dd).slice(-2);
+ mat[1]=('0'+mm).slice(-2);
+ mat[2]=('000'+yy).slice(-4);
  o.value=mat[0]+"/"+mat[1]+"/"+mat[2];
  if(yy==y && mm==m && dd==d){
   return true;
@@ -160,38 +157,6 @@ function maiusc(o) {
  return true;
 }
 
-function posta() {
- var i=arguments[0].indexOf("?");
- var j=i;
- if (j==-1)
-  j=arguments[0].length;
- var f=document.createElement("form");
- f.setAttribute("method","post");
- f.setAttribute("action",arguments[0].substring(0,j));
- if (arguments.length>1)
-  f.setAttribute("target",arguments[1]);
- if (arguments.length>2)
-  window.open("",arguments[1],arguments[2]);
- while ((i>=0) && (arguments[0].length>i)) {
-  j=arguments[0].indexOf("=",i+1);
-  if (j>=i+1) {
-   var e=document.createElement("input");
-   e.setAttribute("type","hidden");
-   e.setAttribute("name",arguments[0].substring(i+1,j));
-   i=j+1;
-   j=arguments[0].indexOf("&",i);
-   if (j==-1)
-    j=arguments[0].length;
-   e.setAttribute("value",arguments[0].substring(i,j));
-   f.appendChild(e);
-  }
-  i=j;
- }
- document.getElementsByTagName("body")[0].appendChild(f);
- f.submit();
- document.getElementsByTagName("body")[0].removeChild(f);
-}
-
 function ctrltime(o){
  var s=o.value;
  if (s=="00:00") return true;
@@ -222,10 +187,8 @@ function ctrltime(o){
   o.focus();
   return false;
  }
- mat[0]="0"+String(h);
- mat[1]="0"+String(m);
- mat[0]=mat[0].substring(mat[0].length-2);
- mat[1]=mat[1].substring(mat[1].length-2);
+ mat[0]=('0'+h).slice(-2);
+ mat[1]=('0'+m).slice(-2);
  o.value=mat[0]+":"+mat[1];
  return true;
 }
