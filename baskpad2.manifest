@@ -1,9 +1,8 @@
 CACHE MANIFEST
-#Versione 20250723.1
+#Versione 20250727.1
 ./
 index.htm
 apple-touch-icon.png
-baskpad2.manifest
 crono.htm
 dbcamp.htm
 dbcampsq.htm
@@ -38,6 +37,7 @@ js/bp.js
 js/ctrldata.js
 js/fastclick.min.js
 js/jquery-1.11.2.min.js
+baskpad2.manifest
 
 NETWORK:
 *

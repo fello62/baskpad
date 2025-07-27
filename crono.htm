@@ -100,7 +100,7 @@
 <script src="js/bp.js"></script>
 <script>
 <!--
-var acceso,b,codprt,sharing,spia;
+var acceso,b,codprt,df,ds,sharing,spia,tr;
 
 if (typeof sessionStorage.crono=='undefined')
  codprt='';
@@ -113,13 +113,20 @@ b=$('#startstop');
 spia=$('#sharespy');
 acceso=false;
 sharing=false;
+df=0;
+tr=(parseInt(document.a.minuti.value,10)||0)*60000+
+ (parseInt(document.a.secondi.value,10)||0)*1000+
+ (parseInt(document.a.decimi.value,10)||0)*100;
 
 b.click(function(){
+ var i=Date.now();
  acceso=!acceso;
  if (acceso){
+  ds=i-df;
   b.removeClass('btn-success');
   b.addClass('btn-danger');
  } else {
+  df=i-ds;
   b.removeClass('btn-danger');
   b.addClass('btn-success');
  }
@@ -146,40 +153,31 @@ $([document.a.minuti,document.a.secondi]).on('blur',function(){
  ctrlnumero(document.a.minuti,0,99);
  ctrlnumero(document.a.secondi,0,59);
  document.a.decimi.value='0';
+ tr=(parseInt(document.a.minuti.value,10)||0)*60000+(parseInt(document.a.secondi.value,10)||0)*1000;
 });
 
 setInterval(function(){
  if (!acceso) return;
- var d,m,s;
- m=parseInt(document.a.minuti.value,10)||0;
- s=parseInt(document.a.secondi.value,10)||0;
- d=parseInt(document.a.decimi.value,10)||0;
+ var d,i,m,s;
+ i=Date.now();
+ tr+=ds-i;
+ ds=i;
+ if (tr>0){
+  m=Math.floor(tr/60000);
+  s=Math.floor((tr%60000)/1000);
+  d=Math.floor((tr%1000)/100);
+ } else m=s=d=0;
+ document.a.minuti.value=m;
+ document.a.secondi.value=s;
+ document.a.decimi.value=d;
  if ((d|s|m)==0){
   acceso=false;
   b.removeClass('btn-danger');
   b.addClass('btn-success');
-  return;
- }
- d--;
- if (d<0){
-  d=9;
-  s--;
-  if (s<0){
-   s=59;
-   m--;
-   document.a.minuti.value=m;
-  }
-  document.a.secondi.value=s;
- }
- document.a.decimi.value=d;
- if ((d|s|m)==0){
-  b.removeClass('btn-danger');
-  b.addClass('btn-success');
-  return;
  }
  if ((sharing)&&(s%10==0)&&(d==0)){
   //posta il tempo
-  inviodati('tmp',parseInt(''+m+('0'+s).slice(-2),10));
+  setTimeout(function(){inviodati('tmp',parseInt(''+m+('0'+s).slice(-2),10));},0);
  }
 },100);
 
