@@ -3089,7 +3089,7 @@ stati mostra:
             daticmp[p][dcbonus]=0;
            for(n=1;n<=tot;n++){
             //sequenze tiri
-            if (((n<=datirec[p][tot].dati[vcprt])||(n>sq))&&(d[p]==0)){
+            if (((n<=datirec[p][tot].dati[vcprt])||(n>=sq))&&(d[p]==0)){
              datirec[p][n].seqtl+=';';
              datirec[p][n].tiri+=';';
             }
@@ -4641,7 +4641,8 @@ function stpmappe(s,esporta){
  w+='<h2>Mappe di tiro '+htmlentities(prt2rec.nomecortosq[s])+'</h2>';
  w+='<table class="ctr">';
  x=2;
- for(g=1;g<=datirec[s][tot].dati[vcprt];g++){
+ for(g=1;g<tot;g++){
+  if (datirec[s][g].dati[vcts1]+datirec[s][g].dati[vcts0]+datirec[s][g].dati[vctf1]+datirec[s][g].dati[vctf0]+datirec[s][g].dati[vct31]+datirec[s][g].dati[vct30]+datirec[s][g].dati[vctl1]+datirec[s][g].dati[vctl0]==0) continue;
   x++;
   if (x>=y){
    if (g>1)
@@ -4652,7 +4653,7 @@ function stpmappe(s,esporta){
   w+='<td>';
   w+='<table class="nobrd">';
   w+='<tr><td class="tac" colspan="2">';
-  w+=datirec[s][g].nmaglia+' '+htmlentities(datirec[s][g].cognome+' '+datirec[s][g].nome);
+  w+=g==sq?'Squadra (autocanestri)':datirec[s][g].nmaglia+' '+htmlentities(datirec[s][g].cognome+' '+datirec[s][g].nome);
   w+='</td></tr>';
   w+='<tr><td>';
   w+='<div class="mappa">';
@@ -4709,10 +4710,11 @@ function stpmappe(s,esporta){
 }
 
 function stpmappaint(esporta){
- var g;
- var nl="\n";
- var ta=new Array(new Array(),new Array());
- var w='';
+ var g,i,m,nl,ta,tsq,w;
+ nl="\n";
+ ta=new Array(new Array(),new Array());
+ tsq=new Array();
+ w='';
  if (esporta){
   w+='<!DOCTYPE html>';
   w+='<html lang="it">';
@@ -4745,15 +4747,17 @@ function stpmappaint(esporta){
  }
  w+='<th class="tal"><div class="checkbox"><label><input name="sq[]" type="checkbox" checked>'+htmlentities(prt2rec.nomecortosq[1])+'</label></div></th>';
  w+='</tr></thead><tbody>';
- if (datirec[0][tot].dati[vcprt]>=datirec[1][tot].dati[vcprt]) m=datirec[0][tot].dati[vcprt];
- else m=datirec[1][tot].dati[vcprt];
+ tsq[0]=datirec[0][tot].dati[vcprt]+(datirec[0][sq].dati[vcts1]+datirec[0][sq].dati[vctf1]>0?1:0);
+ tsq[1]=datirec[1][tot].dati[vcprt]+(datirec[1][sq].dati[vcts1]+datirec[1][sq].dati[vctf1]>0?1:0);
+ m=(tsq[0]>=tsq[1])?tsq[0]:tsq[1];
  for(g=1;g<=m;g++){
   w+='<tr>';
-  if (g<=datirec[0][tot].dati[vcprt]){
+  if (g<=tsq[0]){
+   i=(g<=datirec[0][tot].dati[vcprt])?g:sq;
    w+='<td class="tal"><div class="checkbox"><label><input name="gioca[]" type="checkbox" checked>';
-   w+=datirec[0][g].nmaglia+' '+htmlentities(datirec[0][g].cognome)+' ';
-   w+=htmlentities(datirec[0][g].nome)+'</label></div></td>';
-   ta[0][g-1]=datirec[0][g].tiri.split(';');
+   w+=i<sq?datirec[0][i].nmaglia+' '+htmlentities(datirec[0][i].cognome)+' '+htmlentities(datirec[0][i].nome):'Squadra (autocanestri)';
+   w+='</label></div></td>';
+   ta[0][g-1]=datirec[0][i].tiri.split(';');
   } else {
    w+='<td></td>';
   }
@@ -4767,11 +4771,12 @@ function stpmappaint(esporta){
    w+='</canvas></div>';
    w+='</td>';
   }
-  if (g<=datirec[1][tot].dati[vcprt]){
+  if (g<=tsq[1]){
+   i=(g<=datirec[1][tot].dati[vcprt])?g:sq;
    w+='<td class="tal"><div class="checkbox"><label><input name="giocb[]" type="checkbox" checked>';
-   w+=datirec[1][g].nmaglia+' '+htmlentities(datirec[1][g].cognome)+' ';
-   w+=htmlentities(datirec[1][g].nome)+'</label></div></td>';
-   ta[1][g-1]=datirec[1][g].tiri.split(';');
+   w+=i<sq?datirec[1][i].nmaglia+' '+htmlentities(datirec[1][i].cognome)+' '+htmlentities(datirec[1][g].nome):'Squadra (autocanestri)';
+   w+='</label></div></td>';
+   ta[1][g-1]=datirec[1][i].tiri.split(';');
   } else {
    w+='<td></td>';
   }
