@@ -4789,7 +4789,7 @@ function stpmappaint(esporta){
   w+='var c,cvs,e,i,ta;'+nl;
   w+='cvs=document.getElementById("disegno");'+nl;
   w+='disvert(cvs,560,300,true);'+nl;
-  w+=' var ta='+JSON.stringify(ta)+';'+nl;
+  w+='ta='+JSON.stringify(ta)+';'+nl;
   w+='ridisegna();'+nl;
   w+='e=(document.mappa.elements[\'sq[]\'])||new Array();'+nl;
   w+='for(i=0;i<e.length;i++) e[i].onclick=Function(\'setsqclick(\'+i+\',this.checked);\');'+nl;
