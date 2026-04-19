@@ -160,7 +160,9 @@ Se si è optato per la rilevazione dei tiri sul campo di gioco:
 
 Il tiro verrà poi elaborato dall'app in automatico come tiro da sotto, da fuori o da tre a seconda della posizione indicata e dell'opzione "3 metri/area" selezionata.
 
-In caso di errore dovuto alla mancata sistemazione dei bottoni A e B, per cui, ad esempio, un tiro da sotto venisse trasformato in un tiro da 3 da oltre metà campo, basterà modificare il referto sostituendo il T3 con un TY se il tiro era della squadra A, altrimenti con un TX in caso di squadra B.
+In caso di errore dovuto alla mancata sistemazione dei bottoni A e B, per cui, ad esempio, un tiro da sotto venisse trasformato in un tiro da 3 da oltre metà campo, basterà modificare il referto:
+* sostituendo il T3 con un TY se il tiro era della squadra A, altrimenti con un TX in caso di squadra B,</li>
+* oppure, in maniera più semplice, cliccando il collegamento *tomc* (*t*iro *o*ltre *m*età *c*ampo) nelle informazioni di riga, avviando la procedura apposita.
 
 In caso di tiri liberi immessi tramite l'apposita finestra di dialogo, se nessun libero è realizzato, verrà cancellato l'eventuale assist presente nella riga d'immissione.
 
@@ -189,8 +191,8 @@ Al di sotto dei bottoni con le sigle dei giocatori, c'è una tabella contenente 
 
 ### La tabella Referto
 
-La tabella del referto, posta in basso a destra, presenta tre colonne:
-1. il referto vero e proprio, con le sigle normalizzate nella forma "giocatore azione[]" oppure "sigla[]", con le parentesi quadre che per molte sigle sono opzionali oppure non servono. Ogni riga di questa colonna è cliccabile per poterla modificare
+La tabella del referto, posta in basso a sinistra, presenta tre colonne:
+1. il referto vero e proprio, con le sigle normalizzate nella forma "giocatore azione[]" oppure "sigla[]", con le parentesi quadre che per molte sigle sono opzionali oppure non servono. Ogni cella di questa colonna è cliccabile per poterla modificare
 2. punteggio progressivo e differenze tra le squadre: le sigle qui utilizzate consentono di scovare eventuali errori di rilevazione:
    ##### 1fa
    c'è un fallo fatto in più per A
@@ -225,4 +227,4 @@ La tabella del referto, posta in basso a destra, presenta tre colonne:
 
    Quando compaiono queste sigle, nelle righe successive di solito vengono annullate: se questo non avviene, ci deve essere un errore.
 
-4. informazioni: se l'azione è un fallo fatto vengono riportati i falli del giocatore, se è un tiro realizzato i punti individuali ed il quoziente di tiro, ecc.
+4. informazioni: se l'azione è un fallo fatto vengono riportati i falli del giocatore, se è un tiro realizzato i punti individuali ed il quoziente di tiro, ecc. +  un tiro realizzato i punti individuali ed il quoziente di tiro, ecc. Nel caso di erroneo tiro oltre metà campo (sigla *tomc*), cliccando la sigla verrà avviata la procedura semplificata per invertire la metà campo del tiro.
