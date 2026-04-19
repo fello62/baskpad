@@ -1454,13 +1454,20 @@ function modrefshow(){
 }
 
 function modrigaref(this_){
- var atag,cella,d,old,r,riga,s,t;
+ var arow,atag,cella,d,old,r,riga,s,t;
  atag=$(this_);
- riga=atag.closest('tr').index();
+ arow=atag.closest('tr');
+ riga=arow.index();
  cella=atag.text();
- t=prompt('Modifica referto riga '+riga,cella);
+ if (cella=='tomc'){
+  t=cella=$('td:first',arow).text();
+  if (confirm('Inversione metà campo riga '+riga+'\n'+cella)) s=sintassi(t,10);
+  else t=null;
+ } else {
+  t=prompt('Modifica referto riga '+riga,cella);
+  if (t!=null) s=sintassi(t,2);
+ }
  if (t!=null){
-  s=sintassi(t,2);
   if (s!=cella){
    sessionStorage.refertoold=prt2rec.referto;
    modificato=true;
@@ -2719,6 +2726,10 @@ stati mostra:
        //per aggiungere i tiri alle sequenze di tiro
        if (qua>0){
         t=riga.charAt(qua-1)+riga.substring(qua+1,quc);
+        i=t.indexOf('X');
+        m=parseInt(t.substring(i+1),10)||0;
+        //se maggiore di metà campo
+        if (m>12425) rinfo+=' <a href="javascript:void(0);">tomc</a>';
         if (datirec[sqsel][giocsel].tiri.length>0)
          if (datirec[sqsel][giocsel].tiri.substring(datirec[sqsel][giocsel].tiri.length-1)!=';')
           datirec[sqsel][giocsel].tiri+=',';
@@ -3849,7 +3860,8 @@ function sintassi(testo,intflag){
 /*stati intflag:
 1 gestione visuale selgioc
 2 mantieni selgioc precedente
-4 riassegna i tipi di tiro basandosi sulle coordinate*/
+4 riassegna i tipi di tiro basandosi sulle coordinate
+8 inversione tiri oltre metà campo*/
  var dato,dist,errore,giocsel,i,pselgioc,pselgiocidx,pselsq,pu,puflag,qua,quc,r,s,selflag,sep,sint,sp,t,tdc,v,x,y;
  var righe=[];
  var d=[0,1];
@@ -4024,11 +4036,9 @@ function sintassi(testo,intflag){
         s=t.indexOf('Y');
         x=parseInt(t.substring(i+1,s),10)||0;
         y=parseInt(t.substring(s+1),10)||0;
-        if (dato>vcsc1){ //tiri indefinito
-         if ((selsq==1)!=(dato>=vcty1)){
-          x=24850-x;
-          y=-y;
-         }
+        if (((dato>vcsc1)&&((selsq==1)!=(dato>=vcty1)))||(((intflag&8)!=0)&&(x>12425))){ //inversione tiro indefinito oppure oltre metà campo
+         x=24850-x;
+         y=-y;
         }
         //se le coordinate non sono corrette, vengono azzerate
         if (((x<-1575)&&(x>26425))||(Math.abs(y)>7500)){
@@ -4036,8 +4046,8 @@ function sintassi(testo,intflag){
          y=0;
         }
         dist=Math.sqrt(x*x+y*y);
-        //se il tiro è indefinito (TX o TY), oppure vogliamo modificarlo in base a tsinarea, lo trasforma
-        if ((dato>vcsc1)||(((intflag&4)!=0)&&(dato<vcsc1))){
+        //se il tiro è indefinito (TX o TY), oltre metà campo oppure vogliamo modificarlo in base a tsinarea, lo trasforma
+        if ((dato>vcsc1)||(((intflag&12)!=0)&&(dato<vcsc1))){
          if ((dist>6750)||((x<1415)&&(Math.abs(y)>6600))){
           dato=vct30-parseInt(tdc.charAt(2),10);
           //testo:=T3
